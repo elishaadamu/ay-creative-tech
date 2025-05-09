@@ -1,0 +1,71 @@
+@import "tailwindcss";
+@plugin "flowbite-react/plugin/tailwindcss";
+@source "../.flowbite-react/class-list.json";
+
+:root {
+  --text-color: #0062ff;
+
+  --secondary-color: #adb0cd;
+  --background-color: #ffffff;
+  --font-family: sans-serif;
+}
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", sans-serif;
+  background-color: var(--background-color);
+  color: black;
+  font-family: sans-serif;
+  box-sizing: border-box;
+}
+
+/* Login page */
+.icon-email {
+  position: absolute;
+  top: 21%;
+  left: 10px;
+  transform: translateY(-50%);
+  color: gray;
+}
+.icon-password {
+  position: absolute;
+  top: 78%;
+  left: 10px;
+  transform: translateY(-50%);
+  color: gray;
+}
+.input-email {
+  padding-left: 35px;
+  height: 40px;
+  width: 100%;
+  border: 1px solid var(--secondary-color);
+  border-radius: 5px;
+}
+.input-email:focus {
+  border: 1px solid var(--secondary-color);
+  border-radius: 2px;
+}
+.input-password {
+  padding-left: 35px;
+  height: 40px;
+  width: 100%;
+  border: 1px solid var(--secondary-color);
+  border-radius: 5px;
+}
+.input-password:focus {
+  border: 1px solid var(--secondary-color);
+  border-radius: 2px;
+}
+.login-button {
+  background-color: var(--text-color);
+  text-align: center;
+  font-size: 15px;
+  width: 100%;
+  margin-top: 20px;
+  border-radius: 5px;
+  height: 40px;
+  color: #ffffff;
+}
+.login-button:hover {
+  background-color: var(--text-color);
+}
