@@ -14,7 +14,12 @@ function NavBar() {
       <nav className="navbar">
         <div className="nav-container">
           <NavLink exact to="/" className="nav-logo">
-            <span>AY Creative Tech.</span>
+            <span>
+              <span className="text-[#ffdd40]">ay|</span>
+              <span>
+                cre<span className="text-[#ffdd40]">a</span>tive
+              </span>
+            </span>
           </NavLink>
 
           <ul className={click ? "nav-menu active" : "nav-menu"}>
