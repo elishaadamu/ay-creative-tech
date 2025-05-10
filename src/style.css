@@ -18,6 +18,85 @@ body {
   font-family: sans-serif;
   box-sizing: border-box;
 }
+a {
+  text-decoration: none;
+}
+
+/* Home page */
+
+/* Custom styles to complement Tailwind CSS */
+.slide-transition {
+  transition: opacity 0.5s ease-in-out;
+}
+
+.testimonial-card {
+  transition: transform 0.3s ease-in-out;
+}
+
+.testimonial-card:hover {
+  transform: translateY(-5px);
+}
+
+.feature-card {
+  transition: all 0.3s ease-in-out;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom animation for subscription form */
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+.shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* Custom styles for the hero section */
+.hero-overlay {
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7));
+}
+
+/* Custom styles for buttons */
+.btn-primary {
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+}
+
+/* Custom styles for navigation buttons */
+.nav-button {
+  backdrop-filter: blur(4px);
+}
+
+/* Custom styles for stats counter */
+.stat-number {
+  transition: all 0.3s ease;
+}
+
+.stat-number:hover {
+  transform: scale(1.1);
+}
 
 /* Login page */
 .icon-email {

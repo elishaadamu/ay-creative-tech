@@ -3,7 +3,6 @@ import { NavLink } from "react-router-dom";
 import "./Navbar.css";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { IoMdClose } from "react-icons/io";
-import { FaCode } from "react-icons/fa";
 
 function NavBar() {
   const [click, setClick] = useState(false);
