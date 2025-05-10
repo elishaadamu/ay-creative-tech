@@ -17,7 +17,7 @@ const Signup = () => {
     >
       {/* Right: Signup Form */}
       <div className="flex flex-col justify-center md:w-1/2 w-full mt-5 md:my-7 px-8">
-        <h1 className="text-3xl font-bold pt-12">Signup</h1>
+        <h1 className="text-3xl font-bold pt-12 pb-8">Signup</h1>
         <form action="/signup" method="POST" className="w-full">
           <div className="relative mb-4">
             <MdEmail className="absolute top-3 left-2 text-gray-400" />
@@ -115,7 +115,7 @@ const Signup = () => {
       </div>
 
       {/* Left: Full Height Image */}
-      <div className="md:w-1/2 w-full h-[300px] md:h-[120%] relative">
+      <div className="md:w-3/4 w-full h-[300px] md:h-[120%] relative">
         <img
           src={signupImage}
           alt="Signup visual"

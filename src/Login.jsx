@@ -108,7 +108,7 @@ const Login = () => {
       </div>
 
       {/* Right: Full Height Image */}
-      <div className="md:w-1/2 w-full h-[300px] md:h-[120%] relative">
+      <div className="md:w-3/4 w-full h-[300px] md:h-[120%] relative">
         <img
           src={loginImage}
           alt="Login visual"
