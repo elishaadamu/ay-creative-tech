@@ -13,7 +13,7 @@ const App = () => {
   return (
     <div>
       <NavBar />
-      <div className="mx-auto max-w-[1500px] ">
+      <div className=" ">
         <AnimatePresence mode="wait">
           <Routes>
             <Route path="/" element={<Home />} />

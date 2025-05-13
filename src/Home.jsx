@@ -1,11 +1,13 @@
 // src/pages/Home.jsx
 import React from "react";
 import HeroSection from "./components/Hero";
+import Content from "./components/Content";
 
 const Home = () => {
   return (
-    <div className="max-w-[1500px] mx-10 ">
+    <div className=" ">
       <HeroSection />
+      {/* <Content /> */}
     </div>
   );
 };

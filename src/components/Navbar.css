@@ -145,3 +145,11 @@
     color: var(--hover-nav);
   }
 }
+.search-box {
+  color: black;
+  font-size: medium;
+}
+.search-box::placeholder {
+  color: black;
+  font-size: small;
+}

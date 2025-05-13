@@ -1,9 +1,17 @@
+body.light .hero {
+  background-color: rebeccapurple !important;
+}
+body.light .hero--section--content--box p {
+  color: white;
+}
+body.light h1 {
+  color: white !important;
+}
 /* Hero Section Style */
 .hero--section {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   padding: 133.333px 85.333px 133.333px;
-  align-items: center;
   justify-content: space-between;
   gap: 32px;
   background-color: var(--bg-shade);
@@ -78,12 +86,26 @@
   }
   .section--title {
     font-weight: 600;
-    font-family: "DM Serif Display";
     font-size: 19px;
   }
 }
 .consult--button {
-  border-radius: 8px;
+  border-radius: 5px;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+body.light .consult--button:nth-child(2) {
+  color: black !important;
+}
+body.light .consult--button:nth-child(2):hover {
+  color: white !important;
+}
+body.dark .consult--button:nth-child(2) {
+  color: black !important;
+}
+body.dark .consult--button:nth-child(2):hover {
+  color: white !important;
 }
 @media only screen and (max-width: 768px) {
   .hero--section {
