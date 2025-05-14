@@ -104,14 +104,7 @@ function NavBar() {
               </span>
             )}
           </div>
-          {/* Search Input */}
-          <div className=" mr-3 ml-3">
-            <input
-              type="text"
-              placeholder="🔎 Search..."
-              className="search-box px-3 py-1 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition duration-300 dark:bg-gray-100 dark:text-white dark:border-gray-600"
-            />
-          </div>
+
           {/* Dark Mode Toggle */}
           <div
             className="dark-toggle mt-[0px] md:r- "

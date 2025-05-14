@@ -10,6 +10,7 @@ import Login from "./Login";
 import Signup from "./Signup";
 import Services from "./Services";
 import Footer from "./components/Footer";
+import NotFound from "./NotFound";
 
 const App = () => {
   const location = useLocation();
@@ -26,6 +27,7 @@ const App = () => {
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
             <Route path="/services" element={<Services />} />
+            <Route path="*" element={<NotFound />} /> {/* 404 Route */}
           </Routes>
         </AnimatePresence>
       </div>
