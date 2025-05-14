@@ -176,7 +176,7 @@ const Signup = () => {
             <div className="flex gap-4 items-center">
               {/* SVG icon */}
               <FaGoogle className="text-[#DB4437]" />
-              <span className="font-bold">Google</span>
+              <span className="font-bold dark:text-white">Google</span>
             </div>
           </a>
 
@@ -189,7 +189,7 @@ const Signup = () => {
               {/* SVG icon */}
               <FaFacebookF className="text-[#1877F2]" />
 
-              <span className="font-bold">Facebook</span>
+              <span className="font-bold dark:text-white">Facebook</span>
             </div>
           </a>
         </div>
