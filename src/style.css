@@ -147,8 +147,13 @@ html {
 }
 
 /* Login page and Signup */
-.bg-form {
-  right: 0;
+.bg-form-1 {
+  right: 350px;
+  top: 0;
+}
+.bg-form-2 {
+  left: 350px;
+  bottom: 0;
 }
 form input {
   border: 1px solid #d5d8f3;
