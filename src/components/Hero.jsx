@@ -12,11 +12,11 @@ const HeroSection = () => {
       >
         <div className="hero--section--content--box">
           <div className="hero--section--content">
-            <p className="text-5xl text-center md:text-left ">
+            <p className="text-xl md:text-3xl text-center md:text-left ">
               {" "}
               AY <span className="text-amber-600 ">Creative</span> Technologies
             </p>
-            <h1 className="hero--section--title">
+            <h1 className="hero--section--title text-2xl md:text-4xl">
               <span className="hero--section-title--color">
                 {" "}
                 Empowering Brands{" "}
@@ -33,14 +33,14 @@ const HeroSection = () => {
           >
             <div className="flex gap-3">
               <NavLink
-                className="consult--button w-[150px]  h-[50px] rounded-xl bg-amber-500 text-white mt-5 font-bold text-xl hover:bg-amber-600 hover:text-amber-100 transition-all duration-500"
+                className="consult--button w-[100px]  h-[30px] md:w-[150px]  md:h-[50px] rounded-xl bg-amber-500 text-white mt-5 font-bold text-[14px] md:text-xl hover:bg-amber-600 hover:text-amber-100 transition-all duration-500"
                 to="/signup"
               >
                 Signup
               </NavLink>
 
               <NavLink
-                className="consult--button w-[150px] h-[50px] rounded-xl bg-[#fff]  mt-5 font-bold text-xl hover:bg-amber-600 hover:text-[#fff] transition-all duration-500"
+                className="consult--button w-[100px]  h-[30px] md:w-[150px]  md:h-[50px] rounded-xl bg-[#fff]  mt-5 font-bold text-[14px] md:text-xl hover:bg-amber-600 hover:text-[#fff] transition-all duration-500"
                 to="/login"
               >
                 Login
