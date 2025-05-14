@@ -24,7 +24,7 @@ const Login = () => {
       transition={{ duration: 0.5 }}
     >
       <div className="bg-form-1 z-2 absolute">
-        <img src={Svg} alt="" />
+        <img src={Svg} alt="Bg" />
       </div>
       <div className="bg-white my-8 z-10 p-8  rounded shadow-md w-full max-w-md">
         <div className=" my-5 mx-auto w-40 max-w-full">
@@ -145,7 +145,7 @@ const Login = () => {
         </p>
       </div>
       <div className="bg-form-2 absolute">
-        <img src={Svg} alt="" className="w-full" />
+        <img src={Svg} alt="Bg" className="w-full" />
       </div>
     </motion.div>
   );

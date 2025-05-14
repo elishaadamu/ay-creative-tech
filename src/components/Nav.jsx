@@ -4,8 +4,6 @@ import "./Navbar.css";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { IoMdClose } from "react-icons/io";
 import { BsMoonStarsFill, BsSunFill } from "react-icons/bs"; // Optional icons for toggle
-import { FaFacebookF } from "react-icons/fa";
-import { FaInstagram } from "react-icons/fa";
 import Logo from "../assets/logo-ay.png";
 
 function NavBar() {
@@ -60,12 +58,12 @@ function NavBar() {
             <li className="nav-item">
               <NavLink
                 exact="true"
-                to="/services"
+                to="/contact"
                 activeclassname="active"
                 className="nav-links"
                 onClick={handleClick}
               >
-                Services
+                Contact Us
               </NavLink>
             </li>
             <li className="nav-item">

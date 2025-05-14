@@ -1,14 +1,13 @@
 // src/pages/Home.jsx
 import React from "react";
 import HeroSection from "./components/Hero";
-import Content from "./components/Content";
-import Footer from "./components/Footer";
+import Services from "./components/Services";
 
 const Home = () => {
   return (
-    <div className=" ">
+    <div className=" dark:bg-[#111827]">
       <HeroSection />
-      <Content />
+      <Services />
     </div>
   );
 };

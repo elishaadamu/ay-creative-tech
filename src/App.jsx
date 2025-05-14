@@ -8,14 +8,14 @@ import NavBar from "./components/Nav";
 import Backtotop from "./components/Backtotop";
 import Login from "./Login";
 import Signup from "./Signup";
-import Services from "./Services";
+import Contact from "./Contact";
 import Footer from "./components/Footer";
 import NotFound from "./NotFound";
 
 const App = () => {
   const location = useLocation();
   const showLayout =
-    location.pathname === "/" || location.pathname === "/services";
+    location.pathname === "/" || location.pathname === "/contact";
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -26,7 +26,7 @@ const App = () => {
             <Route path="/" element={<Home />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/services" element={<Services />} />
+            <Route path="/contact" element={<Contact />} /> {/* 404 Route */}
             <Route path="*" element={<NotFound />} /> {/* 404 Route */}
           </Routes>
         </AnimatePresence>

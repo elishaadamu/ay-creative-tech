@@ -175,12 +175,36 @@ form input:focus {
 input:focus {
   border: 0px solid transparent !important;
 }
+
 .submit:hover {
   background-color: #f8921e;
   transition: background-color, 0.4s;
 }
 .login-button:hover {
   background-color: var(--text-color);
+}
+
+/* Textarea */
+
+form textarea {
+  border: 1px solid #d5d8f3;
+  border-radius: 10px;
+}
+textarea:focus::placeholder {
+  color: #adb0cd;
+  padding-left: 5px;
+}
+textarea::placeholder {
+  color: #adb0cd;
+  transition: padding-left 0.5s;
+}
+form textarea:focus {
+  border: 0px solid transparent !important;
+  box-shadow: 1px 1px 10px rgb(223, 223, 223);
+}
+
+textarea:focus {
+  border: 0px solid transparent !important;
 }
 
 .backtotop {
