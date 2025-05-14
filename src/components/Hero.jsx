@@ -1,6 +1,6 @@
 import React from "react";
 import "./heroSection.css";
-import HeroImage from "./ay-landing-page.webp";
+import HeroImage from "../assets/ay-landing-page.webp";
 import { NavLink } from "react-router-dom";
 
 const HeroSection = () => {

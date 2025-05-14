@@ -9,7 +9,7 @@ import { TbLockPassword } from "react-icons/tb";
 const Login = () => {
   return (
     <motion.div
-      className="flex flex-col-reverse md:flex-row md:h-screen w-full"
+      className="flex flex-col-reverse md:flex-row md:h-screen w-full max-w-[1500px] mx-auto"
       initial={{ opacity: 0, x: -100 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 100 }}

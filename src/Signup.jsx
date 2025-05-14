@@ -2,132 +2,186 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import { motion } from "framer-motion";
-import signupImage from "./assets/signup.png";
+import Logo from "./assets/logo-ay.png";
+import Svg from "./assets/bg.svg";
+import Background from "./assets/bg-form.jpg";
 import { MdEmail } from "react-icons/md";
 import { TbLockPassword } from "react-icons/tb";
 
 const Signup = () => {
   return (
     <motion.div
-      className="flex flex-col-reverse md:flex-row-reverse md:h-screen w-full"
+      className="min-h-screen flex items-center justify-center bg-gray-100  px-4"
       initial={{ opacity: 0, x: 100 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -100 }}
       transition={{ duration: 0.5 }}
     >
-      {/* Right: Signup Form */}
-      <div className="flex flex-col justify-center md:w-1/2 w-full mt-5 md:my-7 px-8">
-        <h1 className="text-3xl font-bold pt-12 pb-8">Signup</h1>
+      <div className="bg-white my-8  p-8 rounded shadow-md w-full max-w-md">
+        <div className="bg-form z-20 absolute">
+          <img src={Svg} alt="" />
+        </div>
+        <div className=" my-5 mx-auto w-40 max-w-full">
+          <NavLink
+            exact="true"
+            to="/"
+            className="text-black font-bold text-4xl"
+          >
+            <img src={Logo} alt="Logo" />
+          </NavLink>
+        </div>
+        <div>
+          <h3 className="text-gray-500 mb-4 text-xl font-semibold">
+            Welcome to AY Creative Technologies
+          </h3>
+          <p className="mb-5 text-gray-500">Create a new account</p>
+        </div>
         <form action="/signup" method="POST" className="w-full">
           <div className="relative mb-4">
-            <MdEmail className="absolute top-3 left-2 text-gray-400" />
+            <p className="mb-3">
+              <label
+                htmlFor="Firstname"
+                className="text-gray-500  text-[13px] my-10 "
+              >
+                FIRST NAME
+              </label>
+            </p>
             <input
               type="text"
-              className="pl-10 py-2 border border-gray-500 rounded w-full"
-              placeholder="Your Email address"
+              className="pl-5 py-2 border border-gray-500 rounded w-full h-[50px]"
+              placeholder="First Name"
               required
+              name="Firstname"
+              id="Firstname"
             />
           </div>
-          <div className="relative mb-4">
-            <TbLockPassword className="absolute top-3 left-2 text-gray-400" />
-            <input
-              type="password"
-              className="pl-10 py-2 border border-gray-500 rounded w-full"
-              placeholder="Password"
-              required
-            />
-          </div>
-          <div className="relative mb-4">
-            <TbLockPassword className="absolute top-3 left-2 text-gray-400" />
-            <input
-              type="password"
-              className="pl-10 py-2 border border-gray-500 rounded w-full"
-              placeholder="Repeat Password"
-              required
-            />
-          </div>
+          <p className=" mt-5 mb-3">
+            <label htmlFor="Lastname" className="text-gray-500 text-[13px] ">
+              LAST NAME
+            </label>
+          </p>
+          <input
+            type="text"
+            className="pl-5 py-2 border border-gray-500 rounded w-full h-[50px]"
+            placeholder="Last Name"
+            required
+            name="Lastname"
+            id="Lastname"
+          />
+          <p className="mt-5 mb-3">
+            <label
+              htmlFor="Email"
+              className="text-gray-500  text-[13px] my-10 "
+            >
+              EMAIL
+            </label>
+          </p>
+
+          <input
+            type="email"
+            className="pl-5 py-2 border border-gray-500 rounded w-full h-[50px]"
+            placeholder="Email Address"
+            required
+            name="email"
+            id="Email"
+          />
+          <p className="mt-5 mb-3">
+            <label
+              htmlFor="Phone_Num"
+              className="text-gray-500  text-[13px] my-10 "
+            >
+              PHONE NUMBER
+            </label>
+          </p>
+
+          <input
+            type="tel"
+            className="pl-5 py-2 border border-gray-500 rounded w-full h-[50px]"
+            placeholder="Phone Number"
+            required
+            name="phone_num"
+            id="Phone_Num"
+          />
+          <p className="mt-5 mb-3">
+            <label htmlFor="NIN" className="text-gray-500  text-[13px] my-10 ">
+              NIN NUMBER
+            </label>
+          </p>
+          <input
+            type="number"
+            className="pl-5 py-2 border border-gray-500 rounded w-full h-[50px]"
+            placeholder="NIN Number"
+            required
+            name="NIN"
+            id="NIN"
+          />
+          <p className="mt-5 mb-3">
+            <label
+              htmlFor="Password"
+              className="text-gray-500  text-[13px] my-10 "
+            >
+              PASSWORD
+            </label>
+          </p>
+
+          <input
+            type="password"
+            className="pl-5 py-2 border border-gray-500 rounded w-full h-[50px]"
+            placeholder="Password"
+            required
+            name="password"
+            id="Password"
+          />
           <input
             type="submit"
             value="Signup"
-            className="bg-blue-600 text-white py-2 rounded w-full cursor-pointer hover:bg-blue-700"
+            className="submit bg-amber-600 h-[50px] text-white py-2 mt-5 rounded w-full cursor-pointer "
           />
         </form>
 
         <p className="text-gray-400 text-center text-xl my-5">or</p>
-        <div className="flex w-full gap-3 flex-col md:flex-row justify-center md:justify-between">
-          <button className="border-1 border-gray-500 hover:bg-gray-300 rounded w-full h-10 flex items-center justify-center">
-            <div className="flex gap-4 justify-center items-center">
+        <div className="flex flex-col md:flex-row gap-3">
+          {/* Google Button */}
+          <button className="border border-gray-500 hover:bg-gray-300 rounded h-10 flex items-center justify-center w-full">
+            <div className="flex gap-4 items-center">
+              {/* SVG icon */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 48 48"
-                width="36px"
-                height="36px"
+                width="24px"
+                height="24px"
               >
-                <path
-                  fill="#fbc02d"
-                  d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12 s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20 s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"
-                />
-                <path
-                  fill="#e53935"
-                  d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039 l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"
-                />
-                <path
-                  fill="#4caf50"
-                  d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36 c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"
-                />
-                <path
-                  fill="#1565c0"
-                  d="M43.611,20.083L43.595,20L42,20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571 c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"
-                />
+                ...
               </svg>
               <span className="font-bold">Google</span>
             </div>
           </button>
-          <button className="border-1 border-gray-500 hover:bg-gray-300 rounded w-full h-10 flex items-center justify-center">
-            <div className="flex gap-4 justify-center items-center">
+
+          {/* Facebook Button */}
+          <button className="border border-gray-500 hover:bg-gray-300 rounded h-10 flex items-center justify-center w-full">
+            <div className="flex gap-4 items-center">
+              {/* SVG icon */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 48 48"
-                width="36px"
-                height="36px"
+                width="24px"
+                height="24px"
               >
-                <path
-                  fill="#039be5"
-                  d="M24 5A19 19 0 1 0 24 43A19 19 0 1 0 24 5Z"
-                />
-                <path
-                  fill="#fff"
-                  d="M26.572,29.036h4.917l0.772-4.995h-5.69v-2.73c0-2.075,0.678-3.915,2.619-3.915h3.119v-4.359c-0.548-0.074-1.707-0.236-3.897-0.236c-4.573,0-7.254,2.415-7.254,7.917v3.323h-4.701v4.995h4.701v13.729C22.089,42.905,23.032,43,24,43c0.875,0,1.729-0.08,2.572-0.194V29.036z"
-                />
+                ...
               </svg>
               <span className="font-bold">Facebook</span>
             </div>
           </button>
         </div>
-        <p className="mt-5  flex gap-4 items-center">
-          <span className="text-gray-400 text-[20px]">
+
+        <p className="mt-5 text-center">
+          <span className="text-gray-400 text-[16px]">
             Already have an account?
-          </span>
-          <NavLink to="/login" className="no-underline">
-            <span className="text-blue-700 text-[20px] font-bold">Log In</span>
+          </span>{" "}
+          <NavLink to="/login" className="text-blue-700 text-[16px] font-bold">
+            Log In
           </NavLink>
         </p>
-      </div>
-
-      {/* Left: Full Height Image */}
-      <div className="md:w-3/4 w-full h-[300px] md:h-[120%] relative">
-        <img
-          src={signupImage}
-          alt="Signup visual"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 pt-[50px] pl-[50px] pr-[30px] md:pt-[100px] md:pl-[100px] md:pr-[30px] bg-black bg-opacity-10">
-          <h2 className="text-black text-2xl font-bold">
-            The only way to <span className="text-blue-700">do great work</span>{" "}
-            is to <span className="text-blue-700">love what you do</span>
-          </h2>
-          <p className="text-right text-2xl">- Steve Jobs</p>
-        </div>
       </div>
     </motion.div>
   );

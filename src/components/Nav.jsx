@@ -6,6 +6,7 @@ import { IoMdClose } from "react-icons/io";
 import { BsMoonStarsFill, BsSunFill } from "react-icons/bs"; // Optional icons for toggle
 import { FaFacebookF } from "react-icons/fa";
 import { FaInstagram } from "react-icons/fa";
+import Logo from "../assets/logo-ay.png";
 
 function NavBar() {
   const [click, setClick] = useState(false);
@@ -24,7 +25,7 @@ function NavBar() {
 
   return (
     <>
-      <div className="flex flex-row justify-end max-w-[1500px] mx-auto bg-black gap-7 px-5 py-4">
+      {/* <div className="flex flex-row justify-end max-w-[1500px] mx-auto bg-black gap-7 px-5 py-4">
         <a href="http://facebook.com" target="_blank" rel="noopener noreferrer">
           <FaFacebookF className="w-10" />
         </a>
@@ -35,17 +36,14 @@ function NavBar() {
         >
           <FaInstagram />
         </a>
-      </div>
+      </div> */}
       <nav className="navbar">
         <div className="nav-container">
-          <NavLink exact="true" to="/" className="nav-logo">
-            <span>
-              <span className="text-[#ffdd40]">ay|</span>
-              <span>
-                cre<span className="text-[#ffdd40]">a</span>tive
-              </span>
-            </span>
-          </NavLink>
+          <div>
+            <NavLink exact="true" to="/">
+              <img src={Logo} alt="Logo" className="nav-logo" />
+            </NavLink>
+          </div>
 
           <ul className={click ? "nav-menu active" : "nav-menu"}>
             <li className="nav-item">
@@ -95,7 +93,7 @@ function NavBar() {
           </ul>
 
           {/* Hamburger Menu */}
-          <div className="nav-icon" onClick={handleClick}>
+          <div className="nav-icon mt-[6px] " onClick={handleClick}>
             {click ? (
               <span className="icon">
                 <IoMdClose />
@@ -116,7 +114,7 @@ function NavBar() {
           </div>
           {/* Dark Mode Toggle */}
           <div
-            className="dark-toggle mt-[7px]"
+            className="dark-toggle mt-[0px] md:r- "
             onClick={toggleDarkMode}
             title="Toggle Dark Mode"
           >
