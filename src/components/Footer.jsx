@@ -30,7 +30,7 @@ const Footer = () => {
             </li>
           </ul>
         </div>
-        <div className="flex-[35%]">
+        <div className="flex-[35%] mt-5 md:mt-0">
           <h2 className="text-7xl font-bold">What We do</h2>
           <ul className="">
             <li>
@@ -50,7 +50,7 @@ const Footer = () => {
             </li>
           </ul>
         </div>
-        <div className="flex-1/4">
+        <div className="flex-1/4 mt-5 md:mt-0">
           <h2 className="text-7xl font-bold">Quick Links</h2>
           <ul className="">
             <li>
@@ -71,7 +71,7 @@ const Footer = () => {
             </li>
           </ul>
         </div>
-        <div className="flex-[25%]">
+        <div className="flex-[25%] mt-10 md:mt-0">
           <div>
             <NavLink exact="true" to="/">
               <img src={Logo} alt="Logo" className="nav-logo" />

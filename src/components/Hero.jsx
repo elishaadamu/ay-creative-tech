@@ -19,12 +19,17 @@ const HeroSection = () => {
             </p>
             <h1 className="hero--section--title text-2xl md:text-4xl text-white dark:text-white">
               <span className="hero--section-title--color">
-                {" "}
-                Empowering Brands{" "}
-              </span>{" "}
+                Trusted, secured,
+              </span>
               <br />
-              Through Smart Tech and Bold Ideas.
+              fast, reliable, accurate NIN and BVN verification.
             </h1>
+            <p className="text-[14px] md:text-[18px] ">
+              Trusted platform providing secure verification including Nin,Bvn
+              and documents modification, Our mission is to offer reliable,fast,
+              and accurate verification solutions to help you with your personal
+              and business needs.
+            </p>
           </div>
           <a
             href="#"
@@ -53,6 +58,7 @@ const HeroSection = () => {
           <img src={HeroImage} alt="Hero Section" />
         </div>
       </div>
+      <hr className="text-black dark:text-white" />
     </section>
   );
 };
