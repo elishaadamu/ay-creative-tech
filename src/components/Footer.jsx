@@ -9,7 +9,7 @@ import Logo from "../assets/logo-ay.png";
 const Footer = () => {
   return (
     <footer>
-      <div className="max-w-[1500px] gap-10 pl-10 md:pl-10  mx-auto flex justify-center flex-col md:flex-row  md:justify-around">
+      <div className="max-w-[1500px]  pl-10 md:pl-10  mx-auto flex justify-center flex-col md:flex-row  md:justify-between">
         <div className="flex-1/4">
           <h2 className="text-7xl font-bold">What We do</h2>
           <ul className="">
@@ -80,11 +80,11 @@ const Footer = () => {
           <p className="text-gray-500 mt-5">
             Empowering Brands Through Smart Tech and Bold Ideas.
           </p>
-          <div className="flex justify-start mt-5 items-center gap-3">
+          <div className="flex justify-start mt-5 items-center gap-1">
             <MdOutlineMarkEmailRead />
             <span>
-              <a href="mailto:aycreativetech@gmail.com">
-                aycreativetech@gmail.com
+              <a href="mailto:aycreativetechnology@gmail.com">
+                aycreativetechnology@gmail.com
               </a>
             </span>
           </div>
