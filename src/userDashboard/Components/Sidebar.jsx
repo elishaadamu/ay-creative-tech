@@ -113,7 +113,7 @@ function Sidebar() {
   return (
     <div className="fixed flex flex-col top-0 left-0 w-64 bg-gray-900 h-full shadow-lg text-amber-300">
       <div className="flex items-center pl-6 h-20 border-b border-gray-700">
-        <img src={Logo} alt="" />
+        <img src={Logo} alt="Logo" className="w-[150px] invert" />
       </div>
 
       <div className="flex-1 overflow-y-auto mt-4">

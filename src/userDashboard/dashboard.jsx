@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Sidebar from "./Components/Sidebar";
 import "./assets/css/style.css";
+import Logo from "../assets/images/logo-ay.png";
 
 function UserDashBoard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -9,14 +10,18 @@ function UserDashBoard() {
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-100 text-gray-800 dark:text-gray-900">
       {/* Toggle button for mobile */}
       <div className="md:hidden flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
-        <h1 className="text-xl font-bold">Dashboard</h1>
+        <img
+          src={Logo}
+          alt="Logo"
+          className="w-[120px] dark:invert-1 invert-0"
+        />
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className="text-gray-700 dark:text-gray-200 focus:outline-none"
         >
           {sidebarOpen ? (
             <svg
-              className="w-6 h-6"
+              className="w-6 h-6 text-black"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
