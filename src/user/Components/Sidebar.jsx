@@ -28,7 +28,7 @@ const sidebarSections = [
     section: "",
     links: [
       {
-        to: "/dashboard/home",
+        to: "/dashboard",
         icon: <FiHome className="w-5 h-5" />,
         label: "Dashboard",
       },
