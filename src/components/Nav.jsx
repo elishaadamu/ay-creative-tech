@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
-import "./Navbar.css";
+import "../assets/css/Navbar.css";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { IoMdClose } from "react-icons/io";
 import { BsMoonStarsFill, BsSunFill } from "react-icons/bs"; // Optional icons for toggle
-import Logo from "../assets/logo-ay.png";
+import Logo from "../assets/images/logo-ay.png";
 
 function NavBar() {
   const [click, setClick] = useState(false);

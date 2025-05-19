@@ -2,13 +2,13 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { motion } from "framer-motion";
-import Logo from "./assets/logo-ay.png";
-import Svg from "./assets/bg.svg";
+import Logo from "../assets/images/logo-ay.png";
+import Svg from "../assets/images/bg.svg";
 import { TbEye, TbEyeOff } from "react-icons/tb"; // Eye icons for toggle
 import { FaGoogle } from "react-icons/fa";
 import { FaFacebookF } from "react-icons/fa";
 
-const Signup = () => {
+const Login = () => {
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
 
   const togglePasswordVisibility = () => {
@@ -40,45 +40,13 @@ const Signup = () => {
           <h3 className="text-gray-500 mb-4 text-xl font-semibold">
             Welcome to AY Creative Technologies
           </h3>
-          <p className="mb-5 text-gray-500">Create a new account</p>
+          <p className="mb-5 text-gray-500">Please sign-in to your account</p>
         </div>
-        <form action="/signup" method="POST" className="w-full">
-          <div className="relative mb-4">
-            <p className="mb-3">
-              <label
-                htmlFor="Firstname"
-                className="text-gray-500  text-[13px] my-10 "
-              >
-                FIRST NAME
-              </label>
-            </p>
-            <input
-              type="text"
-              className="pl-5 py-2 border border-gray-500 rounded w-full h-[50px]"
-              placeholder="First Name"
-              required
-              name="Firstname"
-              id="Firstname"
-            />
-          </div>
-          <p className=" mt-5 mb-3">
-            <label htmlFor="Lastname" className="text-gray-500 text-[13px] ">
-              LAST NAME
-            </label>
-          </p>
-          <input
-            type="text"
-            className="pl-5 py-2 border border-gray-500 rounded w-full h-[50px]"
-            placeholder="Last Name"
-            required
-            name="Lastname"
-            id="Lastname"
-          />
+        <form action="/login" method="POST" className="w-full">
+          <div className="relative mb-4"></div>
+
           <p className="mt-5 mb-3">
-            <label
-              htmlFor="Email"
-              className="text-gray-500  text-[13px] my-10 "
-            >
+            <label htmlFor="Email" className="text-gray-500  text-[12px]  ">
               EMAIL
             </label>
           </p>
@@ -91,43 +59,14 @@ const Signup = () => {
             name="email"
             id="Email"
           />
-          <p className="mt-5 mb-3">
-            <label
-              htmlFor="Phone_Num"
-              className="text-gray-500  text-[13px] my-10 "
-            >
-              PHONE NUMBER
-            </label>
-          </p>
 
-          <input
-            type="tel"
-            className="pl-5 py-2 border border-gray-500 rounded w-full h-[50px]"
-            placeholder="Phone Number"
-            required
-            name="phone_num"
-            id="Phone_Num"
-          />
-          <p className="mt-5 mb-3">
-            <label htmlFor="NIN" className="text-gray-500  text-[13px] my-10 ">
-              NIN NUMBER
-            </label>
-          </p>
-          <input
-            type="number"
-            className="pl-5 py-2 border border-gray-500 rounded w-full h-[50px]"
-            placeholder="NIN Number"
-            required
-            name="NIN"
-            id="NIN"
-          />
-          <p className="mt-5 mb-3">
-            <label
-              htmlFor="Password"
-              className="text-gray-500  text-[13px] my-10 "
-            >
+          <p className="mt-5 mb-3 flex justify-between items-center">
+            <label htmlFor="Password" className="text-gray-500  text-[12px]  ">
               PASSWORD
             </label>
+            <a href="#" className="text-amber-500 text-[12px]">
+              Forgot Password?
+            </a>
           </p>
           <div className="relative">
             <input
@@ -149,19 +88,18 @@ const Signup = () => {
           <div className="flex items-center space-x-2 mt-4">
             <input
               type="checkbox"
-              id="terms"
-              name="terms"
+              id="remember"
+              name="remember"
               className="w-4 h-4 cursor-pointer  text-green-500 border border-gray-100 rounded focus:ring-green-500 focus:ring-1"
             />
             <label htmlFor="remember" className="text-sm text-gray-700">
-              <a href="#" className="text-amber-600">
-                Accept terms and condition
-              </a>
+              Remember me
             </label>
           </div>
+
           <input
             type="submit"
-            value="Signup"
+            value="Signin"
             className="submit bg-amber-600 h-[50px] text-white py-2 mt-5 rounded w-full cursor-pointer "
           />
         </form>
@@ -196,10 +134,13 @@ const Signup = () => {
 
         <p className="mt-5 text-center">
           <span className="text-gray-400 text-[16px]">
-            Already have an account?
+            New on our platform?
           </span>{" "}
-          <NavLink to="/login" className="text-amber-600 text-[16px] font-bold">
-            Log In to your Account
+          <NavLink
+            to="/signup"
+            className="text-amber-600 text-[16px] font-bold"
+          >
+            Create an account
           </NavLink>
         </p>
       </div>
@@ -210,4 +151,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default Login;

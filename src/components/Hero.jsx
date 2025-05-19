@@ -1,6 +1,6 @@
 import React from "react";
-import "./heroSection.css";
-import HeroImage from "../assets/IMG-20250515-WA0006.jpg";
+import "../assets/css/heroSection.css";
+import HeroImage from "../assets/images/IMG-20250515-WA0006.jpg";
 import { NavLink } from "react-router-dom";
 
 const HeroSection = () => {
@@ -12,7 +12,7 @@ const HeroSection = () => {
       >
         <div className="hero--section--content--box">
           <div className="hero--section--content">
-            <p className="text-xl md:text-3xl text-center md:text-left ">
+            <p className="text-xlb  md:text-3xl text-center md:text-left ">
               {" "}
               WELCOME TO
               <span className="text-amber-600 ml-2">AYVERIFY</span>

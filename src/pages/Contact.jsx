@@ -2,11 +2,8 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { motion } from "framer-motion";
-import Logo from "./assets/logo-ay.png";
-import Svg from "./assets/bg.svg";
-import { TbEye, TbEyeOff } from "react-icons/tb"; // Eye icons for toggle
-import { FaGoogle } from "react-icons/fa";
-import { FaFacebookF } from "react-icons/fa";
+import Logo from "../assets/images/logo-ay.png";
+import Svg from "../assets/images/bg.svg";
 
 const Contact = () => {
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility

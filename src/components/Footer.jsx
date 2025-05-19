@@ -1,10 +1,10 @@
 import React from "react";
-import "./Footer.css";
+import "../assets/css/Footer.css";
 import { NavLink } from "react-router-dom";
 import { FaFacebookF } from "react-icons/fa";
 import { FaInstagram } from "react-icons/fa";
 import { MdOutlineMarkEmailRead } from "react-icons/md";
-import Logo from "../assets/logo-ay.png";
+import Logo from "../assets/images/logo-ay.png";
 
 const Footer = () => {
   return (
