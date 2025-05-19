@@ -36,13 +36,13 @@ function Dashboard() {
       id: 1,
       name: "NIN VERIFY",
       icon: NIMC,
-      to: "/nin-verify",
+      to: "/dashboard/verifications/nin",
     },
     {
       id: 2,
       name: "NIN WITH PHONE",
       icon: NIMC,
-      to: "/bvn-verify",
+      to: "/dashboard/verifications/pvn",
     },
     {
       id: 3,
@@ -117,8 +117,8 @@ function Dashboard() {
       <div className="mb-10 text-2xl text-gray-500 font-bold">
         Welcome to AY Creative Technologies, User
       </div>
-      <div className="flex justify-center max-w-full flex-col md:flex-row  gap-10">
-        <div className="flex-1/2 rounded-lg hover:shadow-lg shadow-md ring-2 ring-amber-50/2 w-full p-7">
+      <div className="flex justify-center  max-w-full flex-col md:flex-row  gap-10">
+        <div className="flex-1/2 rounded-lg bg-white hover:shadow-lg shadow-md ring-2 ring-amber-50/2 w-full p-7">
           <p className="text-gray-500 text-[16px] font-light">Wallet Balance</p>
           <p className="text-gray-600 text-[30px] mb-10 font-bold font-sans">
             ₦0.00
@@ -130,7 +130,7 @@ function Dashboard() {
             </span>
           </p>
         </div>
-        <div className="flex-1/2 rounded shadow-md hover:shadow-lg ring-2 ring-amber-50/2  w-full p-10">
+        <div className="flex-1/2 rounded bg-white shadow-md hover:shadow-lg ring-2 ring-amber-50/2  w-full p-10">
           <div className="flex justify-between items-center relative">
             <FaCube className="text-5xl" />
             <div className="relative" ref={dropdownRef}>

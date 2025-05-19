@@ -1,7 +1,7 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
 import NIN from "../pages/NIN";
-import NinPhone from "../pages/NINPhone";
+import NinPhone from "../pages/NinPhone";
 import Home from "../pages/Home";
 import Footer from "../Components/Footer";
 

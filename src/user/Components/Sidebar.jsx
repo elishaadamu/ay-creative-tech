@@ -31,6 +31,7 @@ const sidebarSections = [
         to: "/dashboard",
         icon: <FiHome className="w-5 h-5" />,
         label: "Dashboard",
+        end: true, // <-- add this property
       },
     ],
   },
@@ -152,6 +153,7 @@ function Sidebar({ collapsed, setCollapsed }) {
                 <NavLink
                   to={link.to}
                   key={j}
+                  end={link.end || false} // <-- add this line
                   className={({ isActive }) =>
                     `flex items-center px-6 py-2 text-sm font-medium border-l-4 transition-colors duration-200
                     ${collapsed ? "justify-center px-0" : ""}
