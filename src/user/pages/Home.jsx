@@ -170,7 +170,9 @@ function Dashboard() {
               alt={item.name}
               className="w-16 h-16 object-contain mb-3"
             />
-            <span className="font-semibold text-gray-400">{item.name}</span>
+            <span className="font-semibold text-[14px] text-gray-400">
+              {item.name}
+            </span>
           </NavLink>
         ))}
       </div>
