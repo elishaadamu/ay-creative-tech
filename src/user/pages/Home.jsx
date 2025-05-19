@@ -158,7 +158,7 @@ function Dashboard() {
         </div>
       </div>
       {/* Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 w-full p-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 w-full py-4">
         {navItems.map((item) => (
           <NavLink
             to={item.to}

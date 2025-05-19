@@ -78,7 +78,7 @@ function UserDashBoard() {
           ) : (
             /* …hamburger icon… */
             <svg
-              className="w-6 h-6"
+              className="w-6 h-6 text-amber-900"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
