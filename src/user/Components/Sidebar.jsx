@@ -121,7 +121,7 @@ function Sidebar({ collapsed, setCollapsed }) {
     >
       {/* Collapse/Expand Button */}
       <button
-        className="absolute -right-3 top-6 z-40 hidden md:flex items-center justify-center w-7 h-7 rounded-full bg-gray-800 border border-gray-700 hover:bg-gray-700 transition-colors"
+        className="absolute cursor-pointer -right-3 top-6 z-40 hidden md:flex items-center justify-center w-7 h-7 rounded-full bg-gray-800 border border-gray-700 hover:bg-gray-700 transition-colors"
         onClick={() => setCollapsed((c) => !c)}
         aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         type="button"
@@ -129,7 +129,7 @@ function Sidebar({ collapsed, setCollapsed }) {
         {collapsed ? <FiChevronRight /> : <FiChevronLeft />}
       </button>
 
-      <div className="flex items-center pl-6 h-20 border-b border-gray-700 transition-all duration-300">
+      <div className="flex items-center pl-[15px] h-20 border-b border-gray-700 transition-all duration-300">
         <img
           src={Logo}
           alt="Logo"
