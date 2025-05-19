@@ -11,7 +11,7 @@ import Signup from "./pages/Signup";
 import Contact from "./pages/Contact";
 import Footer from "./components/Footer";
 import NotFound from "./pages/NotFound";
-import UserDashBoard from "./userDashboard/dashboard";
+import UserDashBoard from "./user/dashboard";
 
 const App = () => {
   const location = useLocation();
@@ -29,7 +29,7 @@ const App = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/contact" element={<Contact />} /> {/* 404 Route */}
             <Route path="*" element={<NotFound />} /> {/* 404 Route */}
-            <Route path="/dashboard" element={<UserDashBoard />} />{" "}
+            <Route path="/dashboard/*" element={<UserDashBoard />} />{" "}
             {/* 404 Route */}
           </Routes>
         </AnimatePresence>

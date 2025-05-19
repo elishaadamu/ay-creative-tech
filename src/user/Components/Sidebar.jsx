@@ -36,12 +36,12 @@ const sidebarSections = [
     section: "VERIFICATIONS",
     links: [
       {
-        to: "/verifications/nin",
+        to: "/dashboard/verifications/nin",
         icon: <FaFlag className="w-5 h-5" />,
         label: "NIN Verification",
       },
       {
-        to: "/verifications/nin-phone",
+        to: "/dashboard/verifications/pvn",
         icon: <FiPhone className="w-5 h-5" />,
         label: "NIN With Phone",
       },
@@ -111,7 +111,7 @@ const sidebarSections = [
 
 function Sidebar() {
   return (
-    <div className="fixed flex flex-col top-0 left-0 w-64 bg-gray-900 h-full shadow-lg text-amber-300">
+    <div className="sidebar custom-scrollbar fixed flex flex-col top-0 left-0 w-64 bg-gray-900 h-full shadow-lg text-amber-300 ">
       <div className="flex items-center pl-6 h-20 border-b border-gray-700">
         <img src={Logo} alt="Logo" className="w-[150px] invert" />
       </div>
