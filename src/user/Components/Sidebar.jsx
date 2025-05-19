@@ -31,7 +31,6 @@ const sidebarSections = [
         to: "/dashboard",
         icon: <FiHome className="w-5 h-5" />,
         label: "Dashboard",
-        end: true, // <-- add this property
       },
     ],
   },
@@ -52,26 +51,6 @@ const sidebarSections = [
         to: "/verifications/bvn",
         icon: <FaSimCard className="w-5 h-5" />,
         label: "BVN Verification",
-      },
-      {
-        to: "/verifications/cac",
-        icon: <FaBuilding className="w-5 h-5" />,
-        label: "CAC Verification",
-      },
-      {
-        to: "/verifications/drivers-license",
-        icon: <FaCar className="w-5 h-5" />,
-        label: "Driving License",
-      },
-      {
-        to: "/verifications/voters-card",
-        icon: <FaIdBadge className="w-5 h-5" />,
-        label: "Voters Card",
-      },
-      {
-        to: "/verifications/passport",
-        icon: <RiPassportFill className="w-5 h-5" />,
-        label: "International Passport",
       },
     ],
   },
@@ -113,6 +92,8 @@ const sidebarSections = [
 ];
 
 function Sidebar({ collapsed, setCollapsed }) {
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
   return (
     <div
       className={`sidebar custom-scrollbar fixed flex flex-col top-0 left-0 h-full shadow-lg text-amber-300 bg-gray-900 z-30
@@ -149,26 +130,133 @@ function Sidebar({ collapsed, setCollapsed }) {
               </p>
             )}
             <div className="flex flex-col">
-              {section.links.map((link, j) => (
-                <NavLink
-                  to={link.to}
-                  key={j}
-                  end={link.end || false} // <-- add this line
-                  className={({ isActive }) =>
-                    `flex items-center px-6 py-2 text-sm font-medium border-l-4 transition-colors duration-200
-                    ${collapsed ? "justify-center px-0" : ""}
-                    ${
-                      isActive
-                        ? "border-amber-400 text-amber-300 bg-gray-800"
-                        : "border-transparent text-gray-300 hover:text-amber-300 hover:bg-gray-800"
-                    }`
-                  }
-                  title={collapsed ? link.label : undefined}
-                >
-                  {link.icon}
-                  {!collapsed && <span className="ml-3">{link.label}</span>}
-                </NavLink>
-              ))}
+              {section.section === "VERIFICATIONS" ? (
+                <>
+                  {section.links.map((link, j) => {
+                    // Dropdown parent for BVN with CAC-1 and CAC-2
+                    if (link.label === "BVN Verification") {
+                      return (
+                        <div key={j} className="relative">
+                          <button
+                            type="button"
+                            onClick={() => setDropdownOpen((prev) => !prev)}
+                            className={`flex items-center w-full px-6 py-2 text-sm font-medium border-l-4 transition-colors duration-200
+                              ${collapsed ? "justify-center px-0" : ""}
+                              ${
+                                dropdownOpen
+                                  ? "border-amber-400 text-amber-300 bg-gray-800"
+                                  : "border-transparent text-gray-300 hover:text-amber-300 hover:bg-gray-800"
+                              }`}
+                            title={collapsed ? link.label : undefined}
+                          >
+                            {link.icon}
+                            {!collapsed && (
+                              <>
+                                <span className="ml-3">{link.label}</span>
+                                <svg
+                                  className={`ml-auto w-4 h-4 transition-transform duration-300 ${
+                                    dropdownOpen ? "rotate-90" : ""
+                                  }`}
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M9 5l7 7-7 7"
+                                  />
+                                </svg>
+                              </>
+                            )}
+                          </button>
+                          {/* Dropdown content */}
+                          <div
+                            className={`overflow-hidden transition-all duration-300 bg-gray-800
+                              ${
+                                dropdownOpen && !collapsed
+                                  ? "max-h-40 py-1"
+                                  : "max-h-0 py-0"
+                              }
+                            `}
+                          >
+                            <NavLink
+                              to="/verifications/cac-1"
+                              className={({ isActive }) =>
+                                `flex items-center px-10 py-2 text-sm font-medium border-l-4 transition-colors duration-200
+                                ${
+                                  isActive
+                                    ? "border-amber-400 text-amber-300 bg-gray-800"
+                                    : "border-transparent text-gray-300 hover:text-amber-300 hover:bg-gray-800"
+                                }`
+                              }
+                            >
+                              CAC-1
+                            </NavLink>
+                            <NavLink
+                              to="/verifications/cac-2"
+                              className={({ isActive }) =>
+                                `flex items-center px-10 py-2 text-sm font-medium border-l-4 transition-colors duration-200
+                                ${
+                                  isActive
+                                    ? "border-amber-400 text-amber-300 bg-gray-800"
+                                    : "border-transparent text-gray-300 hover:text-amber-300 hover:bg-gray-800"
+                                }`
+                              }
+                            >
+                              CAC-2
+                            </NavLink>
+                          </div>
+                        </div>
+                      );
+                    }
+                    // Normal links
+                    return (
+                      <NavLink
+                        to={link.to}
+                        key={j}
+                        className={({ isActive }) =>
+                          `flex items-center px-6 py-2 text-sm font-medium border-l-4 transition-colors duration-200
+                          ${collapsed ? "justify-center px-0" : ""}
+                          ${
+                            isActive
+                              ? "border-amber-400 text-amber-300 bg-gray-800"
+                              : "border-transparent text-gray-300 hover:text-amber-300 hover:bg-gray-800"
+                          }`
+                        }
+                        title={collapsed ? link.label : undefined}
+                      >
+                        {link.icon}
+                        {!collapsed && (
+                          <span className="ml-3">{link.label}</span>
+                        )}
+                      </NavLink>
+                    );
+                  })}
+                </>
+              ) : (
+                // All other sections
+                section.links.map((link, j) => (
+                  <NavLink
+                    to={link.to}
+                    key={j}
+                    className={({ isActive }) =>
+                      `flex items-center px-6 py-2 text-sm font-medium border-l-4 transition-colors duration-200
+                      ${collapsed ? "justify-center px-0" : ""}
+                      ${
+                        isActive
+                          ? "border-amber-400 text-amber-300 bg-gray-800"
+                          : "border-transparent text-gray-300 hover:text-amber-300 hover:bg-gray-800"
+                      }`
+                    }
+                    title={collapsed ? link.label : undefined}
+                  >
+                    {link.icon}
+                    {!collapsed && <span className="ml-3">{link.label}</span>}
+                  </NavLink>
+                ))
+              )}
             </div>
           </div>
         ))}
