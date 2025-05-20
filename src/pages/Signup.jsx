@@ -7,12 +7,71 @@ import Svg from "../assets/images/bg.svg";
 import { TbEye, TbEyeOff } from "react-icons/tb"; // Eye icons for toggle
 import { FaGoogle } from "react-icons/fa";
 import { FaFacebookF } from "react-icons/fa";
+import axios from "axios";
 
 const Signup = () => {
-  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+  const [showPassword, setShowPassword] = useState(false);
+  const [form, setForm] = useState({
+    Firstname: "",
+    Lastname: "",
+    email: "",
+    phone_num: "",
+    NIN: "",
+    password: "",
+    terms: false,
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState);
+  };
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+    setLoading(true);
+    try {
+      const res = await axios.post(
+        "https://verification-bdef.onrender.com/api/auth/register",
+        {
+          firstName: form.Firstname,
+          lastName: form.Lastname,
+          email: form.email,
+          phone: form.phone_num, // <-- this is correct for your form, backend expects 'phone'
+          nin: form.NIN,
+          password: form.password,
+        }
+      );
+      setSuccess("Signup successful!");
+      console.log("Signup response:", res.data);
+
+      setForm({
+        Firstname: "",
+        Lastname: "",
+        email: "",
+        phone_num: "",
+        NIN: "",
+        password: "",
+        terms: false,
+      });
+    } catch (err) {
+      console.log("Signup error:", err.response ? err.response.data : err);
+      setError(
+        err.response?.data?.message || "Signup failed. Please try again."
+      );
+    }
+    setLoading(false);
   };
 
   return (
@@ -42,7 +101,7 @@ const Signup = () => {
           </h3>
           <p className="mb-5 text-gray-500">Create a new account</p>
         </div>
-        <form action="/signup" method="POST" className="w-full">
+        <form onSubmit={handleSubmit} className="w-full">
           <div className="relative mb-4">
             <p className="mb-3">
               <label
@@ -59,6 +118,8 @@ const Signup = () => {
               required
               name="Firstname"
               id="Firstname"
+              value={form.Firstname}
+              onChange={handleChange}
             />
           </div>
           <p className=" mt-5 mb-3">
@@ -73,6 +134,8 @@ const Signup = () => {
             required
             name="Lastname"
             id="Lastname"
+            value={form.Lastname}
+            onChange={handleChange}
           />
           <p className="mt-5 mb-3">
             <label
@@ -82,7 +145,6 @@ const Signup = () => {
               EMAIL
             </label>
           </p>
-
           <input
             type="email"
             className="pl-5 py-2 border border-gray-500 rounded w-full h-[50px]"
@@ -90,6 +152,8 @@ const Signup = () => {
             required
             name="email"
             id="Email"
+            value={form.email}
+            onChange={handleChange}
           />
           <p className="mt-5 mb-3">
             <label
@@ -99,7 +163,6 @@ const Signup = () => {
               PHONE NUMBER
             </label>
           </p>
-
           <input
             type="tel"
             className="pl-5 py-2 border border-gray-500 rounded w-full h-[50px]"
@@ -107,6 +170,8 @@ const Signup = () => {
             required
             name="phone_num"
             id="Phone_Num"
+            value={form.phone_num}
+            onChange={handleChange}
           />
           <p className="mt-5 mb-3">
             <label htmlFor="NIN" className="text-gray-500  text-[13px] my-10 ">
@@ -120,6 +185,8 @@ const Signup = () => {
             required
             name="NIN"
             id="NIN"
+            value={form.NIN}
+            onChange={handleChange}
           />
           <p className="mt-5 mb-3">
             <label
@@ -131,12 +198,14 @@ const Signup = () => {
           </p>
           <div className="relative">
             <input
-              type={showPassword ? "text" : "password"} // Toggle between text and password
+              type={showPassword ? "text" : "password"}
               className="pl-5 py-2 border border-gray-500 rounded w-full h-[50px]"
               placeholder="Password"
               required
               name="password"
               id="Password"
+              value={form.password}
+              onChange={handleChange}
             />
             <button
               type="button"
@@ -151,17 +220,25 @@ const Signup = () => {
               type="checkbox"
               id="terms"
               name="terms"
+              checked={form.terms}
+              onChange={handleChange}
               className="w-4 h-4 cursor-pointer  text-green-500 border border-gray-100 rounded focus:ring-green-500 focus:ring-1"
+              required
             />
-            <label htmlFor="remember" className="text-sm text-gray-700">
+            <label htmlFor="terms" className="text-sm text-gray-700">
               <a href="#" className="text-amber-600">
                 Accept terms and condition
               </a>
             </label>
           </div>
+          {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
+          {success && (
+            <div className="text-green-600 text-sm mt-2">{success}</div>
+          )}
           <input
             type="submit"
-            value="Signup"
+            value={loading ? "Signing up..." : "Signup"}
+            disabled={loading}
             className="submit bg-amber-600 h-[50px] text-white py-2 mt-5 rounded w-full cursor-pointer "
           />
         </form>

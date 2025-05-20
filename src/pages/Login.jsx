@@ -7,12 +7,51 @@ import Svg from "../assets/images/bg.svg";
 import { TbEye, TbEyeOff } from "react-icons/tb"; // Eye icons for toggle
 import { FaGoogle } from "react-icons/fa";
 import { FaFacebookF } from "react-icons/fa";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+  const [showPassword, setShowPassword] = useState(false);
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      const res = await axios.post(
+        "https://verification-bdef.onrender.com/api/auth/login",
+        {
+          email: form.email,
+          password: form.password,
+        }
+      );
+      console.log(res.data);
+      navigate("/dashboard");
+    } catch (err) {
+      setError(
+        err.response?.data?.message || "Login failed. Please try again."
+      );
+    }
+    setLoading(false);
   };
 
   return (
@@ -42,7 +81,7 @@ const Login = () => {
           </h3>
           <p className="mb-5 text-gray-500">Please sign-in to your account</p>
         </div>
-        <form action="/login" method="POST" className="w-full">
+        <form onSubmit={handleSubmit} className="w-full">
           <div className="relative mb-4"></div>
 
           <p className="mt-5 mb-3">
@@ -58,6 +97,8 @@ const Login = () => {
             required
             name="email"
             id="Email"
+            value={form.email}
+            onChange={handleChange}
           />
 
           <p className="mt-5 mb-3 flex justify-between items-center">
@@ -70,12 +111,14 @@ const Login = () => {
           </p>
           <div className="relative">
             <input
-              type={showPassword ? "text" : "password"} // Toggle between text and password
+              type={showPassword ? "text" : "password"}
               className="pl-5 py-2 border border-gray-500 rounded w-full h-[50px]"
               placeholder="Password"
               required
               name="password"
               id="Password"
+              value={form.password}
+              onChange={handleChange}
             />
             <button
               type="button"
@@ -96,10 +139,11 @@ const Login = () => {
               Remember me
             </label>
           </div>
-
+          {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
           <input
             type="submit"
-            value="Signin"
+            value={loading ? "Signing in..." : "Signin"}
+            disabled={loading}
             className="submit bg-amber-600 h-[50px] text-white py-2 mt-5 rounded w-full cursor-pointer "
           />
         </form>
