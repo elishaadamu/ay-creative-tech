@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "./Components/Sidebar";
 import "./assets/css/style.css";
 import Logo from "../assets/images/logo-ay.png";
+import { NavLink } from "react-router-dom";
 
 import RoutesConfig from "./Components/RoutesConfig";
 
@@ -38,6 +39,7 @@ function UserDashBoard() {
         <div className="modal-overlay">
           <div className="modal-content">
             <img src={Logo} alt="Logo" className="logo" />
+
             <h2>Welcome to AY Creative Technologies</h2>
             <p>
               <strong>Note:</strong> Money deposited cannot be withdrawn back to
@@ -51,11 +53,9 @@ function UserDashBoard() {
 
       {/* ───── Rest of layout ───── */}
       <div className="md:hidden flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
-        <img
-          src={Logo}
-          alt="Logo"
-          className="w-[120px] dark:invert-1 invert-0"
-        />
+        <NavLink to="/">
+          <img src={Logo} alt="Logo" className="logo w-[180px] " />
+        </NavLink>
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className="text-gray-700 dark:text-gray-200 focus:outline-none"

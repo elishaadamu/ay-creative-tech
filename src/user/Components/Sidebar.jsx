@@ -113,13 +113,15 @@ function Sidebar({ collapsed, setCollapsed }) {
       </button>
 
       <div className="flex items-center pl-[15px] h-20 border-b border-gray-700 transition-all duration-300">
-        <img
-          src={Logo}
-          alt="Logo"
-          className={`transition-all duration-300 ${
-            collapsed ? "w-10" : "w-[150px]"
-          } invert`}
-        />
+        <NavLink to="/dashboard">
+          <img
+            src={Logo}
+            alt="Logo"
+            className={`transition-all duration-300 ${
+              collapsed ? "w-10" : "w-[150px]"
+            } invert`}
+          />
+        </NavLink>
       </div>
 
       <div className="flex-1 overflow-y-auto mt-4">
