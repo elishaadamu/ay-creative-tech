@@ -8,6 +8,7 @@ import NIBSS from "../assets/images/nibss.png";
 import CAC from "../assets/images/cac.png";
 import Airtime from "../assets/images/airtime.png";
 import Bank from "../assets/images/bank.webp";
+import Data from "../assets/images/data.png";
 
 function Dashboard() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -94,18 +95,24 @@ function Dashboard() {
     },
     {
       id: 11,
+      name: "DATA SUBSCRIPTION",
+      icon: Data,
+      to: "/data",
+    },
+    {
+      id: 12,
       name: "CAC REGISTRATION",
       icon: CAC,
       to: "/court-doc",
     },
     {
-      id: 12,
+      id: 13,
       name: "BVN LICENCES",
       icon: NIBSS,
       to: "/police-report",
     },
     {
-      id: 13,
+      id: 14,
       name: "BANK AGENCY",
       icon: Bank,
       to: "/verification",

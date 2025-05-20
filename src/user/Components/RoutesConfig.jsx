@@ -1,7 +1,7 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
 import NIN from "../pages/NIN";
-import NinPhone from "../pages/NinPhone";
+import PhoneNIN from "../pages/PhoneNIN";
 import Home from "../pages/Home";
 import Footer from "../Components/Footer";
 
@@ -11,7 +11,7 @@ function RoutesConfig() {
       <Routes className="flex-1 ">
         <Route path="/" element={<Home />} />
         <Route path="verifications/nin" element={<NIN />} />
-        <Route path="verifications/pvn" element={<NinPhone />} />
+        <Route path="verifications/pvn" element={<PhoneNIN />} />
       </Routes>
       <Footer />
     </div>
