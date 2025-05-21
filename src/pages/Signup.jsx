@@ -4,12 +4,14 @@ import { NavLink } from "react-router-dom";
 import { motion } from "framer-motion";
 import Logo from "../assets/images/logo-ay.png";
 import Svg from "../assets/images/bg.svg";
-import { TbEye, TbEyeOff } from "react-icons/tb"; // Eye icons for toggle
+import { TbEye, TbEyeOff } from "react-icons/tb";
 import { FaGoogle } from "react-icons/fa";
 import { FaFacebookF } from "react-icons/fa";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
 
 const Signup = () => {
+  const notify = () => toast("Wow so easy!");
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({
     Firstname: "",
@@ -23,6 +25,7 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [invalidFields, setInvalidFields] = useState({});
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState);
@@ -34,6 +37,22 @@ const Signup = () => {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+    setInvalidFields((prev) => ({ ...prev, [name]: false }));
+  };
+
+  const validateForm = () => {
+    const newInvalid = {};
+    if (!form.Firstname) newInvalid.Firstname = true;
+    if (!form.Lastname) newInvalid.Lastname = true;
+    if (!form.email || !/\S+@\S+\.\S+/.test(form.email))
+      newInvalid.email = true;
+    if (!form.phone_num || form.phone_num.length < 7)
+      newInvalid.phone_num = true;
+    if (!form.NIN || form.NIN.length < 8) newInvalid.NIN = true;
+    if (!form.password || form.password.length < 8) newInvalid.password = true;
+    if (!form.terms) newInvalid.terms = true;
+    setInvalidFields(newInvalid);
+    return Object.keys(newInvalid).length === 0;
   };
 
   const handleSubmit = async (e) => {
@@ -41,6 +60,13 @@ const Signup = () => {
     setError("");
     setSuccess("");
     setLoading(true);
+
+    if (!validateForm()) {
+      setError("Please correct the highlighted fields.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await axios.post(
         "https://verification-bdef.onrender.com/api/auth/register",
@@ -48,14 +74,12 @@ const Signup = () => {
           firstName: form.Firstname,
           lastName: form.Lastname,
           email: form.email,
-          phone: form.phone_num, // <-- this is correct for your form, backend expects 'phone'
+          phone: form.phone_num,
           nin: form.NIN,
           password: form.password,
         }
       );
       setSuccess("Signup successful!");
-      console.log("Signup response:", res.data);
-
       setForm({
         Firstname: "",
         Lastname: "",
@@ -65,8 +89,8 @@ const Signup = () => {
         password: "",
         terms: false,
       });
+      setInvalidFields({});
     } catch (err) {
-      console.log("Signup error:", err.response ? err.response.data : err);
       setError(
         err.response?.data?.message || "Signup failed. Please try again."
       );
@@ -113,7 +137,13 @@ const Signup = () => {
             </p>
             <input
               type="text"
-              className="pl-5 py-2 border border-gray-500 rounded w-full h-[50px]"
+              className={`pl-5 py-2 border rounded w-full h-[50px] ${
+                invalidFields.Firstname
+                  ? "border-red-500"
+                  : form.Firstname
+                  ? "border-green-500"
+                  : "border-gray-500"
+              }`}
               placeholder="First Name"
               required
               name="Firstname"
@@ -129,7 +159,13 @@ const Signup = () => {
           </p>
           <input
             type="text"
-            className="pl-5 py-2 border border-gray-500 rounded w-full h-[50px]"
+            className={`pl-5 py-2 border rounded w-full h-[50px] ${
+              invalidFields.Lastname
+                ? "border-red-500"
+                : form.Lastname
+                ? "border-green-500"
+                : "border-gray-500"
+            }`}
             placeholder="Last Name"
             required
             name="Lastname"
@@ -147,7 +183,13 @@ const Signup = () => {
           </p>
           <input
             type="email"
-            className="pl-5 py-2 border border-gray-500 rounded w-full h-[50px]"
+            className={`input validator pl-5 py-2 border rounded w-full h-[50px] ${
+              invalidFields.email
+                ? "border-red-500"
+                : form.email
+                ? "border-green-500"
+                : "border-gray-500"
+            }`}
             placeholder="Email Address"
             required
             name="email"
@@ -165,7 +207,13 @@ const Signup = () => {
           </p>
           <input
             type="tel"
-            className="pl-5 py-2 border border-gray-500 rounded w-full h-[50px]"
+            className={`text-black pl-5 py-2 border rounded w-full h-[50px] ${
+              invalidFields.phone_num
+                ? "border-red-500"
+                : form.phone_num
+                ? "border-green-500"
+                : "border-gray-500"
+            }`}
             placeholder="Phone Number"
             required
             name="phone_num"
@@ -180,7 +228,13 @@ const Signup = () => {
           </p>
           <input
             type="number"
-            className="pl-5 py-2 border border-gray-500 rounded w-full h-[50px]"
+            className={`pl-5 py-2 border rounded w-full h-[50px] ${
+              invalidFields.NIN
+                ? "border-red-500"
+                : form.NIN
+                ? "border-green-500"
+                : "border-gray-500"
+            }`}
             placeholder="NIN Number"
             required
             name="NIN"
@@ -191,7 +245,7 @@ const Signup = () => {
           <p className="mt-5 mb-3">
             <label
               htmlFor="Password"
-              className="text-gray-500  text-[13px] my-10 "
+              className="text-black   text-[13px] my-10 "
             >
               PASSWORD
             </label>
@@ -199,7 +253,13 @@ const Signup = () => {
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
-              className="pl-5 py-2 border border-gray-500 rounded w-full h-[50px]"
+              className={`pl-5 py-2 border  rounded w-full h-[50px] ${
+                invalidFields.password
+                  ? "border-red-500"
+                  : form.password
+                  ? "border-green-500"
+                  : "border-gray-500"
+              }`}
               placeholder="Password"
               required
               name="password"
@@ -211,6 +271,7 @@ const Signup = () => {
               type="button"
               onClick={togglePasswordVisibility}
               className="absolute right-3 top-4 cursor-pointer text-gray-500 "
+              tabIndex={-1}
             >
               {showPassword ? <TbEyeOff size={20} /> : <TbEye size={20} />}
             </button>
@@ -222,7 +283,9 @@ const Signup = () => {
               name="terms"
               checked={form.terms}
               onChange={handleChange}
-              className="w-4 h-4 cursor-pointer  text-green-500 border border-gray-100 rounded focus:ring-green-500 focus:ring-1"
+              className={`checkbox validator w-4 h-4 cursor-pointer ${
+                invalidFields.terms ? "border-red-500" : ""
+              }`}
               required
             />
             <label htmlFor="terms" className="text-sm text-gray-700">
@@ -231,16 +294,62 @@ const Signup = () => {
               </a>
             </label>
           </div>
-          {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
-          {success && (
-            <div className="text-green-600 text-sm mt-2">{success}</div>
+          {error && (
+            <div className="text-red-500 text-sm mt-2">
+              {error}
+              {error === "User already exists" && (
+                <span>
+                  {" "}
+                  <NavLink
+                    to="/login"
+                    className="text-blue-500 underline font-bold"
+                  >
+                    Sign in
+                  </NavLink>
+                </span>
+              )}
+            </div>
           )}
-          <input
+          {success && (
+            <div className="text-green-600 text-sm mt-2">
+              {success}{" "}
+              <NavLink
+                to="/login"
+                className="text-blue-400 underline font-bold"
+              >
+                Sign in
+              </NavLink>
+            </div>
+          )}
+          <button
             type="submit"
-            value={loading ? "Signing up..." : "Signup"}
             disabled={loading}
-            className="submit bg-amber-600 h-[50px] text-white py-2 mt-5 rounded w-full cursor-pointer "
-          />
+            className="submit bg-amber-600 h-[50px] text-white py-2 mt-5 rounded w-full cursor-pointer flex items-center justify-center"
+          >
+            {loading && (
+              <svg
+                className="animate-spin h-5 w-5 mr-2 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v8z"
+                ></path>
+              </svg>
+            )}
+            {loading ? "Signing up..." : "Signup"}
+          </button>
         </form>
 
         <p className="text-gray-400 text-center text-xl my-5">or</p>
@@ -251,7 +360,6 @@ const Signup = () => {
             className="border border-gray-500 hover:bg-gray-50 cursor-pointer rounded h-10 flex items-center justify-center w-full"
           >
             <div className="flex gap-4 items-center">
-              {/* SVG icon */}
               <FaGoogle className="text-[#DB4437]" />
               <span className="font-bold dark:text-black">Google</span>
             </div>
@@ -263,9 +371,7 @@ const Signup = () => {
             className="border border-gray-500 hover:bg-gray-50 cursor-pointer rounded h-10 flex items-center justify-center w-full"
           >
             <div className="flex gap-4 items-center">
-              {/* SVG icon */}
               <FaFacebookF className="text-[#1877F2]" />
-
               <span className="font-bold dark:text-black">Facebook</span>
             </div>
           </a>

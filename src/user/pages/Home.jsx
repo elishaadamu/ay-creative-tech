@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { CiWallet } from "react-icons/ci";
 import { FaEllipsisVertical } from "react-icons/fa6";
 import { FaCube } from "react-icons/fa6";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import NIMC from "../assets/images/nimc.png";
 import NIBSS from "../assets/images/nibss.png";
 import CAC from "../assets/images/cac.png";
@@ -13,6 +13,7 @@ import Data from "../assets/images/data.png";
 function Dashboard() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const navigate = useNavigate();
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -30,6 +31,14 @@ function Dashboard() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [dropdownOpen]);
+
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const firstName = user.firstName || "User";
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    navigate("/login");
+  };
 
   // navItems.js
   const navItems = [
@@ -122,7 +131,7 @@ function Dashboard() {
   return (
     <div className="max-w-[1500px] mx-auto">
       <div className="mb-10 text-2xl text-gray-500 font-bold">
-        Welcome to AY Creative Technologies, User
+        Welcome to AY Creative Technologies, {firstName}
       </div>
       <div className="flex justify-center  max-w-full flex-col md:flex-row  gap-10">
         <div className="flex-1/2 rounded-lg bg-white hover:shadow-lg shadow-md ring-2 ring-amber-50/2 w-full p-7">
@@ -183,6 +192,12 @@ function Dashboard() {
           </NavLink>
         ))}
       </div>
+      <button
+        onClick={handleLogout}
+        className="bg-red-500 text-white px-4 py-2 rounded mt-4"
+      >
+        Logout
+      </button>
     </div>
   );
 }

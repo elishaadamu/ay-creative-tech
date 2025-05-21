@@ -84,13 +84,20 @@ const sidebarSections = [
         label: "Change Password",
       },
       {
-        to: "/logout",
+        to: "/login",
         icon: <FiLogOut className="w-5 h-5 text-red-500" />,
         label: "Sign Out",
       },
     ],
   },
 ];
+
+const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+const handleLogout = () => {
+  localStorage.removeItem("user");
+  navigate("/login");
+};
 
 function Sidebar({ collapsed, setCollapsed }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -265,6 +272,12 @@ function Sidebar({ collapsed, setCollapsed }) {
             </div>
           </div>
         ))}
+        <button
+          onClick={handleLogout}
+          className="bg-red-500 text-white px-4 py-2 rounded mt-4"
+        >
+          Logout
+        </button>
       </div>
     </div>
   );
