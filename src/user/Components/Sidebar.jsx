@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom"; // <-- import useNavigate
 import Logo from "../assets/images/logo-ay.png";
 import {
   FiHome,
@@ -94,13 +94,15 @@ const sidebarSections = [
 
 const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-const handleLogout = () => {
-  localStorage.removeItem("user");
-  navigate("/login");
-};
-
 function Sidebar({ collapsed, setCollapsed }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const navigate = useNavigate(); // <-- useNavigate hook
+
+  const handleLogout = (e) => {
+    e.preventDefault(); // Prevent default link behavior
+    localStorage.removeItem("user");
+    navigate("/login");
+  };
 
   return (
     <div
@@ -248,36 +250,52 @@ function Sidebar({ collapsed, setCollapsed }) {
                 </>
               ) : (
                 // All other sections
-                section.links.map((link, j) => (
-                  <NavLink
-                    to={link.to}
-                    key={j}
-                    end={link.end || false} // <-- add this line
-                    className={({ isActive }) =>
-                      `flex items-center px-6 py-2 text-sm font-medium border-l-4 transition-colors duration-200
+                section.links.map((link, j) => {
+                  // For the Sign Out link
+                  if (link.label === "Sign Out") {
+                    return (
+                      <a
+                        href="/login"
+                        key={j}
+                        onClick={handleLogout}
+                        className={`flex items-center px-6 py-2 text-sm font-medium border-l-4 transition-colors duration-200
+                        ${collapsed ? "justify-center px-0" : ""}
+                        border-transparent text-gray-300 hover:text-amber-300 hover:bg-gray-800`}
+                        title={collapsed ? link.label : undefined}
+                      >
+                        {link.icon}
+                        {!collapsed && (
+                          <span className="ml-3">{link.label}</span>
+                        )}
+                      </a>
+                    );
+                  }
+                  // All other links
+                  return (
+                    <NavLink
+                      to={link.to}
+                      key={j}
+                      end={link.end || false}
+                      className={({ isActive }) =>
+                        `flex items-center px-6 py-2 text-sm font-medium border-l-4 transition-colors duration-200
                       ${collapsed ? "justify-center px-0" : ""}
                       ${
                         isActive
                           ? "border-amber-400 text-amber-300 bg-gray-800"
                           : "border-transparent text-gray-300 hover:text-amber-300 hover:bg-gray-800"
                       }`
-                    }
-                    title={collapsed ? link.label : undefined}
-                  >
-                    {link.icon}
-                    {!collapsed && <span className="ml-3">{link.label}</span>}
-                  </NavLink>
-                ))
+                      }
+                      title={collapsed ? link.label : undefined}
+                    >
+                      {link.icon}
+                      {!collapsed && <span className="ml-3">{link.label}</span>}
+                    </NavLink>
+                  );
+                })
               )}
             </div>
           </div>
         ))}
-        <button
-          onClick={handleLogout}
-          className="bg-red-500 text-white px-4 py-2 rounded mt-4"
-        >
-          Logout
-        </button>
       </div>
     </div>
   );

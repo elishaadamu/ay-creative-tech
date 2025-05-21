@@ -9,11 +9,16 @@ import CAC from "../assets/images/cac.png";
 import Airtime from "../assets/images/airtime.png";
 import Bank from "../assets/images/bank.webp";
 import Data from "../assets/images/data.png";
+import { IoClose } from "react-icons/io5";
+import "../assets/css/style.css";
 
 function Dashboard() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+
+  const [isOpen, setIsOpen] = useState(false); // <-- add this
+  const toggleModal = () => setIsOpen((open) => !open); // <-- and this
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -139,12 +144,51 @@ function Dashboard() {
           <p className="text-gray-600 text-[30px] mb-10 font-bold font-sans">
             ₦0.00
           </p>
-          <p className="w-[140px] h-[40px] text-black bg-amber-400 cursor-pointer hover:bg-amber-500 max-w-full rounded-lg p-2 ">
+          <p
+            onClick={toggleModal}
+            className="w-[140px] h-[40px] text-black bg-amber-400 cursor-pointer hover:bg-amber-500 max-w-full rounded-lg p-2"
+          >
             <span className="flex flex-row items-center gap-2">
               <CiWallet className="text-2xl font-bold" />
               <span>Add Money</span>
             </span>
           </p>
+
+          {/* Modal */}
+          {isOpen && (
+            <div className="modal-overlay flex justify-center items-center z-50">
+              <div className="bg-white rounded-xl p-8 w-[320px] max-w-full text-center relative shadow-xl">
+                {/* Close Button */}
+                <button
+                  className="absolute top-2 right-2 text-gray-500 hover:text-black"
+                  onClick={toggleModal}
+                >
+                  <IoClose size={24} />
+                </button>
+
+                {/* Modal Content */}
+                <h2 className="text-xl font-bold mb-1">Fund Your Wallet</h2>
+                <p className="text-sm mb-4 text-gray-600">
+                  Send money to your TwinsHUB account!.
+                </p>
+
+                <div className="flex justify-center mb-4">
+                  <div className="bg-green-100 rounded-full p-4">
+                    <img
+                      src="/logo.png"
+                      alt="Wallet Icon"
+                      className="h-8 w-8"
+                    />{" "}
+                    {/* Replace with actual image path */}
+                  </div>
+                </div>
+
+                <p className="font-semibold">Twinshub-Elisha Adamu</p>
+                <p className="text-sm text-gray-600">9Payment Service Bank</p>
+                <p className="text-lg font-bold mt-1">5744426550</p>
+              </div>
+            </div>
+          )}
         </div>
         <div className="flex-1/2 rounded bg-white shadow-md hover:shadow-lg ring-2 ring-amber-50/2  w-full p-10">
           <div className="flex justify-between items-center relative">
@@ -192,12 +236,6 @@ function Dashboard() {
           </NavLink>
         ))}
       </div>
-      <button
-        onClick={handleLogout}
-        className="bg-red-500 text-white px-4 py-2 rounded mt-4"
-      >
-        Logout
-      </button>
     </div>
   );
 }

@@ -10,26 +10,19 @@ const ONE_HOUR = 60 * 60 * 1000; // 3 600 000 ms
 
 function UserDashBoard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [collapsed, setCollapsed] = useState(false); // <-- Add this line
-  const [showModal, setShowModal] = useState(false); //
-
-  const isLoggedIn = !!localStorage.getItem("authToken");
+  const [collapsed, setCollapsed] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    if (!isLoggedIn) return;
-
-    const lastShown = Number(localStorage.getItem("modalLastShown") || 0);
-    const now = Date.now();
-
-    if (now - lastShown > ONE_HOUR) {
+    // Only show modal if just logged in
+    if (localStorage.getItem("showWelcomeModal") === "true") {
       setShowModal(true);
-      localStorage.setItem("modalLastShown", now);
+      localStorage.removeItem("showWelcomeModal");
     }
-  }, [isLoggedIn]);
+  }, []);
 
   const handleCloseModal = () => {
     setShowModal(false);
-    localStorage.setItem("modalLastShown", Date.now());
   };
 
   return (
@@ -38,15 +31,21 @@ function UserDashBoard() {
       {showModal && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <img src={Logo} alt="Logo" className="logo" />
-
-            <h2>Welcome to AY Creative Technologies</h2>
-            <p>
+            <img src={Logo} alt="Logo" className="mx-auto mb-4 w-32" />
+            <h2 className="text-2xl font-bold mb-2 text-amber-700">
+              Welcome to AY Creative Technologies
+            </h2>
+            <p className="mb-6 text-gray-600">
               <strong>Note:</strong> Money deposited cannot be withdrawn back to
               your bank account. You can only use it for another service in case
               your work fails.
             </p>
-            <button onClick={handleCloseModal}>Got it</button>
+            <button
+              onClick={handleCloseModal}
+              className="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-6 py-2 rounded transition"
+            >
+              Got it
+            </button>
           </div>
         </div>
       )}

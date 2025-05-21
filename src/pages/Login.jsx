@@ -61,16 +61,23 @@ const Login = () => {
           password: form.password,
         }
       );
-      // Save user info (directly from res.data)
       localStorage.setItem("user", JSON.stringify(res.data));
+      localStorage.setItem("showWelcomeModal", "true");
       toast.success("Login successful! Redirecting...");
       setTimeout(() => {
         navigate("/dashboard");
-      }, 1500); // 1.5 seconds delay
+      }, 1500);
     } catch (err) {
-      setError(
-        err.response?.data?.message || "Login failed. Please try again."
-      );
+      const apiMessage =
+        err.response?.data?.message || "Login failed. Please try again.";
+      setError(apiMessage);
+
+      if (
+        apiMessage.toLowerCase().includes("incorrect password") ||
+        apiMessage.toLowerCase().includes("wrong password")
+      ) {
+        toast.error("Incorrect password. Please try again.");
+      }
     }
     setLoading(false);
   };
@@ -145,11 +152,7 @@ const Login = () => {
               <input
                 type={showPassword ? "text" : "password"}
                 className={`pl-5 text-black py-2 border rounded w-full h-[50px] ${
-                  invalidFields.password
-                    ? "border-red-500"
-                    : form.password
-                    ? "border-green-500"
-                    : "border-gray-500"
+                  invalidFields.password ? "border-red-500" : "border-gray-500"
                 }`}
                 placeholder="Password"
                 required
