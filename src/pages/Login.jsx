@@ -174,17 +174,7 @@ const Login = () => {
                 {showPassword ? <TbEyeOff size={20} /> : <TbEye size={20} />}
               </button>
             </div>
-            <div className="flex items-center space-x-2 mt-4">
-              <input
-                type="checkbox"
-                id="remember"
-                name="remember"
-                className="w-4 h-4 cursor-pointer   text-green-500 border border-gray-100 rounded focus:ring-green-500 focus:ring-1"
-              />
-              <label htmlFor="remember" className="text-sm text-gray-700">
-                Remember me
-              </label>
-            </div>
+
             {error && (
               <div className="text-red-500 text-sm mt-2">
                 {error}
