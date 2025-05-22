@@ -50,28 +50,26 @@ const ForgotPassword = () => {
         "https://verification-bdef.onrender.com/api/auth/forgotPassword",
         {
           email: form.email,
+        },
+        {
+          withCredentials: true,
         }
       );
+
+      // Just log the response
+      console.log("Backend response:", response.data);
+
       toast.success("If this email exists, a reset link has been sent.");
       setTimeout(() => {
         navigate("/otp");
       }, 2000);
     } catch (err) {
-      if (
-        err.response &&
-        (err.response.data.message?.toLowerCase().includes("user not found") ||
-          err.response.data.message?.toLowerCase().includes("no user"))
-      ) {
-        setError("User not found");
-        toast.error("User not found");
-      } else {
-        setError(
-          err.response?.data?.message || "Reset failed. Please try again."
-        );
-        toast.error(
-          err.response?.data?.message || "Reset failed. Please try again."
-        );
-      }
+      console.error(
+        "Forgot password error:",
+        err.response ? err.response.data : err.message
+      );
+      setError("Request failed. Please try again.");
+      toast.error("Request failed. Please try again.");
     }
     setLoading(false);
   };
