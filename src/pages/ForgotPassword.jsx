@@ -59,6 +59,9 @@ const ForgotPassword = () => {
       // Just log the response
       console.log("Backend response:", response.data);
 
+      // Store email in localStorage
+      localStorage.setItem("email", form.email);
+
       toast.success("If this email exists, a reset link has been sent.");
       setTimeout(() => {
         navigate("/otp");
