@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
 
 const InputOTP = ({ onSubmit }) => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -47,23 +48,48 @@ const InputOTP = ({ onSubmit }) => {
     e.preventDefault();
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (otp.join("").length !== 6) {
       setInvalid(true);
       toast.error("Please fill all 6 digits of the OTP.");
       return;
     }
-    // Simulate OTP check (replace with real API call if needed)
-    const correctOtp = "123456"; // Replace with your logic
-    if (otp.join("") === correctOtp) {
+
+    const email = localStorage.getItem("email");
+    if (!email) {
+      toast.error("No email found for verification.");
+      return;
+    }
+
+    const formData = {
+      email: email,
+      code: otp.join(""),
+    };
+
+    try {
+      const response = await axios.post(
+        "https://verification-bdef.onrender.com/api/auth/verifyCode",
+        formData,
+        {
+          withCredentials: true,
+        }
+      );
+
+      // Just log the response
+      console.log("Backend response:", response.data);
+
       toast.success("OTP verified! Redirecting...");
       setTimeout(() => {
         navigate("/resetpassword");
       }, 1200);
-    } else {
+    } catch (err) {
       setInvalid(true);
-      toast.error("Incorrect OTP. Please try again.");
+      toast.error("Incorrect OTP or verification failed.");
+      console.error(
+        "OTP verification error:",
+        err.response ? err.response.data : err.message
+      );
     }
   };
 
@@ -103,7 +129,7 @@ const InputOTP = ({ onSubmit }) => {
         </div>
         <button
           type="submit"
-          className="bg-amber-600 hover:bg-amber-700 text-white font-semibold px-6 py-2 rounded transition w-full"
+          className="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-6 py-2 rounded transition w-full"
         >
           Verify OTP
         </button>
