@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -7,8 +7,16 @@ import axios from "axios";
 const InputOTP = ({ onSubmit }) => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [invalid, setInvalid] = useState(false);
+  const [loading, setLoading] = useState(false); // <-- Add loading state
   const inputsRef = useRef([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const email = localStorage.getItem("email");
+    if (!email) {
+      navigate("/login");
+    }
+  }, [navigate]);
 
   const handleChange = (e, idx) => {
     const value = e.target.value.replace(/[^0-9]/g, "");
@@ -21,6 +29,13 @@ const InputOTP = ({ onSubmit }) => {
     // Move to next input
     if (idx < 5 && value) {
       inputsRef.current[idx + 1].focus();
+    }
+
+    // If last digit is filled, trigger submit
+    if (idx === 5 && value && newOtp.every((d) => d !== "")) {
+      setTimeout(() => {
+        document.getElementById("otp-form").requestSubmit();
+      }, 100); // slight delay to ensure state updates
     }
   };
 
@@ -67,6 +82,8 @@ const InputOTP = ({ onSubmit }) => {
       code: otp.join(""),
     };
 
+    setLoading(true); // Start loading
+
     try {
       const response = await axios.post(
         "https://verification-bdef.onrender.com/api/auth/verifyCode",
@@ -81,10 +98,12 @@ const InputOTP = ({ onSubmit }) => {
 
       toast.success("OTP verified! Redirecting...");
       setTimeout(() => {
+        setLoading(false); // Stop loading before navigating
         navigate("/resetpassword");
       }, 1200);
     } catch (err) {
       setInvalid(true);
+      setLoading(false); // Stop loading on error
       toast.error("Incorrect OTP or verification failed.");
       console.error(
         "OTP verification error:",
@@ -97,6 +116,7 @@ const InputOTP = ({ onSubmit }) => {
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 px-4">
       <ToastContainer />
       <form
+        id="otp-form"
         onSubmit={handleSubmit}
         className="bg-white rounded-lg shadow-md p-8 max-w-sm w-full flex flex-col items-center"
       >
@@ -124,14 +144,16 @@ const InputOTP = ({ onSubmit }) => {
               onKeyDown={(e) => handleKeyDown(e, idx)}
               onPaste={handlePaste}
               autoFocus={idx === 0}
+              disabled={loading}
             />
           ))}
         </div>
         <button
           type="submit"
           className="cursor-pointer bg-amber-500 hover:bg-amber-600 text-white font-semibold px-6 py-2 rounded transition w-full"
+          disabled={loading}
         >
-          Verify OTP
+          {loading ? "Verifying..." : "Verify OTP"}
         </button>
       </form>
     </div>

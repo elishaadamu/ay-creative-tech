@@ -62,7 +62,7 @@ const ForgotPassword = () => {
       // Store email in localStorage
       localStorage.setItem("email", form.email);
 
-      toast.success("If this email exists, a reset link has been sent.");
+      toast.success("A reset link has been sent to your Email Inbox.");
       setTimeout(() => {
         navigate("/otp");
       }, 2000);
