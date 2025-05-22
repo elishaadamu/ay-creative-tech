@@ -129,7 +129,7 @@ const InputOTP = ({ onSubmit }) => {
         </div>
         <button
           type="submit"
-          className="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-6 py-2 rounded transition w-full"
+          className="cursor-pointer bg-amber-500 hover:bg-amber-600 text-white font-semibold px-6 py-2 rounded transition w-full"
         >
           Verify OTP
         </button>

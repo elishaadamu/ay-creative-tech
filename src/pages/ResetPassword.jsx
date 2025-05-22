@@ -55,14 +55,30 @@ const ResetPassword = () => {
       return;
     }
 
+    const email = localStorage.getItem("email");
+    if (!email) {
+      setError("No email found for password reset.");
+      setLoading(false);
+      return;
+    }
+
+    const formData = {
+      email: email,
+      password: form.password,
+    };
+
     try {
-      // Replace with your actual reset password endpoint and payload
-      await axios.post(
-        "https://verification-bdef.onrender.com/api/auth/set-new-password",
+      const response = await axios.post(
+        "https://verification-bdef.onrender.com/api/auth/setPassword",
+        formData,
         {
-          password: form.password,
+          withCredentials: true,
         }
       );
+
+      // Just log the response
+      console.log("Backend response:", response.data);
+
       toast.success("Password reset successful! Please login.");
       setTimeout(() => {
         navigate("/login");
