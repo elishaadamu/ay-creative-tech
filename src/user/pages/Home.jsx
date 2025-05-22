@@ -169,7 +169,7 @@ function Dashboard() {
                 {/* Modal Content */}
                 <h2 className="text-xl font-bold mb-1">Fund Your Wallet</h2>
                 <p className="text-sm mb-4 text-gray-600">
-                  Send money to your TwinsHUB account!.
+                  Send money to your AY Creative Technologies Account
                 </p>
 
                 <div className="flex justify-center mb-4">
@@ -190,7 +190,7 @@ function Dashboard() {
             </div>
           )}
         </div>
-        <div className="flex-1/2 rounded bg-white shadow-md hover:shadow-lg ring-2 ring-amber-50/2  w-full p-10">
+        <div className="flex-1/2 rounded bg-white shadow-md hover:shadow-lg ring-2 ring-amber-50/2  w-full p-5">
           <div className="flex justify-between items-center relative">
             <FaCube className="text-5xl" />
             <div className="relative" ref={dropdownRef}>

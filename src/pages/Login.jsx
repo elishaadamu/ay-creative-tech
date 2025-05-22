@@ -111,6 +111,25 @@ const Login = () => {
             </h3>
             <p className="mb-5 text-gray-500">Please sign-in to your account</p>
           </div>
+          {error && (
+            <div className="text-red-500 border border-red-400 p-3 rounded text-sm mt-2">
+              {error}
+              {(error.toLowerCase().includes("incorrect password") ||
+                error.toLowerCase().includes("wrong password")) && (
+                <div className="mt-2">
+                  <span>
+                    Forgot your password?{" "}
+                    <NavLink
+                      to="/resetpassword"
+                      className="text-amber-600 underline font-bold"
+                    >
+                      Reset it here
+                    </NavLink>
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="w-full">
             <div className="relative mb-4"></div>
 
@@ -144,13 +163,6 @@ const Login = () => {
               >
                 PASSWORD
               </label>
-              <NavLink
-                exact="true"
-                to="/forgottenpassword"
-                className="text-amber-500 text-[12px]"
-              >
-                Forgot Password?
-              </NavLink>
             </p>
             <div className="relative">
               <input
@@ -165,6 +177,15 @@ const Login = () => {
                 value={form.password}
                 onChange={handleChange}
               />
+              <div className="my-5">
+                <NavLink
+                  exact="true"
+                  to="/forgottenpassword"
+                  className="text-amber-500 text-[16px] font-bold"
+                >
+                  Forgotted Password?
+                </NavLink>
+              </div>
               <button
                 type="button"
                 onClick={togglePasswordVisibility}
@@ -175,25 +196,6 @@ const Login = () => {
               </button>
             </div>
 
-            {error && (
-              <div className="text-red-500 text-sm mt-2">
-                {error}
-                {(error.toLowerCase().includes("incorrect password") ||
-                  error.toLowerCase().includes("wrong password")) && (
-                  <div className="mt-2">
-                    <span>
-                      Forgot your password?{" "}
-                      <NavLink
-                        to="/resetpassword"
-                        className="text-amber-600 underline font-bold"
-                      >
-                        Reset it here
-                      </NavLink>
-                    </span>
-                  </div>
-                )}
-              </div>
-            )}
             <button
               type="submit"
               disabled={loading}
@@ -224,58 +226,6 @@ const Login = () => {
               {loading ? "Signing in..." : "Signin"}
             </button>
           </form>
-
-          <p className="text-gray-400 text-center text-xl my-5">or</p>
-          <div className="flex flex-col md:flex-row gap-3">
-            {/* Google Button */}
-            <button className="btn bg-white text-black border-[#e5e5e5] border h-10 flex items-center justify-center w-full">
-              <svg
-                aria-label="Google logo"
-                width="16"
-                height="16"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 512 512"
-              >
-                <g>
-                  <path d="m0 0H512V512H0" fill="#fff"></path>
-                  <path
-                    fill="#34a853"
-                    d="M153 292c30 82 118 95 171 60h62v48A192 192 0 0190 341"
-                  ></path>
-                  <path
-                    fill="#4285f4"
-                    d="m386 400a140 175 0 0053-179H260v74h102q-7 37-38 57"
-                  ></path>
-                  <path
-                    fill="#fbbc02"
-                    d="m90 341a208 200 0 010-171l63 49q-12 37 0 73"
-                  ></path>
-                  <path
-                    fill="#ea4335"
-                    d="m153 219c22-69 116-109 179-50l55-54c-78-75-230-72-297 55"
-                  ></path>
-                </g>
-              </svg>
-              <span className="ml-2">Login with Google</span>
-            </button>
-
-            {/* Facebook Button */}
-            <button className="btn bg-[#1A77F2] text-white border-[#005fd8] border h-10 flex items-center justify-center w-full">
-              <svg
-                aria-label="Facebook logo"
-                width="16"
-                height="16"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 32 32"
-              >
-                <path
-                  fill="white"
-                  d="M8 12h5V8c0-6 4-7 11-6v5c-4 0-5 0-5 3v2h5l-1 6h-4v12h-6V18H8z"
-                ></path>
-              </svg>
-              <span className="ml-2">Login with Facebook</span>
-            </button>
-          </div>
 
           <p className="mt-5 text-center">
             <span className="text-gray-400 text-[16px]">
