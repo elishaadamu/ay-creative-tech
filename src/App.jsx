@@ -13,6 +13,9 @@ import Footer from "./components/Footer";
 import NotFound from "./pages/NotFound";
 import Dashboard from "./user/dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ForgottenPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import InputOTP from "./pages/InputOTP";
 
 const App = () => {
   const location = useLocation();
@@ -30,6 +33,12 @@ const App = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/contact" element={<Contact />} /> {/* 404 Route */}
             <Route path="*" element={<NotFound />} /> {/* 404 Route */}
+            <Route
+              path="/forgottenpassword"
+              element={<ForgottenPassword />}
+            />{" "}
+            <Route path="/resetpassword" element={<ResetPassword />} />{" "}
+            <Route path="/otp" element={<InputOTP />} /> {/* 404 Route */}
             <Route
               path="/dashboard/*"
               element={

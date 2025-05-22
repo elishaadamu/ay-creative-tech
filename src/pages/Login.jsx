@@ -144,9 +144,13 @@ const Login = () => {
               >
                 PASSWORD
               </label>
-              <a href="#" className="text-amber-500 text-[12px]">
+              <NavLink
+                exact="true"
+                to="/forgottenpassword"
+                className="text-amber-500 text-[12px]"
+              >
                 Forgot Password?
-              </a>
+              </NavLink>
             </p>
             <div className="relative">
               <input
@@ -181,7 +185,25 @@ const Login = () => {
                 Remember me
               </label>
             </div>
-            {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
+            {error && (
+              <div className="text-red-500 text-sm mt-2">
+                {error}
+                {(error.toLowerCase().includes("incorrect password") ||
+                  error.toLowerCase().includes("wrong password")) && (
+                  <div className="mt-2">
+                    <span>
+                      Forgot your password?{" "}
+                      <NavLink
+                        to="/resetpassword"
+                        className="text-amber-600 underline font-bold"
+                      >
+                        Reset it here
+                      </NavLink>
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
             <button
               type="submit"
               disabled={loading}
@@ -205,7 +227,7 @@ const Login = () => {
                   <path
                     className="opacity-75"
                     fill="currentColor"
-                    d="M4 12a8 8 0 018-8v8z"
+                    d="M4 12a8 8 0 008-8v8z"
                   ></path>
                 </svg>
               )}
