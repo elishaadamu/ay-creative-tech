@@ -64,7 +64,7 @@ const sidebarSections = [
         label: "Transactions History",
       },
       {
-        to: "/verifications/history",
+        to: "verificationhistory",
         icon: <MdHistory className="w-5 h-5" />,
         label: "Verifications History",
       },
