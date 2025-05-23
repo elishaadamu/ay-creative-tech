@@ -25,6 +25,7 @@ function Dashboard() {
 
   const [creatingAccount, setCreatingAccount] = useState(false);
   const [account, setAccount] = useState(null);
+  const [loadingAccount, setLoadingAccount] = useState(true);
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const firstName = user.firstName || "User";
@@ -33,6 +34,7 @@ function Dashboard() {
   // Fetch account info on mount
   useEffect(() => {
     const fetchAccount = async () => {
+      setLoadingAccount(true);
       try {
         const res = await axios.get(
           `https://verification-bdef.onrender.com/api/virtualAccount/${userId}`
@@ -42,6 +44,7 @@ function Dashboard() {
         setAccount(null);
         console.error("Fetch account error:", err, err.response?.data);
       }
+      setLoadingAccount(false);
     };
     if (userId) {
       fetchAccount();
@@ -201,7 +204,11 @@ function Dashboard() {
       </div>
       <div className="flex justify-center  max-w-full flex-col md:flex-row  gap-10">
         <div className="flex-1/2 rounded-lg bg-white hover:shadow-lg shadow-md ring-2 ring-amber-50/2 w-full p-7">
-          {account ? (
+          {loadingAccount ? (
+            <div className="flex items-center justify-center h-[100px]">
+              <span className="text-gray-400">Loading...</span>
+            </div>
+          ) : account ? (
             <>
               <p className="text-gray-500 text-[16px] font-light">
                 Wallet Balance

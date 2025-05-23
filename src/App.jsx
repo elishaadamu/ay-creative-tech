@@ -1,8 +1,7 @@
 import "./style.css";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
-import React from "react";
 import Home from "./pages/Home";
 import NavBar from "./components/Nav";
 import Backtotop from "./components/Backtotop";
@@ -22,6 +21,45 @@ const App = () => {
   const showLayout =
     location.pathname === "/" || location.pathname === "/contact";
 
+  // Loading spinner state
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate loading (replace with actual loading logic if needed)
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1200); // 1.2 seconds, adjust as needed
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <svg
+          className="animate-spin h-12 w-12 text-amber-500"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          ></circle>
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8v8z"
+          ></path>
+        </svg>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col min-h-screen">
       {showLayout && <NavBar />}
@@ -31,14 +69,11 @@ const App = () => {
             <Route path="/" element={<Home />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/contact" element={<Contact />} /> {/* 404 Route */}
-            <Route path="*" element={<NotFound />} /> {/* 404 Route */}
-            <Route
-              path="/forgottenpassword"
-              element={<ForgottenPassword />}
-            />{" "}
-            <Route path="/resetpassword" element={<ResetPassword />} />{" "}
-            <Route path="/otp" element={<InputOTP />} /> {/* 404 Route */}
+            <Route path="/contact" element={<Contact />} />
+            <Route path="*" element={<NotFound />} />
+            <Route path="/forgottenpassword" element={<ForgottenPassword />} />
+            <Route path="/resetpassword" element={<ResetPassword />} />
+            <Route path="/otp" element={<InputOTP />} />
             <Route
               path="/dashboard/*"
               element={
@@ -47,7 +82,6 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
-            {/* 404 Route */}
           </Routes>
         </AnimatePresence>
       </div>
