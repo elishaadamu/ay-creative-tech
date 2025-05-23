@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import axios from "axios";
 import { CiWallet } from "react-icons/ci";
 import { FaEllipsisVertical } from "react-icons/fa6";
 import { FaCube } from "react-icons/fa6";
@@ -11,6 +12,8 @@ import Bank from "../assets/images/bank.webp";
 import Data from "../assets/images/data.png";
 import { IoClose } from "react-icons/io5";
 import "../assets/css/style.css";
+import Logo from "../assets/images/logo-ay.png";
+import Swal from "sweetalert2";
 
 function Dashboard() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -19,6 +22,31 @@ function Dashboard() {
 
   const [isOpen, setIsOpen] = useState(false); // <-- add this
   const toggleModal = () => setIsOpen((open) => !open); // <-- and this
+
+  const [creatingAccount, setCreatingAccount] = useState(false);
+  const [account, setAccount] = useState(null);
+
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const firstName = user.firstName || "User";
+  const userId = user._id || user.id;
+
+  // Fetch account info on mount
+  useEffect(() => {
+    const fetchAccount = async () => {
+      try {
+        const res = await axios.get(
+          `https://verification-bdef.onrender.com/api/virtualAccount/${userId}`
+        );
+        setAccount(res.data); // <-- use res.data, not res.data.account
+      } catch (err) {
+        setAccount(null);
+        console.error("Fetch account error:", err, err.response?.data);
+      }
+    };
+    if (userId) {
+      fetchAccount();
+    }
+  }, [userId]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -37,12 +65,45 @@ function Dashboard() {
     };
   }, [dropdownOpen]);
 
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const firstName = user.firstName || "User";
-
   const handleLogout = () => {
     localStorage.removeItem("user");
     navigate("/login");
+  };
+
+  const handleCreateAccount = async () => {
+    setCreatingAccount(true);
+    try {
+      const res = await axios.post(
+        `https://verification-bdef.onrender.com/api/virtualAccount/create/${userId}`
+      );
+      console.log("Create account response:", res.data);
+
+      const accountRes = await axios.get(
+        `https://verification-bdef.onrender.com/api/virtualAccount/${userId}`
+      );
+      setAccount(accountRes.data);
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ ...user, account: accountRes.data })
+      );
+
+      // SweetAlert success
+      Swal.fire({
+        icon: "success",
+        title: "Account Created!",
+        text: "Your virtual account has been created successfully. You can now fund your wallet.",
+        timer: 2500,
+        showConfirmButton: false,
+      });
+    } catch (err) {
+      console.error("Create account error:", err, err.response?.data);
+      alert(
+        err.response?.data?.message ||
+          "Failed to create account. Please try again."
+      );
+    }
+    setCreatingAccount(false);
   };
 
   // navItems.js
@@ -140,19 +201,40 @@ function Dashboard() {
       </div>
       <div className="flex justify-center  max-w-full flex-col md:flex-row  gap-10">
         <div className="flex-1/2 rounded-lg bg-white hover:shadow-lg shadow-md ring-2 ring-amber-50/2 w-full p-7">
-          <p className="text-gray-500 text-[16px] font-light">Wallet Balance</p>
-          <p className="text-gray-600 text-[30px] mb-10 font-bold font-sans">
-            ₦0.00
-          </p>
-          <p
-            onClick={toggleModal}
-            className="w-[140px] h-[40px] text-black bg-amber-400 cursor-pointer hover:bg-amber-500 max-w-full rounded-lg p-2"
-          >
-            <span className="flex flex-row items-center gap-2">
-              <CiWallet className="text-2xl font-bold" />
-              <span>Add Money</span>
-            </span>
-          </p>
+          {account ? (
+            <>
+              <p className="text-gray-500 text-[16px] font-light">
+                Wallet Balance
+              </p>
+              <p className="text-gray-600 text-[30px] mb-10 font-bold font-sans">
+                ₦{account.balance || "0.00"}
+              </p>
+              <p
+                onClick={toggleModal}
+                className="w-[140px] h-[40px] text-black bg-amber-400 cursor-pointer hover:bg-amber-500 max-w-full rounded-lg p-2"
+                style={{ marginTop: "16px" }}
+              >
+                <span className="flex flex-row items-center gap-2">
+                  <CiWallet className="text-2xl font-bold" />
+                  <span>Add Money</span>
+                </span>
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="mb-4 text-gray-500 text-[15px]">
+                To use your wallet, you need to create a virtual account. Click
+                the button below to get started! 🚀
+              </p>
+              <button
+                className="w-[140px] h-[40px] text-black bg-amber-400 cursor-pointer hover:bg-amber-500 max-w-full rounded-lg p-2 flex items-center justify-center"
+                onClick={handleCreateAccount}
+                disabled={creatingAccount}
+              >
+                {creatingAccount ? "Creating..." : "Create Account"}
+              </button>
+            </>
+          )}
 
           {/* Modal */}
           {isOpen && (
@@ -173,19 +255,20 @@ function Dashboard() {
                 </p>
 
                 <div className="flex justify-center mb-4">
-                  <div className="bg-green-100 rounded-full p-4">
-                    <img
-                      src="/logo.png"
-                      alt="Wallet Icon"
-                      className="h-8 w-8"
-                    />{" "}
-                    {/* Replace with actual image path */}
-                  </div>
+                  <img src={Logo} alt="Wallet Icon" className="w-30" />
                 </div>
 
-                <p className="font-semibold">Twinshub-Elisha Adamu</p>
-                <p className="text-sm text-gray-600">9Payment Service Bank</p>
-                <p className="text-lg font-bold mt-1">5744426550</p>
+                {account ? (
+                  <>
+                    <p className="font-semibold">{account.accountName}</p>
+                    <p className="text-sm text-gray-600">{account.bankName}</p>
+                    <p className="text-lg font-bold mt-1">
+                      {account.accountNumber}
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-red-500">No account details available.</p>
+                )}
               </div>
             </div>
           )}
@@ -236,6 +319,7 @@ function Dashboard() {
           </NavLink>
         ))}
       </div>
+      {/* <pre>{JSON.stringify(account, null, 2)}</pre> */}
     </div>
   );
 }

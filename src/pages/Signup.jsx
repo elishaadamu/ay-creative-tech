@@ -1,12 +1,13 @@
 // src/pages/Home.jsx
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import Logo from "../assets/images/logo-ay.png";
 import Svg from "../assets/images/bg.svg";
 import { TbEye, TbEyeOff } from "react-icons/tb";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -24,6 +25,9 @@ const Signup = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [invalidFields, setInvalidFields] = useState({});
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
+  const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState);
@@ -106,10 +110,28 @@ const Signup = () => {
       });
       setInvalidFields({});
       setStep(1);
+
+      Swal.fire({
+        icon: "success",
+        title: "Signup Successful!",
+        text: "You will be redirected to login.",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
     } catch (err) {
-      setError(
-        err.response?.data?.message || "Signup failed. Please try again."
-      );
+      const message =
+        err.response?.data?.message || "Signup failed. Please try again.";
+      setError(message);
+      setLoading(false);
+
+      // Show toast if user exists
+      if (message === "User already exists") {
+        toast.error("User already exists. Please login.");
+      }
     }
     setLoading(false);
   };
@@ -140,6 +162,23 @@ const Signup = () => {
             Welcome to AY Creative Technologies
           </h3>
           <p className="mb-5 text-gray-500">Create a new account</p>
+
+          {error && (
+            <div className="border border-red-400 bg-red-50 rounded p-5 text-red-500 text-sm mt-2 mb-4">
+              {error}
+              {error === "User already exists" && (
+                <span>
+                  {" "}
+                  <NavLink
+                    to="/login"
+                    className="text-blue-400 underline font-bold"
+                  >
+                    Sign in
+                  </NavLink>
+                </span>
+              )}
+            </div>
+          )}
         </div>
         <form
           onSubmit={step === 1 ? handleNext : handleSubmit}
@@ -350,22 +389,6 @@ const Signup = () => {
             </>
           )}
 
-          {error && (
-            <div className="text-red-500 text-sm mt-2">
-              {error}
-              {error === "User already exists" && (
-                <span>
-                  {" "}
-                  <NavLink
-                    to="/login"
-                    className="text-blue-500 underline font-bold"
-                  >
-                    Sign in
-                  </NavLink>
-                </span>
-              )}
-            </div>
-          )}
           {success && (
             <div className="text-green-600 text-sm mt-2">
               {success}{" "}
@@ -390,6 +413,7 @@ const Signup = () => {
       <div className="bg-form-2 absolute">
         <img src={Svg} alt="Bg" className="w-full" />
       </div>
+      <ToastContainer />
     </motion.div>
   );
 };
