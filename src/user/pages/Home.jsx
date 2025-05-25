@@ -36,6 +36,20 @@ function Dashboard() {
   const firstName = user.firstName || "User";
   const userId = user._id || user.id;
 
+  // Detect if user is new or returning
+  const [isReturning, setIsReturning] = useState(false);
+
+  useEffect(() => {
+    // Check localStorage for a flag
+    const hasVisited = localStorage.getItem("hasVisitedAYCreative");
+    if (hasVisited) {
+      setIsReturning(true);
+    } else {
+      setIsReturning(false);
+      localStorage.setItem("hasVisitedAYCreative", "true");
+    }
+  }, []);
+
   // Fetch account info on mount
   useEffect(() => {
     const fetchAccount = async () => {
@@ -162,7 +176,7 @@ function Dashboard() {
       id: 8,
       name: "ENROLLMENT",
       icon: NIMC,
-      to: "/cac",
+      to: "/dashboard/enrollment",
     },
     {
       id: 9,
@@ -215,7 +229,9 @@ function Dashboard() {
   return (
     <div className="max-w-[1500px] mx-auto">
       <div className="mb-10 text-2xl text-gray-500 font-bold">
-        Welcome to AY Creative Technologies, {firstName}
+        {isReturning
+          ? `Welcome back, ${firstName} 🙂`
+          : `Welcome to AY Creative Technologies, ${firstName} 👋`}
       </div>
       <div className="flex justify-center  max-w-full flex-col md:flex-row  gap-10">
         <div className="flex-1/2 rounded-lg bg-white hover:shadow-lg shadow-md ring-2 ring-amber-50/2 w-full p-7">
@@ -293,7 +309,7 @@ function Dashboard() {
                 {account ? (
                   <>
                     <p className="font-semibold text-gray-500">
-                      {account.accountName}
+                      Datapin-{account.accountName}
                     </p>
                     <p className="text-xl text-gray-500">{account.bankName}</p>
                     <div className="flex items-center justify-center gap-2 mt-1">

@@ -155,7 +155,7 @@ html {
   bottom: 0;
 }
 form input {
-  border-radius: 10px;
+  border-radius: 6px;
 }
 input:focus::placeholder {
   color: #adb0cd;
@@ -163,13 +163,11 @@ input:focus::placeholder {
 }
 input::placeholder {
   color: #adb0cd;
+  font-size: 15px;
   transition: padding-left 0.5s;
 }
 form input:focus {
   box-shadow: 1px 1px 10px rgb(223, 223, 223);
-}
-
-input:focus {
 }
 
 .submit:hover {

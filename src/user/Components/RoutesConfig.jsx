@@ -5,6 +5,8 @@ import PhoneNIN from "../pages/PhoneNIN";
 import Home from "../pages/Home";
 import Footer from "../Components/Footer";
 import VerificationHistory from "../pages/VerificationHistory";
+import BVNVerify from "../pages/BVNVerify";
+import Enrollment from "../pages/enrollment";
 
 function RoutesConfig() {
   return (
@@ -14,6 +16,8 @@ function RoutesConfig() {
         <Route path="verifications/nin" element={<NIN />} />
         <Route path="verificationhistory" element={<VerificationHistory />} />
         <Route path="verifications/pvn" element={<PhoneNIN />} />
+        <Route path="enrollment" element={<Enrollment />} />
+        <Route path="verifications/bvn" element={<BVNVerify />} />
       </Routes>
       <Footer />
     </div>

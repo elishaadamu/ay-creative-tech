@@ -22,6 +22,7 @@ import {
 } from "react-icons/fa";
 import { RiPassportFill } from "react-icons/ri";
 import { MdHistory } from "react-icons/md";
+import { IoEnterSharp } from "react-icons/io5";
 
 const sidebarSections = [
   {
@@ -49,9 +50,14 @@ const sidebarSections = [
         label: "NIN With Phone",
       },
       {
-        to: "/verifications/bvn",
+        to: "/dashboard/verifications/bvn",
         icon: <FaSimCard className="w-5 h-5" />,
         label: "BVN Verification",
+      },
+      {
+        to: "/dashboard/enrollment",
+        icon: <IoEnterSharp className="w-5 h-5" />,
+        label: "Enrollment",
       },
     ],
   },
@@ -59,12 +65,12 @@ const sidebarSections = [
     section: "SUMMARY AND HISTORY",
     links: [
       {
-        to: "/transactions",
+        to: "/dashboard/transactionhistory",
         icon: <FiFileText className="w-5 h-5" />,
         label: "Transactions History",
       },
       {
-        to: "verificationhistory",
+        to: "/dashboard/verificationhistory",
         icon: <MdHistory className="w-5 h-5" />,
         label: "Verifications History",
       },
@@ -145,84 +151,6 @@ function Sidebar({ collapsed, setCollapsed }) {
               {section.section === "VERIFICATIONS" ? (
                 <>
                   {section.links.map((link, j) => {
-                    // Dropdown parent for BVN with CAC-1 and CAC-2
-                    if (link.label === "BVN Verification") {
-                      return (
-                        <div key={j} className="relative">
-                          <button
-                            type="button"
-                            onClick={() => setDropdownOpen((prev) => !prev)}
-                            className={`flex items-center w-full px-6 py-2 text-sm font-medium border-l-4 transition-colors duration-200
-                              ${collapsed ? "justify-center px-0" : ""}
-                              ${
-                                dropdownOpen
-                                  ? "border-amber-400 text-amber-300 bg-gray-800"
-                                  : "border-transparent text-gray-300 hover:text-amber-300 hover:bg-gray-800"
-                              }`}
-                            title={collapsed ? link.label : undefined}
-                          >
-                            {link.icon}
-                            {!collapsed && (
-                              <>
-                                <span className="ml-3">{link.label}</span>
-                                <svg
-                                  className={`ml-auto w-4 h-4 transition-transform duration-300 ${
-                                    dropdownOpen ? "rotate-90" : ""
-                                  }`}
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M9 5l7 7-7 7"
-                                  />
-                                </svg>
-                              </>
-                            )}
-                          </button>
-                          {/* Dropdown content */}
-                          <div
-                            className={`overflow-hidden transition-all duration-300 bg-gray-800
-                              ${
-                                dropdownOpen && !collapsed
-                                  ? "max-h-40 py-1"
-                                  : "max-h-0 py-0"
-                              }
-                            `}
-                          >
-                            <NavLink
-                              to="/verifications/cac-1"
-                              className={({ isActive }) =>
-                                `flex items-center px-10 py-2 text-sm font-medium border-l-4 transition-colors duration-200
-                                ${
-                                  isActive
-                                    ? "border-amber-400 text-amber-300 bg-gray-800"
-                                    : "border-transparent text-gray-300 hover:text-amber-300 hover:bg-gray-800"
-                                }`
-                              }
-                            >
-                              CAC-1
-                            </NavLink>
-                            <NavLink
-                              to="/verifications/cac-2"
-                              className={({ isActive }) =>
-                                `flex items-center px-10 py-2 text-sm font-medium border-l-4 transition-colors duration-200
-                                ${
-                                  isActive
-                                    ? "border-amber-400 text-amber-300 bg-gray-800"
-                                    : "border-transparent text-gray-300 hover:text-amber-300 hover:bg-gray-800"
-                                }`
-                              }
-                            >
-                              CAC-2
-                            </NavLink>
-                          </div>
-                        </div>
-                      );
-                    }
                     // Normal links
                     return (
                       <NavLink
