@@ -7,8 +7,8 @@ import Footer from "../Components/Footer";
 import VerificationHistory from "../pages/VerificationHistory";
 import BVNVerify from "../pages/BVNVerify";
 import Enrollment from "../pages/enrollment";
-import DataSub from "../pages/Data";
-import AirtimeSub from "../pages/airtime";
+import DataSubscription from "../pages/Data";
+import AirtimeSubscription from "../pages/airtime";
 
 function RoutesConfig() {
   return (
@@ -20,8 +20,8 @@ function RoutesConfig() {
         <Route path="verifications/pvn" element={<PhoneNIN />} />
         <Route path="enrollment" element={<Enrollment />} />
         <Route path="verifications/bvn" element={<BVNVerify />} />
-        <Route path="data" element={<DataSub />} />
-        <Route path="airtime" element={<AirtimeSub />} />
+        <Route path="data" element={<DataSubscription />} />
+        <Route path="airtime" element={<AirtimeSubscription />} />
       </Routes>
       <Footer />
     </div>
