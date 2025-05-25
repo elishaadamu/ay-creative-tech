@@ -6,9 +6,9 @@ import Home from "../pages/Home";
 import Footer from "../Components/Footer";
 import VerificationHistory from "../pages/VerificationHistory";
 import BVNVerify from "../pages/BVNVerify";
-import Enrollment from "../pages/enrollment";
+import Enrollment from "../pages/Enrollment";
 import DataSubscription from "../pages/Data";
-import AirtimeSubscription from "../pages/airtime";
+import AirtimeSubscription from "../pages/Airtime";
 
 function RoutesConfig() {
   return (
