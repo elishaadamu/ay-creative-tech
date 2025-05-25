@@ -23,6 +23,8 @@ import {
 import { RiPassportFill } from "react-icons/ri";
 import { MdHistory } from "react-icons/md";
 import { IoEnterSharp } from "react-icons/io5";
+import { MdOutlineSubscriptions } from "react-icons/md";
+import { MdContactPhone } from "react-icons/md";
 
 const sidebarSections = [
   {
@@ -58,6 +60,16 @@ const sidebarSections = [
         to: "/dashboard/enrollment",
         icon: <IoEnterSharp className="w-5 h-5" />,
         label: "Enrollment",
+      },
+      {
+        to: "/dashboard/data",
+        icon: <MdOutlineSubscriptions className="w-5 h-5" />,
+        label: "Data Subscription",
+      },
+      {
+        to: "/dashboard/airtime",
+        icon: <MdContactPhone className="w-5 h-5" />,
+        label: "Airtime Subscription",
       },
     ],
   },
