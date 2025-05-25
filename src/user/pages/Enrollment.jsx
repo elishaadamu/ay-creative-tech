@@ -283,7 +283,7 @@ function Enrollment() {
             <div className="w-full max-w-md h-[40px] flex items-center border border-gray-300 rounded-[6px] focus-within:border-gray-200 bg-white overflow-hidden">
               <label
                 htmlFor="file-upload"
-                className="flex-1/4 bg-gray-100 hover:bg-gray-200 cursor-pointer py-2 pl-5 pr-2 text-gray-500 border-r border-gray-300"
+                className="flex-1/4 bg-gray-100  hover:bg-gray-200 cursor-pointer pl-1  py-2 md:pl-2 pr-0 text-gray-500 border-r border-gray-300"
               >
                 <input
                   id="file-upload"
@@ -293,7 +293,7 @@ function Enrollment() {
                   className="hidden"
                   required
                 />
-                <span>Choose file</span>
+                <span className="text-[12px] md:text-[15px]">Choose file</span>
               </label>
               <span className="flex-3/4 pl-3 text-gray-600 text-sm truncate pr-2">
                 {form.file ? form.file.name : "No file has been chosen"}
