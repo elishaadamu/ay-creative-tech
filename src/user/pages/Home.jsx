@@ -11,9 +11,12 @@ import Airtime from "../assets/images/airtime.png";
 import Bank from "../assets/images/bank.webp";
 import Data from "../assets/images/data.png";
 import { IoClose } from "react-icons/io5";
+import { FaRegCopy } from "react-icons/fa"; // <-- Add this import
 import "../assets/css/style.css";
 import Logo from "../assets/images/logo-ay.png";
 import Swal from "sweetalert2";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function Dashboard() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -26,6 +29,8 @@ function Dashboard() {
   const [creatingAccount, setCreatingAccount] = useState(false);
   const [account, setAccount] = useState(null);
   const [loadingAccount, setLoadingAccount] = useState(true);
+
+  const [modalVisible, setModalVisible] = useState(false);
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const firstName = user.firstName || "User";
@@ -197,6 +202,16 @@ function Dashboard() {
     },
   ];
 
+  const openModal = () => {
+    setIsOpen(true);
+    setTimeout(() => setModalVisible(true), 10); // allow for transition
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+    setTimeout(() => setIsOpen(false), 300); // match transition duration
+  };
+
   return (
     <div className="max-w-[1500px] mx-auto">
       <div className="mb-10 text-2xl text-gray-500 font-bold">
@@ -217,7 +232,7 @@ function Dashboard() {
                 ₦{account.balance || "0.00"}
               </p>
               <p
-                onClick={toggleModal}
+                onClick={openModal}
                 className="w-[140px] h-[40px] text-black bg-amber-400 cursor-pointer hover:bg-amber-500 max-w-full rounded-lg p-2"
                 style={{ marginTop: "16px" }}
               >
@@ -245,33 +260,65 @@ function Dashboard() {
 
           {/* Modal */}
           {isOpen && (
-            <div className="modal-overlay flex justify-center items-center z-50">
-              <div className="bg-white rounded-xl p-8 w-[320px] max-w-full text-center relative shadow-xl">
+            <div
+              className={`fixed inset-0 z-50 flex justify-center items-center bg-black/30 transition-opacity duration-300 ${
+                modalVisible ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              <div
+                className={`bg-white rounded-xl w-[450px] h-[450px] max-w-full text-center relative shadow-xl transform transition-all duration-300 ${
+                  modalVisible ? "scale-100" : "scale-90"
+                } flex flex-col justify-center items-center mx-auto`}
+              >
                 {/* Close Button */}
                 <button
-                  className="absolute top-2 right-2 text-gray-500 hover:text-black"
-                  onClick={toggleModal}
+                  className="absolute top-[-10px] right-[-15px] cursor-pointer bg-gray-200 rounded p-1 text-gray-500 hover:text-black"
+                  onClick={closeModal}
                 >
                   <IoClose size={24} />
                 </button>
 
                 {/* Modal Content */}
-                <h2 className="text-xl font-bold mb-1">Fund Your Wallet</h2>
-                <p className="text-sm mb-4 text-gray-600">
+                <h2 className="text-2xl font-bold text-gray-500 mb-1">
+                  Fund Your Wallet
+                </h2>
+                <p className="text-md my-4 text-gray-500">
                   Send money to your AY Creative Technologies Account
                 </p>
 
-                <div className="flex justify-center mb-4">
-                  <img src={Logo} alt="Wallet Icon" className="w-30" />
+                <div className="flex justify-center mt-5 mb-10">
+                  <img src={Logo} alt="Wallet Icon" className="w-[200px]" />
                 </div>
 
                 {account ? (
                   <>
-                    <p className="font-semibold">{account.accountName}</p>
-                    <p className="text-sm text-gray-600">{account.bankName}</p>
-                    <p className="text-lg font-bold mt-1">
-                      {account.accountNumber}
+                    <p className="font-semibold text-gray-500">
+                      {account.accountName}
                     </p>
+                    <p className="text-xl text-gray-500">{account.bankName}</p>
+                    <div className="flex items-center justify-center gap-2 mt-1">
+                      <p className="text-xl text-gray-500 font-bold mb-0">
+                        {account.accountNumber}
+                      </p>
+                      <button
+                        className="ml-2 text-gray-500 hover:text-amber-500"
+                        onClick={() => {
+                          navigator.clipboard.writeText(account.accountNumber);
+                          toast.success("Copied!", {
+                            position: "top-center",
+                            autoClose: 1200,
+                            hideProgressBar: true,
+                            closeOnClick: true,
+                            pauseOnHover: false,
+                            draggable: false,
+                            style: { fontSize: "15px" },
+                          });
+                        }}
+                        title="Copy account number"
+                      >
+                        <FaRegCopy size={20} />
+                      </button>
+                    </div>
                   </>
                 ) : (
                   <p className="text-red-500">No account details available.</p>
@@ -327,6 +374,7 @@ function Dashboard() {
         ))}
       </div>
       {/* <pre>{JSON.stringify(account, null, 2)}</pre> */}
+      <ToastContainer />
     </div>
   );
 }
