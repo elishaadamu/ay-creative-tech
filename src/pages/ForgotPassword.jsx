@@ -50,7 +50,7 @@ const ForgotPassword = () => {
 
     try {
       const response = await axios.post(
-        `${config.apiBaseUrl}${config.endpoints.forgotPassword}`,
+        `${import.meta.env.VITE_API_BASE_URL}/auth/forgotPassword`,
         {
           email: form.email,
         },

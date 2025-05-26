@@ -20,7 +20,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { config } from "../../config/config.jsx";
 import CryptoJS from "crypto-js";
 
-const SECRET_KEY = process.env.REACT_APP_SECRET_KEY;
+const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
 
 function encryptData(data) {
   return CryptoJS.AES.encrypt(JSON.stringify(data), SECRET_KEY).toString();

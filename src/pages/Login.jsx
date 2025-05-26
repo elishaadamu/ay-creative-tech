@@ -13,21 +13,10 @@ import CryptoJS from "crypto-js";
 // Import config
 import { config } from "../config/config.jsx";
 
-const SECRET_KEY = process.env.REACT_APP_SECRET_KEY;
+const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
 
 function encryptData(data) {
   return CryptoJS.AES.encrypt(JSON.stringify(data), SECRET_KEY).toString();
-}
-
-function decryptData(ciphertext) {
-  if (!ciphertext) return null;
-  try {
-    const bytes = CryptoJS.AES.decrypt(ciphertext, SECRET_KEY);
-    const decrypted = bytes.toString(CryptoJS.enc.Utf8);
-    return JSON.parse(decrypted);
-  } catch {
-    return null;
-  }
 }
 
 const Login = () => {
