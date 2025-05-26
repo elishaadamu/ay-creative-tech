@@ -85,8 +85,6 @@ const Login = () => {
     setLoading(false);
   };
 
-  console.log("Storage key exists:", !!import.meta.env.VITE_STORAGE_KEY);
-
   return (
     <>
       <ToastContainer />
