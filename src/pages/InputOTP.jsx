@@ -89,7 +89,7 @@ const InputOTP = ({ onSubmit }) => {
 
     try {
       const response = await axios.post(
-        "https://verification-bdef.onrender.com/api/auth/verifyOTP",
+        `${config.apiBaseUrl}${config.endpoints.verifyCode}`,
         formData,
         {
           withCredentials: true,

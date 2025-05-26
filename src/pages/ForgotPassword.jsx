@@ -50,7 +50,7 @@ const ForgotPassword = () => {
 
     try {
       const response = await axios.post(
-        "https://verification-bdef.onrender.com/api/auth/forgotPassword",
+        `${config.apiBaseUrl}${config.endpoints.forgotPassword}`,
         {
           email: form.email,
         },

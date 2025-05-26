@@ -4,6 +4,7 @@ import RegularImg from "../assets/images/regular.png";
 import StandardImg from "../assets/images/standard.png";
 import PremiumImg from "../assets/images/premium.png";
 import { MdOutlineSendToMobile } from "react-icons/md";
+import axios from "axios"; // Add this import
 
 function NIN() {
   /* ---------------------------------- data --------------------------------- */
@@ -28,12 +29,38 @@ function NIN() {
   /* ---------------------------- component state ---------------------------- */
   const [selectedVerify, setSelectedVerify] = useState(""); // unselected by default
   const [selectedSlip, setSelectedSlip] = useState(""); // unselected by default
+  const [ninNumber, setNinNumber] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState("");
+
+  // Handle form submit
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setResult(null);
+    setError("");
+    try {
+      const response = await axios.post(
+        "https://verification-bdef.onrender.com/api/verify/nin",
+        { nin: ninNumber },
+        { withCredentials: true }
+      );
+      setResult(response.data);
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+          "Verification failed. Please check the NIN and try again."
+      );
+    }
+    setLoading(false);
+  };
 
   /* --------------------------------- render -------------------------------- */
   return (
     <div className="w-full rounded-2xl mb-10 bg-white p-5 shadow-lg">
       <p className="text-[18px] text-gray-500">NIN Verification</p>
-      <form action="#" method="post">
+      <form action="#" method="post" onSubmit={handleSubmit}>
         {/* ------------------------------- Step #1 ------------------------------- */}
         <p className="mt-7 text-[14px] text-gray-500">1. Verify With</p>
         <hr className="my-5 border-gray-200" />
@@ -143,28 +170,31 @@ function NIN() {
           <hr className="my-7 border-gray-200" />
           <input
             type="text"
-            class="pl-5 py-2 border border-gray-200 focus:border-gray-200 rounded w-full h-[50px]"
+            className="pl-5 py-2 border border-gray-200 focus:border-gray-200 rounded w-full h-[50px]"
             placeholder="NIN NUMBER"
             required
             name="NIN"
             id="number"
-            inputmode="numeric"
+            inputMode="numeric"
             pattern="\d{11}"
-            maxlength="11"
+            maxLength="11"
             title="NIN must be exactly 11 digits"
+            value={ninNumber}
+            onChange={(e) => setNinNumber(e.target.value)}
+            disabled={loading}
           />
 
           <p className="text-gray-400 text-[12px] mt-2 ">
             We'll never share your details with anyone else.
           </p>
-          <label class="flex items-center mt-8 space-x-2 cursor-pointer">
+          <label className="flex items-center mt-8 space-x-2 cursor-pointer">
             <input
               type="checkbox"
               className="checkbox validator"
               required
               title="Required"
             />
-            <span class="text-sm text-gray-400">
+            <span className="text-sm text-gray-400">
               By checking this box, you agreed that the owner of the ID has
               granted you consent to verify his/her identity.
             </span>
@@ -173,10 +203,18 @@ function NIN() {
         <button
           type="submit"
           className="flex items-center text-xl mt-10 mb-8 cursor-pointer justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-medium py-2 px-4 rounded-xl w-full h-[50px] transition-colors"
+          disabled={loading}
         >
           <MdOutlineSendToMobile className="" />
-          Verify
+          {loading ? "Verifying..." : "Verify"}
         </button>
+        {error && <div className="text-red-500 text-center mt-2">{error}</div>}
+        {result && (
+          <div className="text-green-600 text-center mt-2">
+            Verification successful!
+            {/* You can display more result details here if needed */}
+          </div>
+        )}
       </form>
     </div>
   );
