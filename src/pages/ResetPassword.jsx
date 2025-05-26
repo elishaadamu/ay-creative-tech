@@ -9,6 +9,9 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { TbEye, TbEyeOff } from "react-icons/tb";
 
+// Import config
+import { config } from "../config/config.jsx";
+
 const ResetPassword = () => {
   const [form, setForm] = useState({
     password: "",
@@ -76,7 +79,7 @@ const ResetPassword = () => {
 
     try {
       const response = await axios.post(
-        "https://verification-bdef.onrender.com/api/auth/setPassword",
+        `${config.apiBaseUrl}${config.endpoints.setPassword}`,
         formData,
         {
           withCredentials: true,

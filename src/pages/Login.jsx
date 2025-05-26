@@ -9,6 +9,9 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+// Import config
+import { config } from "../config/config.jsx";
+
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({
@@ -55,7 +58,7 @@ const Login = () => {
 
     try {
       const res = await axios.post(
-        "https://verification-bdef.onrender.com/api/auth/login",
+        `${config.apiBaseUrl}${config.endpoints.login}`,
         {
           email: form.email,
           password: form.password,
@@ -80,6 +83,8 @@ const Login = () => {
     }
     setLoading(false);
   };
+
+  console.log("Storage key exists:", !!import.meta.env.VITE_STORAGE_KEY);
 
   return (
     <>
