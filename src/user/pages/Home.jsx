@@ -17,6 +17,7 @@ import Logo from "../assets/images/logo-ay.png";
 import Swal from "sweetalert2";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { config } from "../../config/config.jsx";
 
 function Dashboard() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -56,7 +57,7 @@ function Dashboard() {
       setLoadingAccount(true);
       try {
         const res = await axios.get(
-          `https://verification-bdef.onrender.com/api/virtualAccount/${userId}`
+          `${config.apiBaseUrl}/virtualAccount/${userId}`
         );
         setAccount(res.data); // <-- use res.data, not res.data.account
       } catch (err) {
@@ -96,12 +97,12 @@ function Dashboard() {
     setCreatingAccount(true);
     try {
       const res = await axios.post(
-        `https://verification-bdef.onrender.com/api/virtualAccount/create/${userId}`
+        `${config.apiBaseUrl}/virtualAccount/create/${userId}`
       );
       console.log("Create account response:", res.data);
 
       const accountRes = await axios.get(
-        `https://verification-bdef.onrender.com/api/virtualAccount/${userId}`
+        `${config.apiBaseUrl}/virtualAccount/${userId}`
       );
       setAccount(accountRes.data);
 

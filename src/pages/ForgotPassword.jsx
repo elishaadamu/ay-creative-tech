@@ -8,6 +8,9 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+// Import config
+import { config } from "../config/config.jsx";
+
 const ForgotPassword = () => {
   const [form, setForm] = useState({
     email: "",
@@ -47,7 +50,7 @@ const ForgotPassword = () => {
 
     try {
       const response = await axios.post(
-        "https://verification-bdef.onrender.com/api/auth/forgotPassword",
+        `${config.apiBaseUrl}${config.endpoints.forgotPassword}`,
         {
           email: form.email,
         },

@@ -4,6 +4,9 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 
+// Import config
+import { config } from "../config/config.jsx";
+
 const InputOTP = ({ onSubmit }) => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [invalid, setInvalid] = useState(false);
@@ -86,7 +89,7 @@ const InputOTP = ({ onSubmit }) => {
 
     try {
       const response = await axios.post(
-        "https://verification-bdef.onrender.com/api/auth/verifyCode",
+        `${config.apiBaseUrl}${config.endpoints.verifyCode}`,
         formData,
         {
           withCredentials: true,

@@ -9,6 +9,9 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import Swal from "sweetalert2";
 
+// Import config
+import { config } from "../config/config.jsx";
+
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [step, setStep] = useState(1);
@@ -88,7 +91,7 @@ const Signup = () => {
 
     try {
       const res = await axios.post(
-        "https://verification-bdef.onrender.com/api/auth/register",
+        `${config.apiBaseUrl}${config.endpoints.register}`,
         {
           firstName: form.Firstname,
           lastName: form.Lastname,
