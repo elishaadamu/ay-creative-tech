@@ -10,9 +10,6 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import CryptoJS from "crypto-js";
 
-// Import config
-import { config } from "../config/config.jsx";
-
 const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
 
 function encryptData(data) {
