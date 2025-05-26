@@ -115,12 +115,14 @@ function Dashboard() {
     setCreatingAccount(true);
     try {
       const res = await axios.post(
-        `${config.apiBaseUrl}/virtualAccount/create/${userId}`
+        `${
+          import.meta.env.VITE_API_BASE_URL
+        }/auth/virtualAccount//create/${userId}`
       );
       console.log("Create account response:", res.data);
 
       const accountRes = await axios.get(
-        `${config.apiBaseUrl}/virtualAccount/${userId}`
+        `${import.meta.env.VITE_API_BASE_URL}/auth/virtualAccount/${userId}`
       );
       setAccount(accountRes.data);
 
