@@ -13,8 +13,7 @@ import CryptoJS from "crypto-js";
 // Import config
 import { config } from "../config/config.jsx";
 
-const SECRET_KEY =
-  "4015485fb998cca44587a5a90bde5db1e15692de287405e015f15c5de5c56797"; // Use a strong, private key
+const SECRET_KEY = process.env.REACT_APP_SECRET_KEY;
 
 function encryptData(data) {
   return CryptoJS.AES.encrypt(JSON.stringify(data), SECRET_KEY).toString();
