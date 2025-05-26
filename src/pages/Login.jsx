@@ -182,7 +182,7 @@ const Login = () => {
                 htmlFor="Password"
                 className="text-gray-500  text-[12px]  "
               >
-                PASSWORD Please
+                PASSWORD
               </label>
             </p>
             <div className="relative">
