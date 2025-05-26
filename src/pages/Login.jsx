@@ -71,7 +71,8 @@ const Login = () => {
         navigate("/dashboard");
       }, 1500);
     } catch (err) {
-      const apiMessage = err.response?.data?.message || "Login failed. Please try again.";
+      const apiMessage =
+        err.response?.data?.message || "Login failed. Please try again.";
       setError(apiMessage);
 
       if (
@@ -165,7 +166,7 @@ const Login = () => {
                 htmlFor="Password"
                 className="text-gray-500  text-[12px]  "
               >
-                PASSWORD
+                PASSWORD Please
               </label>
             </p>
             <div className="relative">
