@@ -60,7 +60,7 @@ const ForgotPassword = () => {
       );
 
       // Just log the response
-      console.log("Backend response:", response.data);
+      console.log("Backend responses:", response.data);
 
       // Store email in localStorage
       localStorage.setItem("email", form.email);
