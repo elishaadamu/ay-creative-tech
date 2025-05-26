@@ -65,7 +65,7 @@ const Login = () => {
 
     try {
       const res = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/auth/login`,
+        import.meta.env.VITE_API_BASE_URL_LOGIN, // Use only this env variable
         {
           email: form.email,
           password: form.password,
@@ -82,13 +82,7 @@ const Login = () => {
       const apiMessage =
         err.response?.data?.message || "Login failed. Please try again.";
       setError(apiMessage);
-
-      if (
-        apiMessage.toLowerCase().includes("incorrect password") ||
-        apiMessage.toLowerCase().includes("wrong password")
-      ) {
-        toast.error("Incorrect password. Please try again.");
-      }
+      toast.error(apiMessage);
     }
     setLoading(false);
   };
