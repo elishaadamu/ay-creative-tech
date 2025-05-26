@@ -13,7 +13,7 @@ import AirtimeSubscription from "../pages/Airtime";
 function RoutesConfig() {
   return (
     <div className="flex-1 p-8 md:ml-64 min-h-screen flex flex-col ">
-      <Routes className="flex-1 ">
+      <Routes className="flex-1 notvalid ">
         <Route path="/" element={<Home />} />
         <Route path="verifications/nin" element={<NIN />} />
         <Route path="verificationhistory" element={<VerificationHistory />} />
