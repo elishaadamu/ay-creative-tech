@@ -8,9 +8,16 @@ import { TbEye, TbEyeOff } from "react-icons/tb";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import CryptoJS from "crypto-js";
 
 // Import config
 import { config } from "../config/config.jsx";
+
+const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
+
+function encryptData(data) {
+  return CryptoJS.AES.encrypt(JSON.stringify(data), SECRET_KEY).toString();
+}
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -58,14 +65,14 @@ const Login = () => {
 
     try {
       const res = await axios.post(
-        "https://verification-bdef.onrender.com/api/auth/login",
+        `${config.apiBaseUrl}${config.endpoints.login}`,
         {
           email: form.email,
           password: form.password,
         },
         { withCredentials: true }
       );
-      localStorage.setItem("user", JSON.stringify(res.data));
+      localStorage.setItem("user", encryptData(res.data));
       localStorage.setItem("showWelcomeModal", "true");
       toast.success("Login successful! Redirecting...");
       setTimeout(() => {
@@ -85,8 +92,6 @@ const Login = () => {
     }
     setLoading(false);
   };
-
-  console.log("Storage key exists:", !!import.meta.env.VITE_STORAGE_KEY);
 
   return (
     <>
@@ -167,7 +172,7 @@ const Login = () => {
                 htmlFor="Password"
                 className="text-gray-500  text-[12px]  "
               >
-                PASSWORD Please
+                PASSWORD
               </label>
             </p>
             <div className="relative">
