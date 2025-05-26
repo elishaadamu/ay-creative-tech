@@ -18,6 +18,25 @@ import Swal from "sweetalert2";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { config } from "../../config/config.jsx";
+import CryptoJS from "crypto-js";
+
+const SECRET_KEY =
+  "4015485fb998cca44587a5a90bde5db1e15692de287405e015f15c5de5c56797"; // Use a strong, private key
+
+function encryptData(data) {
+  return CryptoJS.AES.encrypt(JSON.stringify(data), SECRET_KEY).toString();
+}
+
+function decryptData(ciphertext) {
+  if (!ciphertext) return null;
+  try {
+    const bytes = CryptoJS.AES.decrypt(ciphertext, SECRET_KEY);
+    const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+    return JSON.parse(decrypted);
+  } catch {
+    return null;
+  }
+}
 
 function Dashboard() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -33,9 +52,9 @@ function Dashboard() {
 
   const [modalVisible, setModalVisible] = useState(false);
 
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const firstName = user.firstName || "User";
-  const userId = user._id || user.id;
+  const user = decryptData(localStorage.getItem("user"));
+  const firstName = user?.firstName || "User";
+  const userId = user?._id || user?.id;
 
   // Detect if user is new or returning
   const [isReturning, setIsReturning] = useState(false);
@@ -108,7 +127,7 @@ function Dashboard() {
 
       localStorage.setItem(
         "user",
-        JSON.stringify({ ...user, account: accountRes.data })
+        encryptData({ ...user, account: accountRes.data })
       );
 
       // SweetAlert success

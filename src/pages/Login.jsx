@@ -8,9 +8,28 @@ import { TbEye, TbEyeOff } from "react-icons/tb";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import CryptoJS from "crypto-js";
 
 // Import config
 import { config } from "../config/config.jsx";
+
+const SECRET_KEY =
+  "4015485fb998cca44587a5a90bde5db1e15692de287405e015f15c5de5c56797"; // Use a strong, private key
+
+function encryptData(data) {
+  return CryptoJS.AES.encrypt(JSON.stringify(data), SECRET_KEY).toString();
+}
+
+function decryptData(ciphertext) {
+  if (!ciphertext) return null;
+  try {
+    const bytes = CryptoJS.AES.decrypt(ciphertext, SECRET_KEY);
+    const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+    return JSON.parse(decrypted);
+  } catch {
+    return null;
+  }
+}
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -64,7 +83,7 @@ const Login = () => {
           password: form.password,
         }
       );
-      localStorage.setItem("user", JSON.stringify(res.data));
+      localStorage.setItem("user", encryptData(res.data));
       localStorage.setItem("showWelcomeModal", "true");
       toast.success("Login successful! Redirecting...");
       setTimeout(() => {
