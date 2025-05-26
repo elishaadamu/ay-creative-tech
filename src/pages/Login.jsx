@@ -65,7 +65,7 @@ const Login = () => {
 
     try {
       const res = await axios.post(
-        `${config.apiBaseUrl}${config.endpoints.login}`,
+        "https://verification-bdef.onrender.com/api/auth/login",
         {
           email: form.email,
           password: form.password,
