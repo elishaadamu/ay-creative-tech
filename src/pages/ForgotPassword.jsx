@@ -50,7 +50,7 @@ const ForgotPassword = () => {
 
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/auth/forgotPassword`,
+        "https://verification-bdef.onrender.com/api/auth/forgotPassword",
         {
           email: form.email,
         },

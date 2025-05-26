@@ -91,7 +91,7 @@ const Signup = () => {
 
     try {
       const res = await axios.post(
-        `${config.apiBaseUrl}${config.endpoints.register}`,
+        "https://verification-bdef.onrender.com/api/auth/signup",
         {
           firstName: form.Firstname,
           lastName: form.Lastname,

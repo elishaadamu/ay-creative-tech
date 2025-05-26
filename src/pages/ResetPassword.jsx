@@ -79,7 +79,7 @@ const ResetPassword = () => {
 
     try {
       const response = await axios.post(
-        `${config.apiBaseUrl}${config.endpoints.setPassword}`,
+        "https://verification-bdef.onrender.com/api/auth/resetPassword",
         formData,
         {
           withCredentials: true,
