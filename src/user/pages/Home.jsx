@@ -115,14 +115,12 @@ function Dashboard() {
     setCreatingAccount(true);
     try {
       const res = await axios.post(
-        `${
-          import.meta.env.VITE_API_BASE_URL
-        }/auth/virtualAccount//create/${userId}`
+        `https://verification-bdef.onrender.com/api/auth/virtualAccount//create/${userId}`
       );
       console.log("Create account response:", res.data);
 
       const accountRes = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/auth/virtualAccount/${userId}`
+        `https://verification-bdef.onrender.com/api/auth/virtualAccount/${userId}`
       );
       setAccount(accountRes.data);
 
