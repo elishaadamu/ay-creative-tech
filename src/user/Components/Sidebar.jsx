@@ -110,7 +110,12 @@ const sidebarSections = [
   },
 ];
 
-const user = JSON.parse(localStorage.getItem("user") || "{}");
+let user = {};
+try {
+  user = JSON.parse(localStorage.getItem("user") || "{}");
+} catch (e) {
+  user = {};
+}
 
 function Sidebar({ collapsed, setCollapsed }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
