@@ -147,6 +147,21 @@ function Dashboard() {
     setCreatingAccount(false);
   };
 
+  // Add this function inside Dashboard component
+  const refreshAccount = async () => {
+    setLoadingAccount(true);
+    try {
+      const res = await axios.get(
+        `${config.apiBaseUrl}/virtualAccount/${userId}`
+      );
+      setAccount(res.data);
+    } catch (err) {
+      setAccount(null);
+      console.error("Fetch account error:", err, err.response?.data);
+    }
+    setLoadingAccount(false);
+  };
+
   // navItems.js
   const navItems = [
     {

@@ -4,7 +4,9 @@ import RegularImg from "../assets/images/regular.png";
 import StandardImg from "../assets/images/standard.png";
 import PremiumImg from "../assets/images/premium.png";
 import { MdOutlineSendToMobile } from "react-icons/md";
-import axios from "axios"; // Add this import
+import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function NIN() {
   /* ---------------------------------- data --------------------------------- */
@@ -15,8 +17,8 @@ function NIN() {
   ];
 
   const cardSlip = [
-    { label: "Information Slip", value: "Basic", image: BasicImg, price: 200 },
-    { label: "Regular Slip", value: "Regular", image: RegularImg, price: 200 },
+    { label: "Information Slip", value: "Basic", image: BasicImg, price: 40 },
+    { label: "Regular Slip", value: "Regular", image: RegularImg, price: 40 },
     {
       label: "Standard Slip",
       value: "Standard",
@@ -29,38 +31,64 @@ function NIN() {
   /* ---------------------------- component state ---------------------------- */
   const [selectedVerify, setSelectedVerify] = useState(""); // unselected by default
   const [selectedSlip, setSelectedSlip] = useState(""); // unselected by default
-  const [ninNumber, setNinNumber] = useState("");
+  const [formData, setFormData] = useState({
+    nin: "",
+  });
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null);
-  const [error, setError] = useState("");
+  const [verificationResult, setVerificationResult] = useState(null);
 
-  // Handle form submit
+  /* --------------------------------- render -------------------------------- */
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!selectedVerify || !selectedSlip) {
+      toast.error("Please select both verification type and slip layout");
+      return;
+    }
+
     setLoading(true);
-    setResult(null);
-    setError("");
     try {
       const response = await axios.post(
         "https://verification-bdef.onrender.com/api/verify/nin",
-        { nin: ninNumber },
-        { withCredentials: true }
+        {
+          nin: formData.nin,
+        },
+        {
+          withCredentials: true,
+        }
       );
-      setResult(response.data);
-    } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          "Verification failed. Please check the NIN and try again."
-      );
+
+      // Add these console.log statements
+      console.log("NIN Verification Response:", response.data);
+      console.log("Verification Details:", {
+        ninNumber: formData.nin,
+        verificationType: selectedVerify,
+        slipType: selectedSlip,
+        timestamp: new Date().toISOString(),
+      });
+
+      setVerificationResult(response.data);
+      toast.success("NIN verified successfully!");
+    } catch (error) {
+      console.error("Verification error:", error);
+      console.log("Error details:", error.response?.data);
+      toast.error(error.response?.data?.message || "Verification failed");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
-  /* --------------------------------- render -------------------------------- */
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
   return (
     <div className="w-full rounded-2xl mb-10 bg-white p-5 shadow-lg">
       <p className="text-[18px] text-gray-500">NIN Verification</p>
-      <form action="#" method="post" onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
         {/* ------------------------------- Step #1 ------------------------------- */}
         <p className="mt-7 text-[14px] text-gray-500">1. Verify With</p>
         <hr className="my-5 border-gray-200" />
@@ -173,15 +201,13 @@ function NIN() {
             className="pl-5 py-2 border border-gray-200 focus:border-gray-200 rounded w-full h-[50px]"
             placeholder="NIN NUMBER"
             required
-            name="NIN"
-            id="number"
-            inputMode="numeric"
+            name="nin"
+            value={formData.nin}
+            onChange={handleInputChange}
+            inputMode="numeric" // Fixed from inputmode
+            maxLength="11"     // Fixed from maxlength
             pattern="\d{11}"
-            maxLength="11"
             title="NIN must be exactly 11 digits"
-            value={ninNumber}
-            onChange={(e) => setNinNumber(e.target.value)}
-            disabled={loading}
           />
 
           <p className="text-gray-400 text-[12px] mt-2 ">
@@ -199,23 +225,54 @@ function NIN() {
               granted you consent to verify his/her identity.
             </span>
           </label>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className={`flex items-center text-xl mt-10 mb-8 cursor-pointer justify-center gap-2 ${
+              loading ? "bg-gray-400" : "bg-amber-500 hover:bg-amber-600"
+            } text-white font-medium py-2 px-4 rounded-xl w-full h-[50px] transition-colors`}
+          >
+            <MdOutlineSendToMobile className="" />
+            {loading ? "Verifying..." : "Verify"}
+          </button>
         </div>
-        <button
-          type="submit"
-          className="flex items-center text-xl mt-10 mb-8 cursor-pointer justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-medium py-2 px-4 rounded-xl w-full h-[50px] transition-colors"
-          disabled={loading}
-        >
-          <MdOutlineSendToMobile className="" />
-          {loading ? "Verifying..." : "Verify"}
-        </button>
-        {error && <div className="text-red-500 text-center mt-2">{error}</div>}
-        {result && (
-          <div className="text-green-600 text-center mt-2">
-            Verification successful!
-            {/* You can display more result details here if needed */}
-          </div>
-        )}
       </form>
+
+      {/* Display verification result */}
+      {verificationResult && (
+        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+          <h3 className="text-lg font-semibold mb-3">Verification Result</h3>
+          <div className="grid gap-2">
+            <p>
+              <span className="font-medium">Name:</span>{" "}
+              {`${verificationResult.result.nin_data.firstname} ${verificationResult.result.nin_data.middlename} ${verificationResult.result.nin_data.surname}`}
+            </p>
+            <p>
+              <span className="font-medium">Gender:</span>{" "}
+              {verificationResult.result.nin_data.gender.toUpperCase()}
+            </p>
+            <p>
+              <span className="font-medium">Birth Date:</span>{" "}
+              {verificationResult.result.nin_data.birthdate}
+            </p>
+            <p>
+              <span className="font-medium">Phone:</span>{" "}
+              {verificationResult.result.nin_data.telephoneno}
+            </p>
+            <p>
+              <span className="font-medium">Email:</span>{" "}
+              {verificationResult.result.nin_data.email}
+            </p>
+            <p>
+              <span className="font-medium">Address:</span>{" "}
+              {verificationResult.result.nin_data.residence_address}
+            </p>
+          </div>
+        </div>
+      )}
+
+      <ToastContainer />
     </div>
   );
 }
