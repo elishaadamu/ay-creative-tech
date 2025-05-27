@@ -10,6 +10,7 @@ import Enrollment from "../pages/Enrollment";
 import DataSubscription from "../pages/Data";
 import AirtimeSubscription from "../pages/Airtime";
 import NINSlip from "../layout/Ninslip";
+import NotFound from "../pages/NotFound";
 
 function RoutesConfig() {
   return (
@@ -24,6 +25,7 @@ function RoutesConfig() {
         <Route path="data" element={<DataSubscription />} />
         <Route path="airtime" element={<AirtimeSubscription />} />
         <Route path="ninslip" element={<NINSlip />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />
     </div>

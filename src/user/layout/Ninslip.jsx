@@ -1,15 +1,37 @@
-import React from "react";
-import { useLocation } from "react-router-dom";
+import React, { useRef } from "react";
+import { useLocation, Navigate } from "react-router-dom";
 import CoatofArm from "../assets/images/coat-of-arm.png";
 import NIMC from "../assets/images/nimc-1.png";
+import { useReactToPrint } from "react-to-print";
 
 function NINSlip() {
   const location = useLocation();
-  const userData = location.state?.userData || {};
-  console.log("User Data:", userData);
+  const userData = location.state?.userData;
+  const slipRef = useRef(null);
+
+  // Redirect if no verification data
+  if (!userData) {
+    return <Navigate to="/dashboard/verifications/nin" replace />;
+  }
+
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-6">
-      <div className="bg-white shadow-md rounded-lg p-8 w-[850px] h-full">
+      {/* Print button OUTSIDE the printable area */}
+      <button
+        onClick={handlePrint}
+        className="mb-4 px-4 py-2 bg-green-600 text-white flex justify-start rounded hover:bg-green-700 no-print"
+      >
+        Print NIN Slip
+      </button>
+      {/* Printable area */}
+      <div
+        ref={slipRef}
+        className="bg-white border  p-8 w-[850px] h-[430px] print-slip"
+      >
         <header className="flex justify-center items-center gap-5">
           <img src={CoatofArm} alt="Coat of Arms" className="w-23 h-15" />
           <div>
@@ -178,6 +200,32 @@ function NINSlip() {
           </div>
         </div>
       </div>
+      {/* Print styles */}
+      <style>
+        {`
+          @media print {
+            body * {
+              visibility: hidden !important;
+            }
+            .print-slip, .print-slip * {
+              visibility: visible !important;
+            }
+            .print-slip {
+              position: absolute !important;
+              left: 0;
+              top: 0;
+              width: 100vw !important;
+              height: 430px !important; /* Set your desired fixed height */
+              margin: 0 !important;
+              box-shadow: none !important;
+              background: white !important;
+            }
+            .no-print {
+              display: none !important;
+            }
+          }
+        `}
+      </style>
     </div>
   );
 }
