@@ -4,11 +4,16 @@ import RegularImg from "../assets/images/regular.png";
 import StandardImg from "../assets/images/standard.png";
 import PremiumImg from "../assets/images/premium.png";
 import { MdOutlineSendToMobile } from "react-icons/md";
+import { AiOutlineLoading3Quarters } from "react-icons/ai"; // Add this import
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
+import { config } from "../../config/config.jsx";
 
 function NIN() {
+  const navigate = useNavigate();
+
   /* ---------------------------------- data --------------------------------- */
   const cardVerify = [
     { label: "NIN", value: "nin" },
@@ -17,8 +22,8 @@ function NIN() {
   ];
 
   const cardSlip = [
-    { label: "Information Slip", value: "Basic", image: BasicImg, price: 40 },
-    { label: "Regular Slip", value: "Regular", image: RegularImg, price: 40 },
+    { label: "Information Slip", value: "Basic", image: BasicImg, price: 200 },
+    { label: "Regular Slip", value: "Regular", image: RegularImg, price: 200 },
     {
       label: "Standard Slip",
       value: "Standard",
@@ -49,7 +54,7 @@ function NIN() {
     setLoading(true);
     try {
       const response = await axios.post(
-        "https://verification-bdef.onrender.com/api/verify/nin",
+        `${config.apiBaseUrl}${config.endpoints.NINVerify}`,
         {
           nin: formData.nin,
         },
@@ -58,20 +63,14 @@ function NIN() {
         }
       );
 
-      // Add these console.log statements
-      console.log("NIN Verification Response:", response.data);
-      console.log("Verification Details:", {
-        ninNumber: formData.nin,
-        verificationType: selectedVerify,
-        slipType: selectedSlip,
-        timestamp: new Date().toISOString(),
-      });
-
       setVerificationResult(response.data);
       toast.success("NIN verified successfully!");
+      // Add navigation after successful verification
+      navigate("/dashboard/ninslip", {
+        state: { userData: response.data.result.nin_data },
+      });
     } catch (error) {
       console.error("Verification error:", error);
-      console.log("Error details:", error.response?.data);
       toast.error(error.response?.data?.message || "Verification failed");
     } finally {
       setLoading(false);
@@ -205,7 +204,7 @@ function NIN() {
             value={formData.nin}
             onChange={handleInputChange}
             inputMode="numeric" // Fixed from inputmode
-            maxLength="11"     // Fixed from maxlength
+            maxLength="11" // Fixed from maxlength
             pattern="\d{11}"
             title="NIN must be exactly 11 digits"
           />
@@ -233,45 +232,15 @@ function NIN() {
               loading ? "bg-gray-400" : "bg-amber-500 hover:bg-amber-600"
             } text-white font-medium py-2 px-4 rounded-xl w-full h-[50px] transition-colors`}
           >
-            <MdOutlineSendToMobile className="" />
+            {loading ? (
+              <AiOutlineLoading3Quarters className="animate-spin" />
+            ) : (
+              <MdOutlineSendToMobile className="" />
+            )}
             {loading ? "Verifying..." : "Verify"}
           </button>
         </div>
       </form>
-
-      {/* Display verification result */}
-      {verificationResult && (
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-          <h3 className="text-lg font-semibold mb-3">Verification Result</h3>
-          <div className="grid gap-2">
-            <p>
-              <span className="font-medium">Name:</span>{" "}
-              {`${verificationResult.result.nin_data.firstname} ${verificationResult.result.nin_data.middlename} ${verificationResult.result.nin_data.surname}`}
-            </p>
-            <p>
-              <span className="font-medium">Gender:</span>{" "}
-              {verificationResult.result.nin_data.gender.toUpperCase()}
-            </p>
-            <p>
-              <span className="font-medium">Birth Date:</span>{" "}
-              {verificationResult.result.nin_data.birthdate}
-            </p>
-            <p>
-              <span className="font-medium">Phone:</span>{" "}
-              {verificationResult.result.nin_data.telephoneno}
-            </p>
-            <p>
-              <span className="font-medium">Email:</span>{" "}
-              {verificationResult.result.nin_data.email}
-            </p>
-            <p>
-              <span className="font-medium">Address:</span>{" "}
-              {verificationResult.result.nin_data.residence_address}
-            </p>
-          </div>
-        </div>
-      )}
-
       <ToastContainer />
     </div>
   );

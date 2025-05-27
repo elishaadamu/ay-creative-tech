@@ -9,6 +9,7 @@ import BVNVerify from "../pages/BVNVerify";
 import Enrollment from "../pages/Enrollment";
 import DataSubscription from "../pages/Data";
 import AirtimeSubscription from "../pages/Airtime";
+import NINSlip from "../layout/Ninslip";
 
 function RoutesConfig() {
   return (
@@ -22,6 +23,7 @@ function RoutesConfig() {
         <Route path="verifications/bvn" element={<BVNVerify />} />
         <Route path="data" element={<DataSubscription />} />
         <Route path="airtime" element={<AirtimeSubscription />} />
+        <Route path="ninslip" element={<NINSlip />} />
       </Routes>
       <Footer />
     </div>

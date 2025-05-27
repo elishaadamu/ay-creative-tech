@@ -74,6 +74,7 @@ const App = () => {
             <Route path="/forgottenpassword" element={<ForgottenPassword />} />
             <Route path="/resetpassword" element={<ResetPassword />} />
             <Route path="/otp" element={<InputOTP />} />
+
             <Route
               path="/dashboard/*"
               element={

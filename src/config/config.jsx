@@ -7,5 +7,6 @@ export const config = {
     verifyCode: "/auth/verifyCode",
     setPassword: "/auth/setPassword",
     virtualAccount: "/virtualAccount",
+    NINVerify: "/verify/nin",
   },
 };
