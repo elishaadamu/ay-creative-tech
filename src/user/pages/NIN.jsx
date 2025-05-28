@@ -66,7 +66,7 @@ function NIN() {
       setVerificationResult(response.data);
       toast.success("NIN verified successfully!");
       // Add navigation after successful verification
-      navigate("/dashboard/ninslip", {
+      navigate("/dashboard/verifications/ninslip", {
         state: { userData: response.data.result.nin_data },
       });
     } catch (error) {
@@ -212,15 +212,28 @@ function NIN() {
           <p className="text-gray-400 text-[12px] mt-2 ">
             We'll never share your details with anyone else.
           </p>
-          <label className="flex items-center mt-8 space-x-2 cursor-pointer">
-            <input
-              type="checkbox"
-              className="checkbox validator"
-              required
-              title="Required"
-            />
-            <span className="text-sm text-gray-400">
-              By checking this box, you agreed that the owner of the ID has
+          <label className="flex items-start mt-8 space-x-3 cursor-pointer">
+            <span className="relative">
+              <input
+                type="checkbox"
+                className="peer shrink-0 appearance-none h-5 w-5 border border-gray-400 rounded-sm bg-white checked:bg-blue-600 checked:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                required
+                title="Required"
+              />
+              <svg
+                className="absolute w-4 h-4 text-white left-0.5 top-0.5 pointer-events-none hidden peer-checked:block"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 011.414-1.414L8.414 12.586l7.879-7.879a1 1 0 011.414 0z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">
+              By checking this box, you agree that the owner of the ID has
               granted you consent to verify his/her identity.
             </span>
           </label>

@@ -11,7 +11,7 @@ import Contact from "./pages/Contact";
 import Footer from "./components/Footer";
 import NotFound from "./pages/NotFound";
 import Dashboard from "./user/dashboard";
-import NINSlip from "./ninslip";
+
 import ProtectedRoute from "./components/ProtectedRoute";
 import ForgottenPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
@@ -75,7 +75,7 @@ const App = () => {
             <Route path="/forgottenpassword" element={<ForgottenPassword />} />
             <Route path="/resetpassword" element={<ResetPassword />} />
             <Route path="/otp" element={<InputOTP />} />
-            <Route path="/problems" element={<NINSlip />} />
+
             <Route
               path="/dashboard/*"
               element={

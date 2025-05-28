@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { VscUnverified } from "react-icons/vsc";
 import { MdOutlineSendToMobile } from "react-icons/md";
+import BasicBVN from "../layout/BasicBVN";
+import AdvancedBVNSlip from "../layout/AdvancedBVN"; // <-- Import Advanced slip
 
 function NIN() {
   /* ---------------------------------- data --------------------------------- */
@@ -16,12 +18,32 @@ function NIN() {
   /* ---------------------------- component state ---------------------------- */
   const [selectedVerify, setSelectedVerify] = useState(""); // unselected by default
   const [selectedSlip, setSelectedSlip] = useState(""); // unselected by default
+  const [bvn, setBvn] = useState("");
+  const [showSlip, setShowSlip] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (
+      (selectedSlip === "Basic" || selectedSlip === "Advanced") &&
+      bvn.length === 11
+    ) {
+      setShowSlip(true);
+    }
+  };
+
+  if (showSlip && selectedSlip === "Basic") {
+    return <BasicBVN /* bvn={bvn} */ />;
+  }
+
+  if (showSlip && selectedSlip === "Advanced") {
+    return <AdvancedBVNSlip /* bvn={bvn} */ />;
+  }
 
   /* --------------------------------- render -------------------------------- */
   return (
     <div className="w-full rounded-2xl mb-10 bg-white p-5 shadow-lg">
       <p className="text-[18px] text-gray-500">BVN Verification</p>
-      <form action="#" method="post">
+      <form action="#" method="post" onSubmit={handleSubmit}>
         {/* ------------------------------- Step #1 ------------------------------- */}
         <p className="mt-7 text-[14px] text-gray-500">1. Verify With</p>
         <hr className="my-5 border-gray-200" />
@@ -134,28 +156,43 @@ function NIN() {
           </div>
           <input
             type="text"
-            class="pl-5 py-2 border border-gray-200 focus:border-gray-200 rounded w-full h-[50px]"
+            className="pl-5 py-2 border border-gray-200 focus:border-gray-200 rounded w-full h-[50px]"
             placeholder="BVN NUMBER"
             required
             name="NIN"
             id="number"
-            inputmode="numeric"
+            inputMode="numeric"
             pattern="\d{11}"
-            maxlength="11"
+            maxLength="11"
             title="NIN must be exactly 11 digits"
+            value={bvn}
+            onChange={(e) => setBvn(e.target.value.replace(/\D/, ""))}
           />
 
           <p className="text-gray-400 text-[12px] mt-2 ">
             We'll never share your details with anyone else.
           </p>
-          <label class="flex items-center mt-8 space-x-2 cursor-pointer">
-            <input
-              type="checkbox"
-              className="checkbox validator"
-              required
-              title="Required"
-            />
-            <span class="text-sm text-gray-400">
+          <label className="flex items-start mt-8 space-x-3 cursor-pointer">
+            <span className="relative">
+              <input
+                type="checkbox"
+                className="peer shrink-0 appearance-none h-5 w-5 border border-gray-400 rounded-sm bg-white checked:bg-blue-600 checked:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                required
+                title="Required"
+              />
+              <svg
+                className="absolute w-4 h-4 text-white left-0.5 top-0.5 pointer-events-none hidden peer-checked:block"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 011.414-1.414L8.414 12.586l7.879-7.879a1 1 0 011.414 0z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </span>
+            <span className="text-sm text-gray-400">
               By checking this box, you agreed that the owner of the ID has
               granted you consent to verify his/her identity.
             </span>
