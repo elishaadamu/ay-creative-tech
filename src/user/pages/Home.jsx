@@ -12,6 +12,7 @@ import Bank from "../assets/images/bank.webp";
 import Data from "../assets/images/data.png";
 import { IoClose } from "react-icons/io5";
 import { FaRegCopy } from "react-icons/fa"; // <-- Add this import
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import "../assets/css/style.css";
 import Logo from "../assets/images/logo-ay.png";
 import Swal from "sweetalert2";
@@ -260,6 +261,8 @@ function Dashboard() {
     setTimeout(() => setIsOpen(false), 300); // match transition duration
   };
 
+  const [showBalance, setShowBalance] = useState(true);
+
   return (
     <div className="max-w-[1500px] mx-auto">
       <div className="mb-10 text-2xl text-gray-500 font-bold">
@@ -278,8 +281,16 @@ function Dashboard() {
               <p className="text-gray-500 text-[16px] font-light">
                 Wallet Balance
               </p>
-              <p className="text-gray-600 text-[30px] mb-10 font-bold font-sans">
-                ₦{account.balance || "0.00"}
+              <p className="text-gray-600 text-[30px] mb-10 font-bold font-sans flex items-center gap-2">
+                {showBalance ? `₦${account.balance || "0.00"}` : "₦*** ***"}
+                <button
+                  onClick={() => setShowBalance((prev) => !prev)}
+                  className="ml-2 focus:outline-none text-gray-400"
+                  title={showBalance ? "Hide Balance" : "Show Balance"}
+                  type="button"
+                >
+                  {showBalance ? <FaEyeSlash /> : <FaEye />}
+                </button>
               </p>
               <p
                 onClick={openModal}

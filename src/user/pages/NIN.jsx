@@ -51,13 +51,23 @@ function NIN() {
       return;
     }
 
+    // Find the selected slip's price
+    const selectedSlipObj = cardSlip.find((s) => s.value === selectedSlip);
+    const slipAmount = selectedSlipObj ? selectedSlipObj.price : 0;
+
     setLoading(true);
+    const payload = {
+      verifyWith: selectedVerify,
+      slipLayout: selectedSlip,
+      nin: formData.nin,
+      amount: slipAmount,
+    };
+    console.log("Sending payload:", payload);
+
     try {
       const response = await axios.post(
         `${config.apiBaseUrl}${config.endpoints.NINVerify}`,
-        {
-          nin: formData.nin,
-        },
+        payload,
         {
           withCredentials: true,
         }
@@ -65,7 +75,6 @@ function NIN() {
 
       setVerificationResult(response.data);
       toast.success("NIN verified successfully!");
-      // Add navigation after successful verification
       navigate("/dashboard/verifications/ninslip", {
         state: { userData: response.data.result.nin_data },
       });
