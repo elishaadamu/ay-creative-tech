@@ -217,7 +217,7 @@ function Dashboard() {
       id: 9,
       name: "BVN VERIFY",
       icon: NIBSS,
-      to: "/nimc-print",
+      to: "/dashboard/verifications/bvn",
     },
     {
       id: 10,

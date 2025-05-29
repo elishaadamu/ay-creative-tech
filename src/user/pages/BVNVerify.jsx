@@ -15,8 +15,8 @@ function BVNVerify() {
   const cardVerify = [{ label: "BANK VERIFICATION NUMBER", value: "BVN" }];
 
   const cardSlip = [
-    { label: "Basic Details", value: "Basic", price: 200 },
-    { label: "Advanced Details", value: "Advanced", price: 400 },
+    { label: "Basic Details", value: "Basic", price: 1 },
+    { label: "Advanced Details", value: "Advanced", price: 1 },
   ];
 
   /* ---------------------------- component state ---------------------------- */
@@ -25,6 +25,7 @@ function BVNVerify() {
   const [bvn, setBvn] = useState("");
   const [showSlip, setShowSlip] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [apiData, setApiData] = useState(null); // <-- Add this state
 
   // Add your secret key for decryption
   const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
@@ -76,8 +77,11 @@ function BVNVerify() {
           payload,
           { withCredentials: true }
         );
-        console.log("API response:", response.data);
+        console.log("API response:", response.data.data);
         toast.success("BVN verified successfully!");
+        const bvnData = response.data?.data?.data; // <-- FIXED PATH
+
+        setApiData(bvnData); // Save API data
         setShowSlip(true);
         // Optionally: handle response.data if you want to pass to slip
       } catch (error) {
@@ -95,11 +99,11 @@ function BVNVerify() {
   };
 
   if (showSlip && selectedSlip === "Basic") {
-    return <BasicBVN /* bvn={bvn} */ />;
+    return <BasicBVN apiData={apiData} />; // <-- Pass apiData as prop
   }
 
   if (showSlip && selectedSlip === "Advanced") {
-    return <AdvancedBVNSlip /* bvn={bvn} */ />;
+    return <AdvancedBVNSlip apiData={apiData} />;
   }
 
   /* --------------------------------- render -------------------------------- */

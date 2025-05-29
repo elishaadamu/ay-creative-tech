@@ -5,10 +5,16 @@ import CoatofArm from "../assets/images/coat-of-arm.png";
 import BVNlogo from "../assets/images/BVN-logo.png";
 import Avatar from "../assets/images/BVN-logo.png";
 
-function BasicBVN() {
+function BasicBVN({ apiData }) {
+  useEffect(() => {
+    toast.success("BVN verified successfully!");
+  }, []);
+
+  // Example: apiData = { data: { ...fields }, ... }
+  const user = apiData || {};
+
   const handlePrint = () => {
-    toast.info("Printing BVN Slip...", { autoClose: 2000 }); // <-- Show toast
-    // Set the document title before printing
+    toast.info("Printing BVN Slip...", { autoClose: 2000 });
     const prevTitle = document.title;
     document.title = "Basic BVN Slip";
     setTimeout(() => {
@@ -16,12 +22,17 @@ function BasicBVN() {
       setTimeout(() => {
         document.title = prevTitle;
       }, 1000);
-    }, 1200); // Delay to allow toast to show
+    }, 1200);
   };
+
+  // Use base64 image if available, else fallback
+  const avatarSrc = user.base64Image
+    ? `data:image/jpeg;base64,${user.base64Image}`
+    : Avatar;
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-6">
-      <ToastContainer /> {/* Toast container for notifications */}
+      <ToastContainer />
       {/* Print button OUTSIDE the printable area */}
       <button
         onClick={handlePrint}
@@ -51,31 +62,41 @@ function BasicBVN() {
                   <span className="text-gray-700 font-semibold w-[80px] inline-block text-[11px]">
                     First Name:
                   </span>
-                  <span className="text-gray-600 text-[11px]">John</span>
+                  <span className="text-gray-600 text-[11px]">
+                    {user.firstName || "-"}
+                  </span>
                 </div>
                 <div className="flex">
                   <span className="text-gray-700 font-semibold w-[80px] inline-block text-[11px]">
                     Middle Name:
                   </span>
-                  <span className="text-gray-600 text-[11px]">Michael</span>
+                  <span className="text-gray-600 text-[11px]">
+                    {user.middleName || "-"}
+                  </span>
                 </div>
                 <div className="flex">
                   <span className="text-gray-700 font-semibold w-[80px] inline-block text-[11px]">
                     Last Name
                   </span>
-                  <span className="text-gray-600 text-[11px]">Doe</span>
+                  <span className="text-gray-600 text-[11px]">
+                    {user.lastName || "-"}
+                  </span>
                 </div>
                 <div className="flex">
                   <span className="text-gray-700 font-semibold w-[80px] inline-block text-[11px]">
                     Date of Birth:
                   </span>
-                  <span className="text-gray-600 text-[11px]">01/01/1990</span>
+                  <span className="text-gray-600 text-[11px]">
+                    {user.dateOfBirth || "-"}
+                  </span>
                 </div>
                 <div className="flex">
                   <span className="text-gray-700 font-semibold w-[80px] inline-block text-[11px]">
                     Gender:
                   </span>
-                  <span className="text-gray-600 text-[11px]">Male</span>
+                  <span className="text-gray-600 text-[11px]">
+                    {user.gender || "-"}
+                  </span>
                 </div>
                 <div className="">
                   <div className="flex items-start gap-2 mt-5">
@@ -85,7 +106,7 @@ function BasicBVN() {
                           Marital Status:
                         </span>
                         <span className="text-gray-600 text-[11px]">
-                          Single
+                          {user.maritalStatus || "-"}
                         </span>
                       </div>
                       <div className="flex">
@@ -93,7 +114,7 @@ function BasicBVN() {
                           Phone Number:
                         </span>
                         <span className="text-gray-600 text-[11px]">
-                          08012345678
+                          {user.phoneNumber1 || "-"}
                         </span>
                       </div>
                       <div className="flex">
@@ -101,27 +122,31 @@ function BasicBVN() {
                           Enrollment Institution:
                         </span>
                         <span className="text-gray-600 text-[11px]">
-                          Zenith Bank
+                          {user.enrollmentBank || "-"}
                         </span>
                       </div>
                       <div className="flex">
                         <span className="text-gray-700 font-semibold w-[80px] inline-block text-[11px]">
                           Origin State:
                         </span>
-                        <span className="text-gray-600 text-[11px]">Lagos</span>
+                        <span className="text-gray-600 text-[11px]">
+                          {user.stateOfOrigin || "-"}
+                        </span>
                       </div>
                       <div className="flex">
                         <span className="text-gray-700 font-semibold w-[80px] inline-block text-[11px]">
                           Residence State:
                         </span>
-                        <span className="text-gray-600 text-[11px]">Abuja</span>
+                        <span className="text-gray-600 text-[11px]">
+                          {user.stateOfResidence || "-"}
+                        </span>
                       </div>
                       <div className="flex">
                         <span className="text-gray-700 font-semibold w-[80px] inline-block text-[11px]">
                           Residential Address:
                         </span>
                         <span className="text-gray-600 text-[11px] w-10">
-                          BEHIND LIVING FAITHCHURCH,NEWLAYOUT,KISSAGYHIP
+                          {user.residentialAddress || "-"}
                         </span>
                       </div>
                     </div>
@@ -131,7 +156,7 @@ function BasicBVN() {
                           NIN:
                         </span>
                         <span className="text-gray-600 text-[11px]">
-                          85639354692
+                          {user.nin || "-"}
                         </span>
                       </div>
                       <div className="flex">
@@ -139,20 +164,24 @@ function BasicBVN() {
                           Enrollment Branch:
                         </span>
                         <span className="text-gray-600 text-[11px]">
-                          Zenith Bank HQ
+                          {user.enrollmentBranch || "-"}
                         </span>
                       </div>
                       <div className="flex">
                         <span className="text-gray-700 font-semibold w-[80px] inline-block text-[11px]">
                           Origin LGA:
                         </span>
-                        <span className="text-gray-600 text-[11px]">Ikeja</span>
+                        <span className="text-gray-600 text-[11px]">
+                          {user.lgaOfOrigin || "-"}
+                        </span>
                       </div>
                       <div className="flex">
                         <span className="text-gray-700 font-semibold w-[80px] inline-block text-[11px]">
                           Residence LGA:
                         </span>
-                        <span className="text-gray-600 text-[11px]">Garki</span>
+                        <span className="text-gray-600 text-[11px]">
+                          {user.lgaOfResidence || "-"}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -161,15 +190,15 @@ function BasicBVN() {
               {/* You can add a placeholder image or remove this block */}
               <div className="max-w-[400px] w-[145px] flex flex-col items-center mx-auto">
                 <img
-                  src={Avatar}
+                  src={avatarSrc}
                   alt="Profile"
                   className="w-[80px] h-[100px] object-cover avatar"
                 />
-                <p className="text-center text-[10px] text-gray-700 font-semibold ">
+                <p className="text-center text-[10px] mt-2 text-gray-700 font-semibold ">
                   BVN
                 </p>
                 <p className="text-center text-[16px] mt-1 text-gray-700 font-semibold">
-                  222 50 586 879
+                  {user.bvn || "-"}
                 </p>
               </div>
             </div>
@@ -195,7 +224,10 @@ function BasicBVN() {
               <li className="ml-4 mb-2">
                 The information shown on this slip is valid for the lifetime of
                 the holder and
-                <span className="text-red-500 font-bold">DOES NOT EXPIRE</span>.
+                <span className="text-red-500 font-bold ml-0.5">
+                  DOES NOT EXPIRE
+                </span>
+                .
               </li>
               <li className="ml-4 mb-2">
                 AnyVerify should not be blamed for any unauthorized
