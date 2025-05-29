@@ -25,6 +25,7 @@ import { MdHistory } from "react-icons/md";
 import { IoEnterSharp } from "react-icons/io5";
 import { MdOutlineSubscriptions } from "react-icons/md";
 import { MdContactPhone } from "react-icons/md";
+import { FaPersonCircleCheck } from "react-icons/fa6";
 
 const sidebarSections = [
   {
@@ -63,7 +64,7 @@ const sidebarSections = [
       },
       {
         to: "/dashboard/ipe-clearance",
-        icon: <MdContactPhone className="w-5 h-5" />,
+        icon: <FaPersonCircleCheck className="w-5 h-5" />,
         label: "IPE Clearance",
       },
       {

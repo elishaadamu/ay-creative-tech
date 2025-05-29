@@ -10,6 +10,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import { config } from "../../config/config.jsx";
+import CryptoJS from "crypto-js";
 
 function NIN() {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ function NIN() {
   ];
 
   const cardSlip = [
-    { label: "Information Slip", value: "Basic", image: BasicImg, price: 1 },
+    { label: "Information Slip", value: "Basic", image: BasicImg, price: 5 },
     { label: "Regular Slip", value: "Regular", image: RegularImg, price: 200 },
     {
       label: "Standard Slip",
@@ -42,6 +43,20 @@ function NIN() {
   const [loading, setLoading] = useState(false);
   const [verificationResult, setVerificationResult] = useState(null);
 
+  // Add your secret key for decryption
+  const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
+
+  function decryptData(ciphertext) {
+    if (!ciphertext) return null;
+    try {
+      const bytes = CryptoJS.AES.decrypt(ciphertext, SECRET_KEY);
+      const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+      return JSON.parse(decrypted);
+    } catch {
+      return null;
+    }
+  }
+
   /* --------------------------------- render -------------------------------- */
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,12 +70,23 @@ function NIN() {
     const selectedSlipObj = cardSlip.find((s) => s.value === selectedSlip);
     const slipAmount = selectedSlipObj ? selectedSlipObj.price : 0;
 
+    // Get userId from encrypted localStorage (same as Dashboard)
+    let userId = null;
+    try {
+      const userStr = localStorage.getItem("user");
+      if (userStr) {
+        const userObj = decryptData(userStr);
+        userId = userObj?._id || userObj?.id;
+      }
+    } catch {}
+
     setLoading(true);
     const payload = {
       verifyWith: selectedVerify,
       slipLayout: selectedSlip,
       nin: formData.nin,
       amount: slipAmount,
+      userId, // <-- Add this line
     };
     console.log("Sending payload:", payload);
 
