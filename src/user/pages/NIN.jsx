@@ -23,7 +23,7 @@ function NIN() {
   ];
 
   const cardSlip = [
-    { label: "Information Slip", value: "Basic", image: BasicImg, price: 5 },
+    { label: "Information Slip", value: "Basic", image: BasicImg, price: 200 },
     { label: "Regular Slip", value: "Regular", image: RegularImg, price: 200 },
     {
       label: "Standard Slip",
@@ -99,11 +99,18 @@ function NIN() {
         }
       );
 
+      console.log("API response:", response.data); // Log the whole data for debugging
+
       setVerificationResult(response.data);
       toast.success("NIN verified successfully!");
-      navigate("/dashboard/verifications/ninslip", {
-        state: { userData: response.data.result.nin_data },
-      });
+      const ninData = response.data?.data?.nin_data; // <-- FIXED PATH
+      if (ninData) {
+        navigate("/dashboard/verifications/ninslip", {
+          state: { userData: ninData },
+        });
+      } else {
+        toast.error("Verification succeeded but no NIN data returned.");
+      }
     } catch (error) {
       console.error("Verification error:", error);
       toast.error(error.response?.data?.message || "Verification failed");
