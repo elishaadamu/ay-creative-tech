@@ -8,5 +8,6 @@ export const config = {
     setPassword: "/auth/setPassword",
     virtualAccount: "/virtualAccount",
     NINVerify: "/verify/nin",
+    BVNVerify: "/verify/bvn",
   },
 };

@@ -1,19 +1,22 @@
 import React, { useState } from "react";
 import { VscUnverified } from "react-icons/vsc";
 import { MdOutlineSendToMobile } from "react-icons/md";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import BasicBVN from "../layout/BasicBVN";
-import AdvancedBVNSlip from "../layout/AdvancedBVN"; // <-- Import Advanced slip
+import AdvancedBVNSlip from "../layout/AdvancedBVN";
 import CryptoJS from "crypto-js";
+import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { config } from "../../config/config.jsx";
 
-function NIN() {
+function BVNVerify() {
   /* ---------------------------------- data --------------------------------- */
-  const cardVerify = [
-    { label: "BANK VERIFICATION NUMBER", value: "BANK VERIFICATION NUMBER" },
-  ];
+  const cardVerify = [{ label: "BANK VERIFICATION NUMBER", value: "BVN" }];
 
   const cardSlip = [
     { label: "Basic Details", value: "Basic", price: 200 },
-    { label: "Advanced Details", value: "Advanced", price: 200 },
+    { label: "Advanced Details", value: "Advanced", price: 400 },
   ];
 
   /* ---------------------------- component state ---------------------------- */
@@ -21,6 +24,7 @@ function NIN() {
   const [selectedSlip, setSelectedSlip] = useState(""); // unselected by default
   const [bvn, setBvn] = useState("");
   const [showSlip, setShowSlip] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // Add your secret key for decryption
   const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
@@ -42,6 +46,10 @@ function NIN() {
       (selectedSlip === "Basic" || selectedSlip === "Advanced") &&
       bvn.length === 11
     ) {
+      // Find the selected slip's price
+      const selectedSlipObj = cardSlip.find((s) => s.value === selectedSlip);
+      const slipAmount = selectedSlipObj ? selectedSlipObj.price : 0;
+
       // Get userId from encrypted localStorage (same as Dashboard)
       let userId = null;
       try {
@@ -54,26 +62,35 @@ function NIN() {
 
       // Prepare payload
       const payload = {
-        detailsVerifiy: selectedVerify, // "Basic" or "Advanced"
-        detailsNeeded: selectedSlip, // "Basic" or "Advanced"
-        bvnNumber: bvn,
+        verifyWith: selectedVerify,
+        slipLayout: selectedSlip,
+        bvn: bvn,
+        amount: slipAmount,
         userId,
       };
-      // Log the payload to the console
-      console.log("Payload to be sent:", payload);
-      // Example POST request (replace with your actual endpoint)
+      console.log("Sending payload:", payload);
+      setLoading(true);
       try {
         const response = await axios.post(
-          `${config.apiBaseUrl}/bvn/verify`,
+          `${config.apiBaseUrl}${config.endpoints.BVNVerify}`,
           payload,
           { withCredentials: true }
         );
-        // Handle response as needed
+        console.log("API response:", response.data);
+        toast.success("BVN verified successfully!");
         setShowSlip(true);
+        // Optionally: handle response.data if you want to pass to slip
       } catch (error) {
-        // Handle error as needed
-        alert("Verification failed. Please try again.");
+        console.error("Verification error:", error);
+        toast.error(
+          error.response?.data?.message ||
+            "Verification failed. Please try again."
+        );
+      } finally {
+        setLoading(false);
       }
+    } else {
+      toast.error("Please select slip type and enter a valid 11-digit BVN.");
     }
   };
 
@@ -246,14 +263,22 @@ function NIN() {
         </div>
         <button
           type="submit"
-          className="flex items-center text-xl mt-10 mb-8 cursor-pointer justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-medium py-2 px-4 rounded-xl w-full h-[50px] transition-colors"
+          disabled={loading}
+          className={`flex items-center text-xl mt-10 mb-8 cursor-pointer justify-center gap-2 ${
+            loading ? "bg-gray-400" : "bg-amber-500 hover:bg-amber-600"
+          } text-white font-medium py-2 px-4 rounded-xl w-full h-[50px] transition-colors`}
         >
-          <MdOutlineSendToMobile className="" />
-          Verify
+          {loading ? (
+            <AiOutlineLoading3Quarters className="animate-spin" />
+          ) : (
+            <MdOutlineSendToMobile className="" />
+          )}
+          {loading ? "Verifying..." : "Verify"}
         </button>
       </form>
+      <ToastContainer />
     </div>
   );
 }
 
-export default NIN;
+export default BVNVerify;
