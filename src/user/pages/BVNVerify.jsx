@@ -3,6 +3,7 @@ import { VscUnverified } from "react-icons/vsc";
 import { MdOutlineSendToMobile } from "react-icons/md";
 import BasicBVN from "../layout/BasicBVN";
 import AdvancedBVNSlip from "../layout/AdvancedBVN"; // <-- Import Advanced slip
+import CryptoJS from "crypto-js";
 
 function NIN() {
   /* ---------------------------------- data --------------------------------- */
@@ -21,13 +22,58 @@ function NIN() {
   const [bvn, setBvn] = useState("");
   const [showSlip, setShowSlip] = useState(false);
 
-  const handleSubmit = (e) => {
+  // Add your secret key for decryption
+  const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
+
+  function decryptData(ciphertext) {
+    if (!ciphertext) return null;
+    try {
+      const bytes = CryptoJS.AES.decrypt(ciphertext, SECRET_KEY);
+      const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+      return JSON.parse(decrypted);
+    } catch {
+      return null;
+    }
+  }
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (
       (selectedSlip === "Basic" || selectedSlip === "Advanced") &&
       bvn.length === 11
     ) {
-      setShowSlip(true);
+      // Get userId from encrypted localStorage (same as Dashboard)
+      let userId = null;
+      try {
+        const userStr = localStorage.getItem("user");
+        if (userStr) {
+          const userObj = decryptData(userStr);
+          userId = userObj?._id || userObj?.id;
+        }
+      } catch {}
+
+      // Prepare payload
+      const payload = {
+        detailsVerifiy: selectedVerify, // "Basic" or "Advanced"
+        detailsNeeded: selectedSlip, // "Basic" or "Advanced"
+        bvnNumber: bvn,
+        userId,
+      };
+      // Log the payload to the console
+      console.log("Payload to be sent:", payload);
+      // Example POST request (replace with your actual endpoint)
+      try {
+        const response = await axios.post(
+          `${config.apiBaseUrl}/bvn/verify`,
+          payload,
+          { withCredentials: true }
+        );
+        // Handle response as needed
+        setShowSlip(true);
+      } catch (error) {
+        // Handle error as needed
+        alert("Verification failed. Please try again.");
+      }
     }
   };
 

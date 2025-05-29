@@ -13,6 +13,7 @@ import NINSlip from "../layout/Ninslip";
 import NotFound from "../pages/NotFound";
 import BasicBVN from "../layout/BasicBVN";
 import AdvancedBVN from "../layout/AdvancedBVN";
+import IPEClearance from "../pages/IPEClearance";
 
 function RoutesConfig() {
   return (
@@ -30,6 +31,7 @@ function RoutesConfig() {
         <Route path="/verifications/basicbvn" element={<BasicBVN />} />
         <Route path="/verifications/advancedbvn" element={<AdvancedBVN />} />
         <Route path="*" element={<NotFound />} />
+        <Route path="ipe-clearance" element={<IPEClearance />} />
       </Routes>
       <Footer />
     </div>

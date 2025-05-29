@@ -1,8 +1,5 @@
 import React, { useState } from "react";
-import BasicImg from "../assets/images/information.png";
-import RegularImg from "../assets/images/regular.png";
-import StandardImg from "../assets/images/standard.png";
-import PremiumImg from "../assets/images/premium.png";
+
 import { MdOutlineSendToMobile } from "react-icons/md";
 import { AiOutlineLoading3Quarters } from "react-icons/ai"; // Add this import
 import axios from "axios";
@@ -10,6 +7,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import { config } from "../../config/config.jsx";
+import CryptoJS from "crypto-js";
 
 function NIN() {
   const navigate = useNavigate();
@@ -22,15 +20,13 @@ function NIN() {
   ];
 
   const cardSlip = [
-    { label: "Information Slip", value: "Basic", image: BasicImg, price: 1 },
-    { label: "Regular Slip", value: "Regular", image: RegularImg, price: 200 },
+    { label: "InProcessing Error", value: "Basic", price: 700 },
+    { label: "Still Being Proccess", value: "Regular", price: 700 },
     {
-      label: "Standard Slip",
+      label: "New Enrollment For Tracking ID",
       value: "Standard",
-      image: StandardImg,
-      price: 200,
+      price: 700,
     },
-    { label: "Premium Slip", value: "Premium", image: PremiumImg, price: 300 },
   ];
 
   /* ---------------------------- component state ---------------------------- */
@@ -41,6 +37,19 @@ function NIN() {
   });
   const [loading, setLoading] = useState(false);
   const [verificationResult, setVerificationResult] = useState(null);
+
+  const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
+
+  function decryptData(ciphertext) {
+    if (!ciphertext) return null;
+    try {
+      const bytes = CryptoJS.AES.decrypt(ciphertext, SECRET_KEY);
+      const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+      return JSON.parse(decrypted);
+    } catch {
+      return null;
+    }
+  }
 
   /* --------------------------------- render -------------------------------- */
   const handleSubmit = async (e) => {
@@ -55,12 +64,23 @@ function NIN() {
     const selectedSlipObj = cardSlip.find((s) => s.value === selectedSlip);
     const slipAmount = selectedSlipObj ? selectedSlipObj.price : 0;
 
+    // Get user ID from localStorage (same as Dashboard)
+    let userId = null;
+    try {
+      const userStr = localStorage.getItem("user");
+      if (userStr) {
+        const userObj = decryptData(userStr);
+        userId = userObj?._id || userObj?.id;
+      }
+    } catch {}
+
     setLoading(true);
     const payload = {
       verifyWith: selectedVerify,
       slipLayout: selectedSlip,
-      nin: formData.nin,
+      ipe: formData.nin,
       amount: slipAmount,
+      userId, // <-- Add userId to payload
     };
     console.log("Sending payload:", payload);
 
@@ -95,55 +115,10 @@ function NIN() {
 
   return (
     <div className="w-full rounded-2xl mb-10 bg-white p-5 shadow-lg">
-      <p className="text-[18px] text-gray-500">NIN Verification</p>
+      <p className="text-[18px] text-gray-500">IPE CLEARENCE</p>
       <form onSubmit={handleSubmit}>
         {/* ------------------------------- Step #1 ------------------------------- */}
-        <p className="mt-7 text-[14px] text-gray-500">1. Verify With</p>
-        <hr className="my-5 border-gray-200" />
-
-        <div className="grid gap-6 p-4 sm:grid-cols-2 md:grid-cols-3">
-          {cardVerify.map(({ label, value }) => (
-            <label
-              key={value}
-              className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border p-6 text-center transition
-            ${
-              selectedVerify === value
-                ? "border-amber-400 ring-2 ring-amber-300 shadow-lg"
-                : "border-gray-200 shadow-md hover:shadow-lg"
-            }`}
-            >
-              <input
-                type="radio"
-                name="verifyWith"
-                value={value}
-                checked={selectedVerify === value}
-                onChange={() => setSelectedVerify(value)}
-                className="hidden"
-                required
-              />
-
-              <h3 className="mb-4 text-lg font-semibold text-gray-600">
-                {label}
-              </h3>
-
-              {/* visual radio indicator */}
-              <span
-                className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
-                  selectedVerify === value
-                    ? "border-amber-400"
-                    : "border-gray-300"
-                }`}
-              >
-                {selectedVerify === value && (
-                  <span className="h-2.5 w-2.5 rounded-full bg-amber-500"></span>
-                )}
-              </span>
-            </label>
-          ))}
-        </div>
-
-        {/* ------------------------------- Step #2 ------------------------------- */}
-        <p className="mt-7 text-[14px] text-gray-500">2. Slip Layout</p>
+        <p className="mt-7 text-[14px] text-gray-500">1. Layout</p>
         <hr className="my-5 border-gray-200" />
 
         <div className="grid gap-6 p-4 sm:grid-cols-2 md:grid-cols-3">
@@ -168,22 +143,12 @@ function NIN() {
               />
 
               {/* price */}
-              <p className="mb-4 text-3xl font-bold tracking-wide text-slate-700">
+              <p className="mb-4 text-3xl  tracking-wide text-slate-500">
                 ₦{price}.00
               </p>
 
-              {/* preview image */}
-              <img
-                src={image}
-                alt={label}
-                loading="lazy"
-                className="mb-4 h-24 w-full object-contain"
-              />
-
               {/* label */}
-              <h4 className="mb-4 text-base font-semibold text-gray-600">
-                {label}
-              </h4>
+              <h4 className="mb-4 text-base  text-gray-400">{label}</h4>
 
               {/* visual radio indicator */}
               <span
@@ -200,14 +165,16 @@ function NIN() {
             </label>
           ))}
         </div>
-        {/* ------------------------------- Step #3 ------------------------------- */}
+        {/* ------------------------------- Step #2 ------------------------------- */}
         <div>
-          <p className="mt-7 text-[14px] text-gray-500">3. Supply ID Number</p>
+          <p className="mt-7 text-[14px] text-gray-500">
+            2. Supply Tracking ID
+          </p>
           <hr className="my-7 border-gray-200" />
           <input
             type="text"
             className="pl-5 py-2 border border-gray-200 focus:border-gray-200 rounded w-full h-[50px]"
-            placeholder="NIN NUMBER"
+            placeholder="Enter Tracking ID"
             required
             name="nin"
             value={formData.nin}
@@ -215,7 +182,7 @@ function NIN() {
             inputMode="numeric" // Fixed from inputmode
             maxLength="11" // Fixed from maxlength
             pattern="\d{11}"
-            title="NIN must be exactly 11 digits"
+            title=""
           />
 
           <p className="text-gray-400 text-[12px] mt-2 ">
@@ -241,7 +208,7 @@ function NIN() {
                 />
               </svg>
             </span>
-            <span className="text-sm text-gray-600 dark:text-gray-400">
+            <span className="text-sm text-gray-400 dark:text-gray-400">
               By checking this box, you agree that the owner of the ID has
               granted you consent to verify his/her identity.
             </span>
@@ -259,7 +226,7 @@ function NIN() {
             ) : (
               <MdOutlineSendToMobile className="" />
             )}
-            {loading ? "Verifying..." : "Verify"}
+            {loading ? "Submitting..." : "Submit"}
           </button>
         </div>
       </form>

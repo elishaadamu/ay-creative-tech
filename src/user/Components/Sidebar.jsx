@@ -62,6 +62,11 @@ const sidebarSections = [
         label: "Enrollment",
       },
       {
+        to: "/dashboard/ipe-clearance",
+        icon: <MdContactPhone className="w-5 h-5" />,
+        label: "IPE Clearance",
+      },
+      {
         to: "/dashboard/data",
         icon: <MdOutlineSubscriptions className="w-5 h-5" />,
         label: "Data Subscription",

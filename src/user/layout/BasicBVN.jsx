@@ -178,27 +178,28 @@ function BasicBVN() {
           {/* Disclaimer section */}
           <div className="flex-1/2 ">
             <h4 className="text-green-600 text-[18px] text-center">Verified</h4>
+
             <p className="text-[10px] text-gray-600  text-center">
-              This is a property of National Identity Management Commission
-              (NIMC), Nigeria.
-            </p>
-            <p className="text-[10px] text-gray-600  text-center">
-              If found, please return to the nearest NIMC's office or contact
-              +234 815 769 1214, +234 815 769 1071
+              Please do note that:
             </p>
             <ul className="list-decimal font-semibold text-[10px] text-gray-600  mt-2 ">
               <li className="ml-4 mb-2">
-                This BVN slip remains the property of the Federal Republic of
-                Nigeria, and MUST be surrendered on demand;
+                The information on this slip remains valid until
+                altered/modified where necessary by an authorized body
               </li>
               <li className="ml-4 mb-2">
-                This BVN slip does not imply nor confer citizenship of the
-                Federal Republic of Nigeria on the individual the document is
-                issued to;
+                Any person/authority using the information shouls verify it at
+                anyverify.com.ng or ant other channel approved by the federal
+                governement of Nigeria.
               </li>
               <li className="ml-4 mb-2">
-                This BVN slip is valid for the lifetime of the holder and{" "}
+                The information shown on this slip is valid for the lifetime of
+                the holder and
                 <span className="text-red-500 font-bold">DOES NOT EXPIRE</span>.
+              </li>
+              <li className="ml-4 mb-2">
+                AnyVerify should not be blamed for any unauthorized
+                alteration/copy/erasure etc. done on the slip
               </li>
             </ul>
           </div>
