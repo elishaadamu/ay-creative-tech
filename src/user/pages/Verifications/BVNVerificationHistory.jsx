@@ -191,89 +191,91 @@ export default function VerificationsHistoryTable() {
       {loading && <p className="text-center">Loading...</p>}
 
       {!loading && sortedTransactions.length > 0 ? (
-        <div className="relative overflow-hidden rounded-lg border border-gray-200 shadow">
-          <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-            <table className="w-full table-auto divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <TableHeader
-                    label="Date"
-                    sortKey="createdAt"
-                    className="w-[clamp(80px,15vw,112px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
-                  />
-                  <TableHeader
-                    label="Reference"
-                    sortKey="transactionReference"
-                    className=" sm:table-cell w-[clamp(120px,20vw,160px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
-                  />
-                  <TableHeader
-                    label="Type"
-                    sortKey="type"
-                    className="w-[clamp(70px,12vw,96px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
-                  />
-                  <TableHeader
-                    label="Amount"
-                    sortKey="amount"
-                    className="w-[clamp(80px,15vw,112px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
-                  />
-                  <TableHeader
-                    label="Status"
-                    sortKey="status"
-                    className="w-[clamp(70px,12vw,96px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
-                  />
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {sortedTransactions.map((transaction, index) => (
-                  <tr
-                    key={transaction._id || index}
-                    className="hover:bg-gray-50 transition-colors"
-                  >
-                    <td className="w-[clamp(80px,15vw,112px)] px-2 py-2 whitespace-nowrap text-[clamp(0.7rem,1.1vw,0.875rem)] text-gray-600">
-                      {format(
-                        new Date(transaction.createdAt),
-                        "dd/MM/yy HH:mm"
-                      )}
-                    </td>
-                    <td className=" sm:table-cell w-[clamp(120px,20vw,160px)] px-2 py-2 whitespace-nowrap">
-                      <span className="text-[clamp(0.7rem,1.1vw,0.875rem)] text-gray-600">
-                        {transaction.transactionReference}
-                      </span>
-                    </td>
-                    <td className="w-[clamp(70px,12vw,96px)] px-2 py-2 whitespace-nowrap">
-                      <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[clamp(0.65rem,1vw,0.75rem)] font-medium capitalize ${
-                          transaction.type === "credit"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {transaction.type}
-                      </span>
-                    </td>
-                    <td className="w-[clamp(80px,15vw,112px)] px-2 py-2 whitespace-nowrap text-[clamp(0.7rem,1.1vw,0.875rem)] text-gray-600">
-                      ₦{transaction.amount.toLocaleString()}
-                    </td>
-                    <td className="w-[clamp(70px,12vw,96px)] px-2 py-2 whitespace-nowrap">
-                      <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[clamp(0.65rem,1vw,0.75rem)] font-medium capitalize ${
-                          transaction.status === "success"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {transaction.status}
-                      </span>
-                    </td>
+        <div className="relative border border-gray-200 rounded-lg shadow">
+          <div className="overflow-x-auto">
+            <div className="inline-block min-w-full">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50 sticky top-0 z-10">
+                  <tr>
+                    <TableHeader
+                      label="Date"
+                      sortKey="createdAt"
+                      className="w-[clamp(80px,15vw,112px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
+                    />
+                    <TableHeader
+                      label="Reference"
+                      sortKey="transactionReference"
+                      className="  sm:table-cell w-[clamp(120px,20vw,160px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
+                    />
+                    <TableHeader
+                      label="Type"
+                      sortKey="type"
+                      className="w-[clamp(70px,12vw,96px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
+                    />
+                    <TableHeader
+                      label="Amount"
+                      sortKey="amount"
+                      className="w-[clamp(80px,15vw,112px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
+                    />
+                    <TableHeader
+                      label="Status"
+                      sortKey="status"
+                      className="w-[clamp(70px,12vw,96px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
+                    />
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {sortedTransactions.map((transaction, index) => (
+                    <tr
+                      key={transaction._id || index}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
+                      <td className="w-[clamp(80px,15vw,112px)] px-2 py-2 whitespace-nowrap text-[clamp(0.7rem,1.1vw,0.875rem)] text-gray-600">
+                        {format(
+                          new Date(transaction.createdAt),
+                          "dd/MM/yy HH:mm"
+                        )}
+                      </td>
+                      <td className=" sm:table-cell w-[clamp(120px,20vw,160px)] px-2 py-2 whitespace-nowrap">
+                        <span className="text-[clamp(0.7rem,1.1vw,0.875rem)] text-gray-600">
+                          {transaction.transactionReference}
+                        </span>
+                      </td>
+                      <td className="w-[clamp(70px,12vw,96px)] px-2 py-2 whitespace-nowrap">
+                        <span
+                          className={`inline-flex items-center px-2 py-0.5 rounded-full text-[clamp(0.65rem,1vw,0.75rem)] font-medium capitalize ${
+                            transaction.type === "credit"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {transaction.type}
+                        </span>
+                      </td>
+                      <td className="w-[clamp(80px,15vw,112px)] px-2 py-2 whitespace-nowrap text-[clamp(0.7rem,1.1vw,0.875rem)] text-gray-600">
+                        ₦{transaction.amount.toLocaleString()}
+                      </td>
+                      <td className="w-[clamp(70px,12vw,96px)] px-2 py-2 whitespace-nowrap">
+                        <span
+                          className={`inline-flex items-center px-2 py-0.5 rounded-full text-[clamp(0.65rem,1vw,0.75rem)] font-medium capitalize ${
+                            transaction.status === "success"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {transaction.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       ) : (
         <p className="text-center text-gray-500 mt-4 text-[clamp(0.875rem,1.2vw,1rem)]">
-          No transactions found
+          No BVN transactions found
         </p>
       )}
     </div>
