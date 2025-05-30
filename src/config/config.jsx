@@ -9,5 +9,6 @@ export const config = {
     virtualAccount: "/virtualAccount",
     NINVerify: "/verify/nin",
     BVNVerify: "/verify/bvn",
+    VerificationHistory: "/transactions/history/",
   },
 };
