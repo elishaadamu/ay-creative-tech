@@ -83,9 +83,9 @@ const sidebarSections = [
     section: "SUMMARY AND HISTORY",
     links: [
       {
-        to: "/dashboard/transactionhistory",
+        to: "/dashboard/fundinghistory",
         icon: <FiFileText className="w-5 h-5" />,
-        label: "Transactions History",
+        label: "Funding History",
       },
       {
         to: "/dashboard/verificationhistory",

@@ -4,7 +4,10 @@ import NIN from "../pages/NIN";
 import PhoneNIN from "../pages/PhoneNIN";
 import Home from "../pages/Home";
 import Footer from "../Components/Footer";
-import VerificationHistory from "../pages/VerificationHistory";
+import Verifications from "../pages/Verifications";
+import BVNVerificationHistory from "../pages/Verifications/BVNVerificationHistory";
+import NINVerificationHistory from "../pages/Verifications/NINVerificationHistory";
+import FundingHistory from "../pages/FundingHistory";
 import BVNVerify from "../pages/BVNVerify";
 import Enrollment from "../pages/Enrollment";
 import DataSubscription from "../pages/Data";
@@ -21,7 +24,10 @@ function RoutesConfig() {
       <Routes className="flex-1 notvalid ">
         <Route path="/" element={<Home />} />
         <Route path="/verifications/nin" element={<NIN />} />
-        <Route path="/verificationhistory" element={<VerificationHistory />} />
+        <Route path="/verificationhistory" element={<Verifications />} />
+        <Route path="/bvnhistory" element={<BVNVerificationHistory />} />
+        <Route path="/ninhistory" element={<NINVerificationHistory />} />
+        <Route path="/fundinghistory" element={<FundingHistory />} />
         <Route path="/verifications/pvn" element={<PhoneNIN />} />
         <Route path="/enrollment" element={<Enrollment />} />
         <Route path="/verifications/bvn" element={<BVNVerify />} />

@@ -1,6 +1,6 @@
 import * as React from "react";
 import axios from "axios";
-import { config } from "../../config/config.jsx";
+import { config } from "../../../config/config.jsx";
 import CryptoJS from "crypto-js";
 import { format } from "date-fns"; // Add this import for date formatting
 import DatePicker from "react-datepicker";
@@ -70,10 +70,14 @@ export default function VerificationsHistoryTable() {
     }
   };
 
-  // Filter transactions based on search term
+  // Filter transactions based on search term and BVN verification type
   const filteredTransactions = apiData.filter((transaction) => {
     const searchStr = searchTerm.toLowerCase();
     const transactionDate = new Date(transaction.createdAt);
+
+    // Only include BVN verification transactions
+    const isBVNVerification =
+      transaction.TransactionType === "BVN-Verification";
 
     // Date filter
     const passesDateFilter =
@@ -84,11 +88,10 @@ export default function VerificationsHistoryTable() {
     const passesSearchFilter =
       transaction.accountNumber?.toLowerCase().includes(searchStr) ||
       transaction.transactionReference?.toLowerCase().includes(searchStr) ||
-      transaction.type?.toLowerCase().includes(searchStr) ||
       transaction.status?.toLowerCase().includes(searchStr) ||
       transaction.description?.toLowerCase().includes(searchStr);
 
-    return passesDateFilter && passesSearchFilter;
+    return isBVNVerification && passesDateFilter && passesSearchFilter;
   });
 
   const sortData = (key) => {
@@ -153,8 +156,10 @@ export default function VerificationsHistoryTable() {
   const sortedTransactions = getSortedData(filteredTransactions);
 
   return (
-    <div className="p-4 max-w-[70%] md:max-w-full">
-      <h2 className="text-2xl font-bold mb-4">Verifications History</h2>
+    <div className="p-4 w-full">
+      <h2 className="text-[clamp(1.2rem,1.7vw,2rem)] font-bold mb-4 text-gray-500">
+        BVN Verifications History
+      </h2>
 
       {/* Search and Date Filter Controls */}
       <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -188,33 +193,33 @@ export default function VerificationsHistoryTable() {
       {!loading && sortedTransactions.length > 0 ? (
         <div className="relative overflow-hidden rounded-lg border border-gray-200 shadow">
           <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-            <table className="min-w-full table-auto divide-y divide-gray-200">
+            <table className="w-full table-auto divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
                   <TableHeader
                     label="Date"
                     sortKey="createdAt"
-                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
+                    className="w-[clamp(80px,15vw,112px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
                   />
                   <TableHeader
                     label="Reference"
                     sortKey="transactionReference"
-                    className="hidden md:table-cell px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
+                    className=" sm:table-cell w-[clamp(120px,20vw,160px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
                   />
                   <TableHeader
                     label="Type"
                     sortKey="type"
-                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
+                    className="w-[clamp(70px,12vw,96px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
                   />
                   <TableHeader
                     label="Amount"
                     sortKey="amount"
-                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
+                    className="w-[clamp(80px,15vw,112px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
                   />
                   <TableHeader
                     label="Status"
                     sortKey="status"
-                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
+                    className="w-[clamp(70px,12vw,96px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
                   />
                 </tr>
               </thead>
@@ -224,20 +229,20 @@ export default function VerificationsHistoryTable() {
                     key={transaction._id || index}
                     className="hover:bg-gray-50 transition-colors"
                   >
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
+                    <td className="w-[clamp(80px,15vw,112px)] px-2 py-2 whitespace-nowrap text-[clamp(0.7rem,1.1vw,0.875rem)] text-gray-600">
                       {format(
                         new Date(transaction.createdAt),
                         "dd/MM/yy HH:mm"
                       )}
                     </td>
-                    <td className="hidden md:table-cell px-4 py-3 whitespace-nowrap text-sm text-gray-600">
-                      <span className="text-xs">
+                    <td className=" sm:table-cell w-[clamp(120px,20vw,160px)] px-2 py-2 whitespace-nowrap">
+                      <span className="text-[clamp(0.7rem,1.1vw,0.875rem)] text-gray-600">
                         {transaction.transactionReference}
                       </span>
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
+                    <td className="w-[clamp(70px,12vw,96px)] px-2 py-2 whitespace-nowrap">
                       <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${
+                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[clamp(0.65rem,1vw,0.75rem)] font-medium capitalize ${
                           transaction.type === "credit"
                             ? "bg-green-100 text-green-800"
                             : "bg-red-100 text-red-800"
@@ -246,12 +251,12 @@ export default function VerificationsHistoryTable() {
                         {transaction.type}
                       </span>
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
+                    <td className="w-[clamp(80px,15vw,112px)] px-2 py-2 whitespace-nowrap text-[clamp(0.7rem,1.1vw,0.875rem)] text-gray-600">
                       ₦{transaction.amount.toLocaleString()}
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
+                    <td className="w-[clamp(70px,12vw,96px)] px-2 py-2 whitespace-nowrap">
                       <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${
+                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[clamp(0.65rem,1vw,0.75rem)] font-medium capitalize ${
                           transaction.status === "success"
                             ? "bg-green-100 text-green-800"
                             : "bg-red-100 text-red-800"
@@ -267,7 +272,9 @@ export default function VerificationsHistoryTable() {
           </div>
         </div>
       ) : (
-        <p className="text-center text-gray-500 mt-4">No transactions found</p>
+        <p className="text-center text-gray-500 mt-4 text-[clamp(0.875rem,1.2vw,1rem)]">
+          No transactions found
+        </p>
       )}
     </div>
   );
