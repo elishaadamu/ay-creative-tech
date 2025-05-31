@@ -262,6 +262,62 @@ function Dashboard() {
   };
 
   const [showBalance, setShowBalance] = useState(true);
+  const [verificationCount, setVerificationCount] = useState(0);
+
+  // Add this new useEffect for fetching verification counts
+  useEffect(() => {
+    const fetchVerificationCount = async () => {
+      if (!userId) return;
+
+      try {
+        // Fetch both BVN and NIN verification histories
+        const [bvnResponse, ninResponse] = await Promise.all([
+          axios.get(
+            `${config.apiBaseUrl}${config.endpoints.VerificationHistory}${userId}`,
+            {
+              withCredentials: true,
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          ),
+          axios.get(
+            `${config.apiBaseUrl}${config.endpoints.VerificationHistory}${userId}`,
+            {
+              withCredentials: true,
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          ),
+        ]);
+
+        // Filter and count successful verifications
+        const bvnCount =
+          bvnResponse.data.transactions?.filter(
+            (transaction) =>
+              transaction.TransactionType === "BVN-Verification" &&
+              transaction.status === "success"
+          ).length || 0;
+
+        const ninCount =
+          ninResponse.data.transactions?.filter(
+            (transaction) =>
+              transaction.TransactionType === "NIN-Verification" &&
+              transaction.status === "success"
+          ).length || 0;
+
+        // Set total verification count
+        const totalCount = bvnCount + ninCount;
+        setVerificationCount(totalCount);
+      } catch (error) {
+        console.error("Error fetching verification count:", error);
+        setVerificationCount(0);
+      }
+    };
+
+    fetchVerificationCount();
+  }, [userId]);
 
   return (
     <div className="max-w-[1500px] mx-auto">
@@ -388,7 +444,7 @@ function Dashboard() {
             </div>
           )}
         </div>
-        <div className="flex-1/2 rounded bg-white shadow-md hover:shadow-lg ring-2 ring-amber-50/2  w-full p-5">
+        <div className="flex-1/2 rounded bg-white shadow-md hover:shadow-lg ring-2 ring-amber-50/2 w-full p-5">
           <div className="flex justify-between items-center relative">
             <FaCube className="text-5xl" />
             <div className="relative" ref={dropdownRef}>
@@ -399,7 +455,7 @@ function Dashboard() {
               {dropdownOpen && (
                 <div className="absolute right-full top-1/2 -translate-y-1/2 mr-2 mt-[30px] bg-gray-50 shadow-lg rounded-md py-2 px-4 z-50 min-w-[120px]">
                   <NavLink
-                    to="/verifications/history"
+                    to="/dashboard/verificationhistory"
                     className="block text-gray-700 hover:text-amber-600 py-1"
                     onClick={() => setDropdownOpen(false)}
                   >
@@ -409,10 +465,12 @@ function Dashboard() {
               )}
             </div>
           </div>
-          <p className="text-gray-500 text-[16px] mt-8 font-normal ">
+          <p className="text-gray-500 text-[16px] mt-8 font-normal">
             Verifications History
           </p>
-          <p className="text-gray-500 text-[24px] mt-2 font-bold ">0</p>
+          <p className="text-gray-500 text-[24px] mt-2 font-bold">
+            {verificationCount}
+          </p>
         </div>
       </div>
       {/* Cards */}

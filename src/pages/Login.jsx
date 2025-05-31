@@ -76,7 +76,7 @@ const Login = () => {
       localStorage.setItem("showWelcomeModal", "true");
       toast.success("Login successful! Redirecting...");
       setTimeout(() => {
-        navigate("/dashboard");
+        navigate("/setpin");
       }, 1500);
     } catch (err) {
       const apiMessage =

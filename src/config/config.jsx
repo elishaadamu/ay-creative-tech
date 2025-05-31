@@ -10,5 +10,6 @@ export const config = {
     NINVerify: "/verify/nin",
     BVNVerify: "/verify/bvn",
     VerificationHistory: "/transactions/history/",
+    setPin: "/virtualAccount/setPin",
   },
 };

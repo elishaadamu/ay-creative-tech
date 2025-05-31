@@ -31,12 +31,7 @@ export default function VerificationsHistoryTable() {
   const user = decryptData(encryptedUser);
   const userId = user?._id || user?.id;
 
-  // Log the user ID
-  console.log("User ID:", userId);
-
-  // Set the API link using the userId
   const apiLink = `${config.apiBaseUrl}${config.endpoints.VerificationHistory}${userId}`;
-  console.log("API Link:", apiLink);
 
   const [loading, setLoading] = React.useState(false);
   const [apiData, setApiData] = React.useState([]);
@@ -60,8 +55,6 @@ export default function VerificationsHistoryTable() {
         },
       });
 
-      // Log full transaction array
-      console.log("All Transactions:", response.data.transactions);
       setApiData(response.data.transactions || []);
     } catch (error) {
       console.error("Error fetching verification history:", error);

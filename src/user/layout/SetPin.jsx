@@ -1,54 +1,113 @@
-import React, { useState } from "react";
-import { Form, Input, Button, Card, Typography } from "antd";
+import React, { useState, useEffect } from "react";
+import { Form, Input, Button, Card } from "antd";
+import { LockOutlined } from "@ant-design/icons";
 import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
-import { config } from "../../config/config";
 import CryptoJS from "crypto-js";
+import { config } from "../../config/config.jsx";
+import { useNavigate } from "react-router-dom";
 
-const { Title, Text } = Typography;
+// Get the secret key from environment variables
+const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
+
+// Decryption function
+function decryptData(encryptedData) {
+  try {
+    const bytes = CryptoJS.AES.decrypt(encryptedData, SECRET_KEY);
+    const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+    return decryptedData;
+  } catch (error) {
+    console.error("Decryption error:", error);
+    return null;
+  }
+}
 
 function SetPin() {
-  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
 
-  const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
+  // Add useEffect to check PIN status when component mounts
+  useEffect(() => {
+    const checkExistingPin = async () => {
+      const encryptedUser = localStorage.getItem("user");
+      if (!encryptedUser) return;
 
-  function decryptData(ciphertext) {
-    if (!ciphertext) return null;
-    try {
-      const bytes = CryptoJS.AES.decrypt(ciphertext, SECRET_KEY);
-      const decrypted = bytes.toString(CryptoJS.enc.Utf8);
-      return JSON.parse(decrypted);
-    } catch {
-      return null;
-    }
-  }
+      const decryptedUser = decryptData(encryptedUser);
+      if (!decryptedUser || !decryptedUser.id) return;
+
+      try {
+        const response = await axios.post(
+          `${config.apiBaseUrl}${config.endpoints.setPin}`,
+          { userId: decryptedUser.id },
+          { withCredentials: true }
+        );
+
+        if (response.data?.hasPin) {
+          toast.info("You already have a PIN set");
+          navigate("/dashboard");
+        }
+      } catch (error) {
+        console.error("Error checking PIN status:", error);
+      }
+    };
+
+    checkExistingPin();
+  }, [navigate]);
 
   const onFinish = async (values) => {
-    if (values.pin !== values.confirmPin) {
-      toast.error("PINs do not match!");
-      return;
-    }
-
     setLoading(true);
+
     try {
-      const userData = decryptData(localStorage.getItem("user"));
-      if (!userData) {
-        toast.error("Please login to continue");
+      const encryptedUser = localStorage.getItem("user");
+      if (!encryptedUser) {
+        toast.error("User not found! Please login again.");
+        navigate("/login");
         return;
       }
 
-      const response = await axios.post(`${config.apiBaseUrl}/user/set-pin`, {
-        userId: userData._id,
-        pin: values.pin,
-      });
+      const decryptedUser = decryptData(encryptedUser);
+      if (!decryptedUser || !decryptedUser.id) {
+        toast.error("Invalid user data! Please login again.");
+        navigate("/login");
+        return;
+      }
 
-      if (response.data.success) {
-        toast.success("Transaction PIN set successfully!");
-        form.resetFields();
+      if (values.pin !== values.confirmPin) {
+        toast.error("PINs do not match!");
+        setLoading(false);
+        return;
+      }
+
+      const pinLoad = {
+        pin: values.pin,
+        userId: decryptedUser.id,
+      };
+
+      const response = await axios.post(
+        `${config.apiBaseUrl}${config.endpoints.setPin}`,
+        pinLoad,
+        { withCredentials: true }
+      );
+
+      // Check if PIN exists in response
+      if (response.data?.hasPin) {
+        toast.info("PIN already exists. Redirecting to dashboard...");
+        navigate("/dashboard");
+        return;
+      }
+
+      // If PIN was successfully set
+      if (response.data) {
+        toast.success("PIN set successfully!");
+        navigate("/dashboard");
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to set PIN");
+      console.error("API Error:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to set PIN. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -56,31 +115,28 @@ function SetPin() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <Card className="w-full max-w-md shadow-lg">
-        <Title level={3} className="text-center mb-6">
-          Set Transaction PIN
-        </Title>
-        <Text className="block text-center mb-6">
-          This PIN will be required for all transactions
-        </Text>
+      <ToastContainer />
+      <Card title="Set Your PIN" className="w-full max-w-md shadow-lg">
         <Form
           form={form}
-          layout="vertical"
+          name="set_pin"
           onFinish={onFinish}
+          layout="vertical"
           autoComplete="off"
         >
           <Form.Item
             name="pin"
             label="Enter PIN"
             rules={[
-              { required: true, message: "Please enter your PIN" },
-              { len: 6, message: "PIN must be 6 digits" },
+              { required: true, message: "Please input your PIN!" },
+              { len: 4, message: "PIN must be 4 digits" },
+              { pattern: /^\d+$/, message: "PIN must contain only numbers" },
             ]}
           >
             <Input.Password
-              maxLength={6}
-              placeholder="Enter 6-digit PIN"
-              size="large"
+              prefix={<LockOutlined />}
+              placeholder="Enter 4-digit PIN"
+              maxLength={4}
             />
           </Form.Item>
 
@@ -88,31 +144,25 @@ function SetPin() {
             name="confirmPin"
             label="Confirm PIN"
             rules={[
-              { required: true, message: "Please confirm your PIN" },
-              { len: 6, message: "PIN must be 6 digits" },
+              { required: true, message: "Please confirm your PIN!" },
+              { len: 4, message: "PIN must be 4 digits" },
+              { pattern: /^\d+$/, message: "PIN must contain only numbers" },
             ]}
           >
             <Input.Password
-              maxLength={6}
-              placeholder="Confirm 6-digit PIN"
-              size="large"
+              prefix={<LockOutlined />}
+              placeholder="Confirm 4-digit PIN"
+              maxLength={4}
             />
           </Form.Item>
 
           <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={loading}
-              block
-              size="large"
-            >
+            <Button type="primary" htmlType="submit" loading={loading} block>
               Set PIN
             </Button>
           </Form.Item>
         </Form>
       </Card>
-      <ToastContainer />
     </div>
   );
 }
