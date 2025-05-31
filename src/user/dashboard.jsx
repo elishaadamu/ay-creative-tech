@@ -3,8 +3,8 @@ import Sidebar from "./Components/Sidebar";
 import "./assets/css/style.css";
 import Logo from "../assets/images/logo-ay.png";
 import { NavLink } from "react-router-dom";
-
 import RoutesConfig from "./Components/RoutesConfig";
+import CustomerCare from "./Components/CustomerCare";
 
 const ONE_HOUR = 60 * 60 * 1000; // 3 600 000 ms
 
@@ -60,7 +60,6 @@ function UserDashBoard() {
           className="text-gray-700 dark:text-gray-200 focus:outline-none"
         >
           {sidebarOpen ? (
-            /* …close icon… */
             <svg
               className="w-6 h-6 text-black"
               fill="none"
@@ -75,7 +74,6 @@ function UserDashBoard() {
               />
             </svg>
           ) : (
-            /* …hamburger icon… */
             <svg
               className="w-6 h-6 text-amber-900"
               fill="none"
@@ -108,6 +106,9 @@ function UserDashBoard() {
           <RoutesConfig />
         </div>
       </div>
+
+      {/* Customer Care Component */}
+      <CustomerCare />
     </div>
   );
 }

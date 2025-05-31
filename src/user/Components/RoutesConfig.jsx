@@ -17,6 +17,8 @@ import NotFound from "../pages/NotFound";
 import BasicBVN from "../layout/BasicBVN";
 import AdvancedBVN from "../layout/AdvancedBVN";
 import IPEClearance from "../pages/IPEClearance";
+import SetPin from "../layout/SetPin";
+import ResetPin from "../layout/ResetPin";
 
 function RoutesConfig() {
   return (
@@ -36,6 +38,8 @@ function RoutesConfig() {
         <Route path="/verifications/ninslip" element={<NINSlip />} />
         <Route path="/verifications/basicbvn" element={<BasicBVN />} />
         <Route path="/verifications/advancedbvn" element={<AdvancedBVN />} />
+        <Route path="/set-pin" element={<SetPin />} />
+        <Route path="/reset-pin" element={<ResetPin />} />
         <Route path="*" element={<NotFound />} />
         <Route path="ipe-clearance" element={<IPEClearance />} />
       </Routes>

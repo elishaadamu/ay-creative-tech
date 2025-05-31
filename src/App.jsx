@@ -21,6 +21,7 @@ const App = () => {
   const location = useLocation();
   const showLayout =
     location.pathname === "/" || location.pathname === "/contact";
+  const isDashboard = location.pathname.startsWith("/dashboard");
 
   // Loading spinner state
   const [loading, setLoading] = useState(true);
@@ -88,7 +89,7 @@ const App = () => {
         </AnimatePresence>
       </div>
       {showLayout && <Footer />}
-      <Backtotop />
+      {!isDashboard && <Backtotop />}
     </div>
   );
 };

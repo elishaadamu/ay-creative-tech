@@ -223,13 +223,13 @@ function Dashboard() {
       id: 10,
       name: "AIRTIME SUBSCRIPTION",
       icon: Airtime,
-      to: "/birth-cert",
+      to: "/dashboard/airtime",
     },
     {
       id: 11,
       name: "DATA SUBSCRIPTION",
       icon: Data,
-      to: "/data",
+      to: "/dashboard/data",
     },
     {
       id: 12,

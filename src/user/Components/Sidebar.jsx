@@ -108,6 +108,11 @@ const sidebarSections = [
         label: "Change Password",
       },
       {
+        to: "/dashboard/reset-pin",
+        icon: <FiSettings className="w-5 h-5" />,
+        label: "Reset Pin",
+      },
+      {
         to: "/login",
         icon: <FiLogOut className="w-5 h-5 text-red-500" />,
         label: "Sign Out",
