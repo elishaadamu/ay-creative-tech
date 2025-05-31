@@ -28,34 +28,6 @@ function SetPin() {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
-  // Add useEffect to check PIN status when component mounts
-  useEffect(() => {
-    const checkExistingPin = async () => {
-      const encryptedUser = localStorage.getItem("user");
-      if (!encryptedUser) return;
-
-      const decryptedUser = decryptData(encryptedUser);
-      if (!decryptedUser || !decryptedUser.id) return;
-
-      try {
-        const response = await axios.post(
-          `${config.apiBaseUrl}${config.endpoints.setPin}`,
-          { userId: decryptedUser.id },
-          { withCredentials: true }
-        );
-
-        if (response.data?.hasPin) {
-          toast.info("You already have a PIN set");
-          navigate("/dashboard");
-        }
-      } catch (error) {
-        console.error("Error checking PIN status:", error);
-      }
-    };
-
-    checkExistingPin();
-  }, [navigate]);
-
   const onFinish = async (values) => {
     setLoading(true);
 
@@ -68,15 +40,9 @@ function SetPin() {
       }
 
       const decryptedUser = decryptData(encryptedUser);
-      if (!decryptedUser || !decryptedUser.id) {
-        toast.error("Invalid user data! Please login again.");
-        navigate("/login");
-        return;
-      }
 
       if (values.pin !== values.confirmPin) {
         toast.error("PINs do not match!");
-        setLoading(false);
         return;
       }
 
@@ -84,24 +50,21 @@ function SetPin() {
         pin: values.pin,
         userId: decryptedUser.id,
       };
-
+      const responseCheck = await axios.post(
+        `${config.apiBaseUrl}${config.endpoints.checkPin}`,
+        pinLoad,
+        { withCredentials: true }
+      );
+      console.log("responseCheck:", responseCheck);
+      console.log("pinLoad:", pinLoad);
       const response = await axios.post(
         `${config.apiBaseUrl}${config.endpoints.setPin}`,
         pinLoad,
         { withCredentials: true }
       );
 
-      // Check if PIN exists in response
-      if (response.data?.hasPin) {
-        toast.info("PIN already exists. Redirecting to dashboard...");
-        navigate("/dashboard");
-        return;
-      }
-
-      // If PIN was successfully set
       if (response.data) {
         toast.success("PIN set successfully!");
-        navigate("/dashboard");
       }
     } catch (error) {
       console.error("API Error:", error);

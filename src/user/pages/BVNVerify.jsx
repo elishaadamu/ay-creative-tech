@@ -9,6 +9,7 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { config } from "../../config/config.jsx";
+import Swal from "sweetalert2";
 
 function BVNVerify() {
   /* ---------------------------------- data --------------------------------- */
@@ -26,6 +27,7 @@ function BVNVerify() {
   const [showSlip, setShowSlip] = useState(false);
   const [loading, setLoading] = useState(false);
   const [apiData, setApiData] = useState(null); // <-- Add this state
+  const [pin, setPin] = useState(""); // Add state for Transaction PIN
 
   // Add your secret key for decryption
   const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
@@ -43,58 +45,100 @@ function BVNVerify() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (
-      (selectedSlip === "Basic" || selectedSlip === "Advanced") &&
-      bvn.length === 11
-    ) {
-      // Find the selected slip's price
-      const selectedSlipObj = cardSlip.find((s) => s.value === selectedSlip);
-      const slipAmount = selectedSlipObj ? selectedSlipObj.price : 0;
 
-      // Get userId from encrypted localStorage (same as Dashboard)
-      let userId = null;
-      try {
-        const userStr = localStorage.getItem("user");
-        if (userStr) {
-          const userObj = decryptData(userStr);
-          userId = userObj?._id || userObj?.id;
-        }
-      } catch {}
+    if (!selectedVerify || !selectedSlip) {
+      toast.error("Please select verification type and details needed");
+      return;
+    }
 
-      // Prepare payload
-      const payload = {
-        verifyWith: selectedVerify,
-        slipLayout: selectedSlip,
-        bvn: bvn,
-        amount: slipAmount,
-        userId,
-      };
-      console.log("Sending payload:", payload);
-      setLoading(true);
-      try {
-        const response = await axios.post(
-          `${config.apiBaseUrl}${config.endpoints.BVNVerify}`,
-          payload,
-          { withCredentials: true }
-        );
-        console.log("API response:", response.data.data);
-        toast.success("BVN verified successfully!");
-        const bvnData = response.data?.data?.data; // <-- FIXED PATH
+    if (!bvn || bvn.length !== 11) {
+      toast.error("Please enter a valid 11-digit BVN");
+      return;
+    }
 
-        setApiData(bvnData); // Save API data
-        setShowSlip(true);
-        // Optionally: handle response.data if you want to pass to slip
-      } catch (error) {
-        console.error("Verification error:", error);
-        toast.error(
-          error.response?.data?.message ||
-            "Verification failed. Please try again."
-        );
-      } finally {
-        setLoading(false);
+    // Add PIN validation
+    if (!pin || pin.length !== 4) {
+      toast.error("Please enter a valid 4-digit PIN");
+      return;
+    }
+
+    // Find the selected slip's price
+    const selectedSlipObj = cardSlip.find((s) => s.value === selectedSlip);
+    const slipAmount = selectedSlipObj ? selectedSlipObj.price : 0;
+
+    // Show confirmation dialog
+    const result = await Swal.fire({
+      title: "Confirm Verification",
+      text: `Are you sure you want to proceed with this verification? ${
+        slipAmount > 0 ? `Amount: ₦${slipAmount}` : ""
+      }`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#f59e0b",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, verify",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
+
+    // Get userId from encrypted localStorage
+    let userId = null;
+    try {
+      const userStr = localStorage.getItem("user");
+      if (userStr) {
+        const userObj = decryptData(userStr);
+        userId = userObj?._id || userObj?.id;
       }
-    } else {
-      toast.error("Please select slip type and enter a valid 11-digit BVN.");
+    } catch {}
+
+    const payload = {
+      verifyWith: selectedVerify,
+      slipLayout: selectedSlip,
+      bvn: bvn,
+      amount: slipAmount,
+      userId,
+      pin: pin, // Add PIN to payload
+    };
+
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        `${config.apiBaseUrl}${config.endpoints.BVNVerify}`,
+        payload,
+        { withCredentials: true }
+      );
+
+      // Show success alert
+      await Swal.fire({
+        title: "Verification Successful!",
+        text: "Your BVN has been successfully verified.",
+        icon: "success",
+        confirmButtonColor: "#f59e0b",
+      });
+
+      toast.success("BVN verified successfully!", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+
+      const bvnData = response.data?.data?.data;
+      setApiData(bvnData);
+      setShowSlip(true);
+    } catch (error) {
+      console.error("Verification error:", error);
+      toast.error(
+        error.response?.data?.message ||
+          "Verification failed. Please try again."
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -239,32 +283,54 @@ function BVNVerify() {
           <p className="text-gray-400 text-[12px] mt-2 ">
             We'll never share your details with anyone else.
           </p>
-          <label className="flex items-start mt-8 space-x-3 cursor-pointer">
-            <span className="relative">
-              <input
-                type="checkbox"
-                className="peer shrink-0 appearance-none h-5 w-5 border border-gray-400 rounded-sm bg-white checked:bg-blue-600 checked:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                required
-                title="Required"
-              />
-              <svg
-                className="absolute w-4 h-4 text-white left-0.5 top-0.5 pointer-events-none hidden peer-checked:block"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 011.414-1.414L8.414 12.586l7.879-7.879a1 1 0 011.414 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </span>
-            <span className="text-sm text-gray-400">
-              By checking this box, you agreed that the owner of the ID has
-              granted you consent to verify his/her identity.
-            </span>
-          </label>
         </div>
+        {/* ------------------------------- Step #4 ------------------------------- */}
+        <div className="mt-4">
+          <p className="mt-7 text-[14px] text-gray-500">
+            4. Enter your Transaction PIN
+          </p>
+          <hr className="my-4 border-gray-200" />
+          <input
+            type="password"
+            className="pl-5 py-2 border border-gray-200 focus:border-gray-200 rounded w-full h-[50px]"
+            placeholder="Enter 4-digit Transaction PIN"
+            required
+            name="pin"
+            value={pin}
+            onChange={(e) => setPin(e.target.value.replace(/\D/, ""))}
+            inputMode="numeric"
+            maxLength="4"
+            pattern="\d{4}"
+            autoComplete="off"
+            title="PIN must be exactly 4 digits"
+          />
+        </div>
+        <label className="flex items-start mt-8 space-x-3 cursor-pointer">
+          <span className="relative">
+            <input
+              type="checkbox"
+              className="peer shrink-0 appearance-none h-5 w-5 border border-gray-400 rounded-sm bg-white checked:bg-blue-600 checked:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              required
+              title="Required"
+            />
+            <svg
+              className="absolute w-4 h-4 text-white left-0.5 top-0.5 pointer-events-none hidden peer-checked:block"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 011.414-1.414L8.414 12.586l7.879-7.879a1 1 0 011.414 0z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </span>
+          <span className="text-sm text-gray-400">
+            By checking this box, you agreed that the owner of the ID has
+            granted you consent to verify his/her identity.
+          </span>
+        </label>
+
         <button
           type="submit"
           disabled={loading}

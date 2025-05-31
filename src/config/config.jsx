@@ -11,5 +11,6 @@ export const config = {
     BVNVerify: "/verify/bvn",
     VerificationHistory: "/transactions/history/",
     setPin: "/virtualAccount/setPin",
+    checkPin: "/virtualAccount/checkPin",
   },
 };

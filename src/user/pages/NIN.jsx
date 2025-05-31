@@ -11,6 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import { config } from "../../config/config.jsx";
 import CryptoJS from "crypto-js";
+import Swal from "sweetalert2";
 
 function NIN() {
   const navigate = useNavigate();
@@ -39,6 +40,7 @@ function NIN() {
   const [selectedSlip, setSelectedSlip] = useState(""); // unselected by default
   const [formData, setFormData] = useState({
     nin: "",
+    pin: "", // Add PIN to formData
   });
   const [loading, setLoading] = useState(false);
   const [verificationResult, setVerificationResult] = useState(null);
@@ -66,11 +68,34 @@ function NIN() {
       return;
     }
 
+    if (!formData.pin || formData.pin.length !== 4) {
+      toast.error("Please enter a valid 4-digit PIN");
+      return;
+    }
+
     // Find the selected slip's price
     const selectedSlipObj = cardSlip.find((s) => s.value === selectedSlip);
     const slipAmount = selectedSlipObj ? selectedSlipObj.price : 0;
 
-    // Get userId from encrypted localStorage (same as Dashboard)
+    // Show confirmation dialog
+    const result = await Swal.fire({
+      title: "Confirm Verification",
+      text: `Are you sure you want to proceed with this verification? ${
+        slipAmount > 0 ? `Amount: ₦${slipAmount}` : ""
+      }`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#f59e0b",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, verify",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
+
+    // Get userId from encrypted localStorage
     let userId = null;
     try {
       const userStr = localStorage.getItem("user");
@@ -86,9 +111,9 @@ function NIN() {
       slipLayout: selectedSlip,
       nin: formData.nin,
       amount: slipAmount,
-      userId, // <-- Add this line
+      userId,
+      pin: formData.pin,
     };
-    console.log("Sending payload:", payload);
 
     try {
       const response = await axios.post(
@@ -99,11 +124,26 @@ function NIN() {
         }
       );
 
-      console.log("API response:", response.data); // Log the whole data for debugging
-
       setVerificationResult(response.data);
-      toast.success("NIN verified successfully!");
-      const ninData = response.data?.data?.nin_data; // <-- FIXED PATH
+
+      // Show success alert
+      await Swal.fire({
+        title: "Verification Successful!",
+        text: "Your NIN has been successfully verified.",
+        icon: "success",
+        confirmButtonColor: "#f59e0b",
+      });
+
+      toast.success("NIN verified successfully!", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+
+      const ninData = response.data?.data?.nin_data;
       if (ninData) {
         navigate("/dashboard/verifications/ninslip", {
           state: { userData: ninData },
@@ -248,8 +288,31 @@ function NIN() {
             inputMode="numeric" // Fixed from inputmode
             maxLength="11" // Fixed from maxlength
             pattern="\d{11}"
+            autoComplete="off"
             title="NIN must be exactly 11 digits"
           />
+
+          {/* Add this after the NIN input */}
+          <div className="mt-4">
+            <p className="mt-7 text-[14px] text-gray-500">
+              4. Enter your Transaction PIN
+            </p>
+            <hr className="my-7 border-gray-200" />
+            <input
+              type="password"
+              className="pl-5 py-2 border border-gray-200 focus:border-gray-200 rounded w-full h-[50px]"
+              placeholder="Enter 4-digit Transaction PIN"
+              required
+              name="pin"
+              value={formData.pin}
+              onChange={handleInputChange}
+              inputMode="numeric"
+              maxLength="4"
+              pattern="\d{4}"
+              autoComplete="off"
+              title="PIN must be exactly 4 digits"
+            />
+          </div>
 
           <p className="text-gray-400 text-[12px] mt-2 ">
             We'll never share your details with anyone else.

@@ -11,7 +11,7 @@ import Contact from "./pages/Contact";
 import Footer from "./components/Footer";
 import NotFound from "./pages/NotFound";
 import Dashboard from "./user/dashboard";
-import SetPin from "./user/layout/SetPin";
+
 import ProtectedRoute from "./components/ProtectedRoute";
 import ForgottenPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
@@ -85,7 +85,6 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
-            <Route path="/setpin" element={<SetPin />} />
           </Routes>
         </AnimatePresence>
       </div>

@@ -38,7 +38,7 @@ function RoutesConfig() {
         <Route path="/verifications/ninslip" element={<NINSlip />} />
         <Route path="/verifications/basicbvn" element={<BasicBVN />} />
         <Route path="/verifications/advancedbvn" element={<AdvancedBVN />} />
-        <Route path="/set-pin" element={<SetPin />} />
+        <Route path="/setpin" element={<SetPin />} />
         <Route path="/reset-pin" element={<ResetPin />} />
         <Route path="*" element={<NotFound />} />
         <Route path="ipe-clearance" element={<IPEClearance />} />
