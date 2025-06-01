@@ -5,6 +5,7 @@ import CryptoJS from "crypto-js";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { config } from "../../config/config.jsx";
+import { useNavigate } from "react-router-dom";
 
 function DataSub() {
   const [form] = Form.useForm();
@@ -15,6 +16,7 @@ function DataSub() {
   const [networkPlans, setNetworkPlans] = useState([]);
   const [selectedNetwork, setSelectedNetwork] = useState(null);
   const [selectedPlanType, setSelectedPlanType] = useState(null);
+  const navigate = useNavigate();
 
   // Add secret key for decryption
   const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
@@ -113,14 +115,24 @@ function DataSub() {
   };
 
   const onFinish = async (values) => {
-    setLoading(true);
     try {
-      const encryptedUser = localStorage.getItem("user");
-      const userData = decryptData(encryptedUser);
+      const userStr = localStorage.getItem("user");
+      if (userStr) {
+        const userObj = decryptData(userStr);
+        if (!userObj?.hasPin) {
+          toast.info("Please set your transaction PIN first!", {
+            autoClose: 2000,
+          });
 
-      if (!userData) {
-        toast.error("Please login to continue");
-        return;
+          setTimeout(() => {
+            navigate("/dashboard/setpin", {
+              state: {
+                returnPath: "/dashboard/data",
+              },
+            });
+          }, 2000);
+          return;
+        }
       }
 
       // Get data plan price based on selection
@@ -164,6 +176,36 @@ function DataSub() {
       setLoading(false);
     }
   };
+
+  // Add PIN check effect
+  useEffect(() => {
+    const checkPin = () => {
+      try {
+        const userStr = localStorage.getItem("user");
+        if (userStr) {
+          const userObj = decryptData(userStr);
+          if (!userObj?.hasPin) {
+            toast.info("Please set your transaction PIN first!", {
+              position: "top-right",
+              autoClose: 2000,
+            });
+
+            setTimeout(() => {
+              navigate("/dashboard/setpin", {
+                state: {
+                  returnPath: "/data",
+                },
+              });
+            }, 2000);
+          }
+        }
+      } catch (error) {
+        console.error("Error checking PIN status:", error);
+      }
+    };
+
+    checkPin();
+  }, [navigate]);
 
   return (
     <div>

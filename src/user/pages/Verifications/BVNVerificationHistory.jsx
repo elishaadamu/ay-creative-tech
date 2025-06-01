@@ -10,6 +10,8 @@ import {
   ArrowUpIcon,
   ArrowDownIcon,
 } from "@heroicons/react/24/solid";
+import { Empty } from "antd";
+import { InboxOutlined } from "@ant-design/icons";
 
 // Add your secret key for decryption
 const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
@@ -182,7 +184,7 @@ export default function VerificationsHistoryTable() {
         />
       </div>
 
-      {loading && <p className="text-center">Loading...</p>}
+      {loading}
 
       {!loading && sortedTransactions.length > 0 ? (
         <div className="relative border border-gray-200 rounded-lg shadow">
@@ -268,9 +270,22 @@ export default function VerificationsHistoryTable() {
           </div>
         </div>
       ) : (
-        <p className="text-center text-gray-500 mt-4 text-[clamp(0.875rem,1.2vw,1rem)]">
-          No BVN transactions found
-        </p>
+        <div className="flex flex-col items-center justify-center p-8">
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            imageStyle={{ height: 60 }}
+            description={
+              <div className="text-center">
+                <p className="text-gray-500 text-lg mb-2">
+                  No BVN Verification Records
+                </p>
+                <p className="text-gray-400 text-sm">
+                  Your BVN verification history will appear here
+                </p>
+              </div>
+            }
+          />
+        </div>
       )}
     </div>
   );

@@ -6,7 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import CryptoJS from "crypto-js";
 import { config } from "../../config/config.jsx";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 // Get the secret key from environment variables
 const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
@@ -25,8 +25,10 @@ function decryptData(encryptedData) {
 
 function SetPin() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const returnPath = location.state?.returnPath || "/dashboard/";
 
   const onFinish = async (values) => {
     setLoading(true);
@@ -34,7 +36,7 @@ function SetPin() {
     try {
       const encryptedUser = localStorage.getItem("user");
       if (!encryptedUser) {
-        toast.error("User not found! Please login again.");
+        toast.error("User not found! Is an Account Created?");
         navigate("/login");
         return;
       }
@@ -50,13 +52,7 @@ function SetPin() {
         pin: values.pin,
         userId: decryptedUser.id,
       };
-      const responseCheck = await axios.post(
-        `${config.apiBaseUrl}${config.endpoints.checkPin}`,
-        pinLoad,
-        { withCredentials: true }
-      );
-      console.log("responseCheck:", responseCheck);
-      console.log("pinLoad:", pinLoad);
+
       const response = await axios.post(
         `${config.apiBaseUrl}${config.endpoints.setPin}`,
         pinLoad,
@@ -64,7 +60,26 @@ function SetPin() {
       );
 
       if (response.data) {
-        toast.success("PIN set successfully!");
+        toast.success("PIN set successfully!", {
+          autoClose: 2000,
+          onClose: () => {
+            // Update the user object in localStorage to include hasPin
+            const updatedUser = {
+              ...decryptedUser,
+              hasPin: true,
+            };
+            const encryptedUpdatedUser = CryptoJS.AES.encrypt(
+              JSON.stringify(updatedUser),
+              SECRET_KEY
+            ).toString();
+            localStorage.setItem("user", encryptedUpdatedUser);
+
+            // Redirect back to the previous page after 2 seconds
+            setTimeout(() => {
+              navigate(returnPath);
+            }, 2000);
+          },
+        });
       }
     } catch (error) {
       console.error("API Error:", error);
@@ -116,11 +131,18 @@ function SetPin() {
               prefix={<LockOutlined />}
               placeholder="Confirm 4-digit PIN"
               maxLength={4}
+              size="large"
             />
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit" loading={loading} block>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              block
+              size="large"
+            >
               Set PIN
             </Button>
           </Form.Item>

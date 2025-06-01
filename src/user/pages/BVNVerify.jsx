@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { VscUnverified } from "react-icons/vsc";
 import { MdOutlineSendToMobile } from "react-icons/md";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
@@ -10,6 +10,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { config } from "../../config/config.jsx";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 function BVNVerify() {
   /* ---------------------------------- data --------------------------------- */
@@ -29,6 +30,8 @@ function BVNVerify() {
   const [apiData, setApiData] = useState(null); // <-- Add this state
   const [pin, setPin] = useState(""); // Add state for Transaction PIN
 
+  const navigate = useNavigate();
+
   // Add your secret key for decryption
   const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
 
@@ -45,6 +48,31 @@ function BVNVerify() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    try {
+      const userStr = localStorage.getItem("user");
+      if (userStr) {
+        const userObj = decryptData(userStr);
+        if (!userObj?.hasPin) {
+          toast.info("Please set your transaction PIN first!", {
+            position: "top-right",
+            autoClose: 2000,
+          });
+
+          setTimeout(() => {
+            navigate("/dashboard/setpin", {
+              state: {
+                returnPath: "/verifications/bvn",
+              },
+            });
+          }, 2000);
+          return;
+        }
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error(error.response?.data?.message || "Verification failed");
+    }
 
     if (!selectedVerify || !selectedSlip) {
       toast.error("Please select verification type and details needed");
@@ -141,6 +169,35 @@ function BVNVerify() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const checkPin = () => {
+      try {
+        const userStr = localStorage.getItem("user");
+        if (userStr) {
+          const userObj = decryptData(userStr);
+          if (!userObj?.hasPin) {
+            toast.info("Please set your transaction PIN first!", {
+              position: "top-right",
+              autoClose: 2000,
+            });
+
+            setTimeout(() => {
+              navigate("/dashboard/setpin", {
+                state: {
+                  returnPath: "/dashboard/verifications/bvn",
+                },
+              });
+            }, 2000);
+          }
+        }
+      } catch (error) {
+        console.error("Error checking PIN status:", error);
+      }
+    };
+
+    checkPin();
+  }, [navigate]);
 
   if (showSlip && selectedSlip === "Basic") {
     return <BasicBVN apiData={apiData} />; // <-- Pass apiData as prop
@@ -273,6 +330,7 @@ function BVNVerify() {
             name="NIN"
             id="number"
             inputMode="numeric"
+            autoComplete="off"
             pattern="\d{11}"
             maxLength="11"
             title="NIN must be exactly 11 digits"
@@ -299,9 +357,9 @@ function BVNVerify() {
             value={pin}
             onChange={(e) => setPin(e.target.value.replace(/\D/, ""))}
             inputMode="numeric"
+            autoComplete="pin" // Change this line
             maxLength="4"
             pattern="\d{4}"
-            autoComplete="off"
             title="PIN must be exactly 4 digits"
           />
         </div>
