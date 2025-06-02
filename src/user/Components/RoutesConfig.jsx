@@ -5,8 +5,8 @@ import PhoneNIN from "../pages/PhoneNIN";
 import Home from "../pages/Home";
 import Footer from "../Components/Footer";
 import Verifications from "../pages/Verifications";
-import BVNVerificationHistory from "../pages/Verifications/BVNVerificationHistory";
-import NINVerificationHistory from "../pages/Verifications/NINVerificationHistory";
+import BVNVerificationHistory from "../pages/History/BVNVerificationHistory";
+import NINVerificationHistory from "../pages/History/NINVerificationHistory";
 import FundingHistory from "../pages/FundingHistory";
 import BVNVerify from "../pages/BVNVerify";
 import Enrollment from "../pages/Enrollment";
@@ -19,6 +19,7 @@ import AdvancedBVN from "../layout/AdvancedBVN";
 import IPEClearance from "../pages/IPEClearance";
 import SetPin from "../layout/SetPin";
 import ResetPin from "../layout/ResetPin";
+import IPEClearanceHistory from "../pages/History/IPEHistory";
 
 function RoutesConfig() {
   return (
@@ -40,8 +41,9 @@ function RoutesConfig() {
         <Route path="/verifications/advancedbvn" element={<AdvancedBVN />} />
         <Route path="/setpin" element={<SetPin />} />
         <Route path="/reset-pin" element={<ResetPin />} />
+        <Route path="/ipe-clearance" element={<IPEClearance />} />
+        <Route path="/ipe-history" element={<IPEClearanceHistory />} />
         <Route path="*" element={<NotFound />} />
-        <Route path="ipe-clearance" element={<IPEClearance />} />
       </Routes>
       <Footer />
     </div>

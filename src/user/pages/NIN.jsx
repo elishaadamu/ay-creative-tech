@@ -4,7 +4,11 @@ import RegularImg from "../assets/images/regular.png";
 import StandardImg from "../assets/images/standard.png";
 import PremiumImg from "../assets/images/premium.png";
 import { MdOutlineSendToMobile } from "react-icons/md";
-import { AiOutlineLoading3Quarters } from "react-icons/ai"; // Add this import
+import {
+  AiOutlineLoading3Quarters,
+  AiOutlineEye,
+  AiOutlineEyeInvisible,
+} from "react-icons/ai"; // Add this import
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -44,6 +48,7 @@ function NIN() {
   });
   const [loading, setLoading] = useState(false);
   const [verificationResult, setVerificationResult] = useState(null);
+  const [showPin, setShowPin] = useState(false); // Add state for PIN visibility
 
   // Add your secret key for decryption
   const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
@@ -298,20 +303,33 @@ function NIN() {
               4. Enter your Transaction PIN
             </p>
             <hr className="my-7 border-gray-200" />
-            <input
-              type="password"
-              className="pl-5 py-2 border border-gray-200 focus:border-gray-200 rounded w-full h-[50px]"
-              placeholder="Enter 4-digit Transaction PIN"
-              required
-              name="pin"
-              value={formData.pin}
-              onChange={handleInputChange}
-              inputMode="numeric"
-              maxLength="4"
-              pattern="\d{4}"
-              autoComplete="pin"
-              title="PIN must be exactly 4 digits"
-            />
+            <div className="relative">
+              <input
+                type={showPin ? "text" : "password"}
+                className="pl-5 py-2 border border-gray-200 focus:border-gray-200 rounded w-full h-[50px]"
+                placeholder="Enter 4-digit Transaction PIN"
+                required
+                name="pin"
+                value={formData.pin}
+                onChange={handleInputChange}
+                inputMode="numeric"
+                maxLength="4"
+                pattern="\d{4}"
+                autoComplete="pin"
+                title="PIN must be exactly 4 digits"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPin(!showPin)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              >
+                {showPin ? (
+                  <AiOutlineEyeInvisible size={20} />
+                ) : (
+                  <AiOutlineEye size={20} />
+                )}
+              </button>
+            </div>
           </div>
 
           <p className="text-gray-400 text-[12px] mt-2 ">

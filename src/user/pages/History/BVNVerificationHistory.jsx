@@ -10,8 +10,8 @@ import {
   ArrowUpIcon,
   ArrowDownIcon,
 } from "@heroicons/react/24/solid";
-import { Empty } from "antd";
-import { InboxOutlined } from "@ant-design/icons";
+import { Empty, Modal } from "antd";
+import { InboxOutlined, EyeOutlined } from "@ant-design/icons";
 
 // Add your secret key for decryption
 const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
@@ -45,6 +45,8 @@ export default function VerificationsHistoryTable() {
     key: "createdAt",
     direction: "desc",
   });
+  const [isModalVisible, setIsModalVisible] = React.useState(false);
+  const [selectedTransaction, setSelectedTransaction] = React.useState(null);
 
   const fetchVerificationHistory = async () => {
     if (!userId) return;
@@ -145,6 +147,11 @@ export default function VerificationsHistoryTable() {
     );
   };
 
+  const showModal = (transaction) => {
+    setSelectedTransaction(transaction);
+    setIsModalVisible(true);
+  };
+
   React.useEffect(() => {
     fetchVerificationHistory();
   }, [userId]);
@@ -199,25 +206,18 @@ export default function VerificationsHistoryTable() {
                       className="w-[clamp(80px,15vw,112px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
                     />
                     <TableHeader
-                      label="Reference"
-                      sortKey="transactionReference"
-                      className="  sm:table-cell w-[clamp(120px,20vw,160px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
-                    />
-                    <TableHeader
                       label="Type"
                       sortKey="type"
-                      className="w-[clamp(70px,12vw,96px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
-                    />
-                    <TableHeader
-                      label="Amount"
-                      sortKey="amount"
-                      className="w-[clamp(80px,15vw,112px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
+                      className="w-[clamp(120px,20vw,160px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
                     />
                     <TableHeader
                       label="Status"
                       sortKey="status"
-                      className="w-[clamp(70px,12vw,96px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
+                      className="w-[clamp(120px,20vw,160px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
                     />
+                    <th className="w-[60px] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">
+                      Details
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -232,12 +232,7 @@ export default function VerificationsHistoryTable() {
                           "dd/MM/yy HH:mm"
                         )}
                       </td>
-                      <td className=" sm:table-cell w-[clamp(120px,20vw,160px)] px-2 py-2 whitespace-nowrap">
-                        <span className="text-[clamp(0.7rem,1.1vw,0.875rem)] text-gray-600">
-                          {transaction.transactionReference}
-                        </span>
-                      </td>
-                      <td className="w-[clamp(70px,12vw,96px)] px-2 py-2 whitespace-nowrap">
+                      <td className="w-[clamp(120px,20vw,160px)] px-2 py-2 whitespace-nowrap">
                         <span
                           className={`inline-flex items-center px-2 py-0.5 rounded-full text-[clamp(0.65rem,1vw,0.75rem)] font-medium capitalize ${
                             transaction.type === "credit"
@@ -248,10 +243,7 @@ export default function VerificationsHistoryTable() {
                           {transaction.type}
                         </span>
                       </td>
-                      <td className="w-[clamp(80px,15vw,112px)] px-2 py-2 whitespace-nowrap text-[clamp(0.7rem,1.1vw,0.875rem)] text-gray-600">
-                        ₦{transaction.amount.toLocaleString()}
-                      </td>
-                      <td className="w-[clamp(70px,12vw,96px)] px-2 py-2 whitespace-nowrap">
+                      <td className="w-[clamp(120px,20vw,160px)] px-2 py-2 whitespace-nowrap">
                         <span
                           className={`inline-flex items-center px-2 py-0.5 rounded-full text-[clamp(0.65rem,1vw,0.75rem)] font-medium capitalize ${
                             transaction.status === "success"
@@ -261,6 +253,14 @@ export default function VerificationsHistoryTable() {
                         >
                           {transaction.status}
                         </span>
+                      </td>
+                      <td className="w-[60px] px-2 py-2 whitespace-nowrap">
+                        <button
+                          onClick={() => showModal(transaction)}
+                          className="text-blue-600 hover:text-blue-800 transition-colors"
+                        >
+                          <EyeOutlined className="text-lg" />
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -287,6 +287,61 @@ export default function VerificationsHistoryTable() {
           />
         </div>
       )}
+
+      {/* Add Modal */}
+      <Modal
+        title="Transaction Details"
+        open={isModalVisible}
+        onCancel={() => setIsModalVisible(false)}
+        footer={null}
+        width={600}
+      >
+        {selectedTransaction && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm font-medium text-gray-500">Date</p>
+                <p className="mt-1 text-sm text-gray-900">
+                  {format(
+                    new Date(selectedTransaction.createdAt),
+                    "dd/MM/yyyy HH:mm:ss"
+                  )}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Reference</p>
+                <p className="mt-1 text-sm text-gray-900">
+                  {selectedTransaction.transactionReference}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Amount</p>
+                <p className="mt-1 text-sm text-gray-900">
+                  ₦{selectedTransaction.amount.toLocaleString()}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Type</p>
+                <p className="mt-1 text-sm text-gray-900">
+                  {selectedTransaction.type}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Status</p>
+                <p className="mt-1 text-sm text-gray-900">
+                  {selectedTransaction.status}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Description</p>
+                <p className="mt-1 text-sm text-gray-900">
+                  {selectedTransaction.description}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

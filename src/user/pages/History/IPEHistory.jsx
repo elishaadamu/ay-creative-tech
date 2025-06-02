@@ -10,8 +10,8 @@ import {
   ArrowUpIcon,
   ArrowDownIcon,
 } from "@heroicons/react/24/solid";
-import { Empty } from "antd";
-import { InboxOutlined } from "@ant-design/icons";
+import { Empty, Modal } from "antd";
+import { InboxOutlined, EyeOutlined } from "@ant-design/icons";
 
 // Add your secret key for decryption
 const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
@@ -33,6 +33,7 @@ export default function VerificationsHistoryTable() {
   const user = decryptData(encryptedUser);
   const userId = user?._id || user?.id;
 
+  // Set the API link using the userId
   const apiLink = `${config.apiBaseUrl}${config.endpoints.VerificationHistory}${userId}`;
 
   const [loading, setLoading] = React.useState(false);
@@ -44,6 +45,8 @@ export default function VerificationsHistoryTable() {
     key: "createdAt",
     direction: "desc",
   });
+  const [isModalVisible, setIsModalVisible] = React.useState(false);
+  const [selectedTransaction, setSelectedTransaction] = React.useState(null);
 
   const fetchVerificationHistory = async () => {
     if (!userId) return;
@@ -65,14 +68,14 @@ export default function VerificationsHistoryTable() {
     }
   };
 
-  // Filter transactions based on search term and NIN verification type
+  // Filter transactions based on search term and BVN verification type
   const filteredTransactions = apiData.filter((transaction) => {
     const searchStr = searchTerm.toLowerCase();
     const transactionDate = new Date(transaction.createdAt);
 
-    // Only include NIN verification transactions
-    const isNINVerification =
-      transaction.TransactionType === "NIN-Verification";
+    // Only include BVN verification transactions
+    const isBVNVerification =
+      transaction.TransactionType === "BVN-Verification";
 
     // Date filter
     const passesDateFilter =
@@ -86,7 +89,7 @@ export default function VerificationsHistoryTable() {
       transaction.status?.toLowerCase().includes(searchStr) ||
       transaction.description?.toLowerCase().includes(searchStr);
 
-    return isNINVerification && passesDateFilter && passesSearchFilter;
+    return isBVNVerification && passesDateFilter && passesSearchFilter;
   });
 
   const sortData = (key) => {
@@ -153,7 +156,7 @@ export default function VerificationsHistoryTable() {
   return (
     <div className="p-4 w-full">
       <h2 className="text-[clamp(1.2rem,1.7vw,2rem)] font-bold mb-4 text-gray-500">
-        NIN Verifications History
+        BVN Verifications History
       </h2>
 
       {/* Search and Date Filter Controls */}
@@ -187,10 +190,10 @@ export default function VerificationsHistoryTable() {
 
       {!loading && sortedTransactions.length > 0 ? (
         <div className="relative border border-gray-200 rounded-lg shadow">
-          <div className="overflow-x-auto min-w-full">
+          <div className="overflow-x-auto">
             <div className="inline-block min-w-full">
               <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+                <thead className="bg-gray-50 sticky top-0 z-10">
                   <tr>
                     <TableHeader
                       label="Date"
@@ -198,24 +201,24 @@ export default function VerificationsHistoryTable() {
                       className="w-[clamp(80px,15vw,112px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
                     />
                     <TableHeader
-                      label="Reference"
+                      label="Tracking ID"
                       sortKey="transactionReference"
-                      className=" sm:table-cell w-[clamp(120px,20vw,160px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
+                      className="  sm:table-cell w-[clamp(70px,12vw,96px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
                     />
                     <TableHeader
-                      label="Type"
+                      label="Ticket ID"
                       sortKey="type"
                       className="w-[clamp(70px,12vw,96px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
                     />
-                    <TableHeader
-                      label="Amount"
-                      sortKey="amount"
-                      className="w-[clamp(80px,15vw,112px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
-                    />
+
                     <TableHeader
                       label="Status"
                       sortKey="status"
                       className="w-[clamp(70px,12vw,96px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
+                    />
+                    <TableHeader
+                      label="Details"
+                      className="w-[60px] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
                     />
                   </tr>
                 </thead>
@@ -247,9 +250,7 @@ export default function VerificationsHistoryTable() {
                           {transaction.type}
                         </span>
                       </td>
-                      <td className="w-[clamp(80px,15vw,112px)] px-2 py-2 whitespace-nowrap text-[clamp(0.7rem,1.1vw,0.875rem)] text-gray-600">
-                        ₦{transaction.amount.toLocaleString()}
-                      </td>
+
                       <td className="w-[clamp(70px,12vw,96px)] px-2 py-2 whitespace-nowrap">
                         <span
                           className={`inline-flex items-center px-2 py-0.5 rounded-full text-[clamp(0.65rem,1vw,0.75rem)] font-medium capitalize ${
@@ -260,6 +261,17 @@ export default function VerificationsHistoryTable() {
                         >
                           {transaction.status}
                         </span>
+                      </td>
+                      <td className="w-[60px] px-2 py-2 whitespace-nowrap">
+                        <button
+                          onClick={() => {
+                            setSelectedTransaction(transaction);
+                            setIsModalVisible(true);
+                          }}
+                          className="text-blue-600 hover:text-blue-800 transition-colors"
+                        >
+                          <EyeOutlined className="text-lg" />
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -276,16 +288,89 @@ export default function VerificationsHistoryTable() {
             description={
               <div className="text-center">
                 <p className="text-gray-500 text-lg mb-2">
-                  No NIN Verification Records
+                  No IPE Clearance Records found
                 </p>
                 <p className="text-gray-400 text-sm">
-                  Your NIN verification history will appear here
+                  Your IPE Clearance history will appear here
                 </p>
               </div>
             }
           />
         </div>
       )}
+
+      {/* Transaction Details Modal */}
+      <Modal
+        title="Transaction Details"
+        open={isModalVisible}
+        onCancel={() => setIsModalVisible(false)}
+        footer={null}
+        width={600}
+      >
+        {selectedTransaction && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm font-medium text-gray-500">Status</p>
+                <p
+                  className={`mt-1 text-sm ${
+                    selectedTransaction.status === "success"
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}
+                >
+                  {selectedTransaction.status}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">NIN</p>
+                <p className="mt-1 text-sm text-gray-900">
+                  {selectedTransaction.nin}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Ticket ID</p>
+                <p className="mt-1 text-sm text-gray-900">
+                  {selectedTransaction.ticketId}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Action</p>
+                <p className="mt-1 text-sm text-gray-900">
+                  {selectedTransaction.action}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  Created Date
+                </p>
+                <p className="mt-1 text-sm text-gray-900">
+                  {format(
+                    new Date(selectedTransaction.createdAt),
+                    "dd/MM/yyyy HH:mm:ss"
+                  )}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  Old Tracking ID
+                </p>
+                <p className="mt-1 text-sm text-gray-900">
+                  {selectedTransaction.oldTrackingId}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  New Tracking ID
+                </p>
+                <p className="mt-1 text-sm text-gray-900">
+                  {selectedTransaction.newTrackingId}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import * as React from "react";
 import axios from "axios";
-import { config } from "../../config/config.jsx";
+import { config } from "../../../config/config.jsx";
 import CryptoJS from "crypto-js";
 import { format } from "date-fns"; // Add this import for date formatting
 import DatePicker from "react-datepicker";
@@ -33,7 +33,6 @@ export default function VerificationsHistoryTable() {
   const user = decryptData(encryptedUser);
   const userId = user?._id || user?.id;
 
-  // Set the API link using the userId
   const apiLink = `${config.apiBaseUrl}${config.endpoints.VerificationHistory}${userId}`;
 
   const [loading, setLoading] = React.useState(false);
@@ -68,13 +67,14 @@ export default function VerificationsHistoryTable() {
     }
   };
 
-  // Filter transactions based on search term and only show credit transactions
+  // Filter transactions based on search term and NIN verification type
   const filteredTransactions = apiData.filter((transaction) => {
     const searchStr = searchTerm.toLowerCase();
     const transactionDate = new Date(transaction.createdAt);
 
-    // Only include credit transactions
-    const isCreditTransaction = transaction.type === "credit";
+    // Only include NIN verification transactions
+    const isNINVerification =
+      transaction.TransactionType === "NIN-Verification";
 
     // Date filter
     const passesDateFilter =
@@ -88,7 +88,7 @@ export default function VerificationsHistoryTable() {
       transaction.status?.toLowerCase().includes(searchStr) ||
       transaction.description?.toLowerCase().includes(searchStr);
 
-    return isCreditTransaction && passesDateFilter && passesSearchFilter;
+    return isNINVerification && passesDateFilter && passesSearchFilter;
   });
 
   const sortData = (key) => {
@@ -159,8 +159,8 @@ export default function VerificationsHistoryTable() {
 
   return (
     <div className="p-4 w-full">
-      <h2 className="text-[clamp(1.2rem,2vw,2rem)] font-bold mb-4">
-        Funding History
+      <h2 className="text-[clamp(1.2rem,1.7vw,2rem)] font-bold mb-4 text-gray-500">
+        NIN Verifications History
       </h2>
 
       {/* Search and Date Filter Controls */}
@@ -193,76 +193,79 @@ export default function VerificationsHistoryTable() {
       {loading}
 
       {!loading && sortedTransactions.length > 0 ? (
-        <div className="relative overflow-hidden rounded-lg border border-gray-200 shadow">
-          <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-            <table className="w-full table-auto divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <TableHeader
-                    label="Date"
-                    sortKey="createdAt"
-                    className="w-[clamp(80px,15vw,112px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
-                  />
-                  <TableHeader
-                    label="Type"
-                    sortKey="type"
-                    className="w-[clamp(120px,20vw,160px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
-                  />
-                  <TableHeader
-                    label="Status"
-                    sortKey="status"
-                    className="w-[clamp(120px,20vw,160px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
-                  />
-                  <th className="w-[60px] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">
-                    Details
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {sortedTransactions.map((transaction, index) => (
-                  <tr
-                    key={transaction._id || index}
-                    className="hover:bg-gray-50 transition-colors"
-                  >
+        <div className="relative border border-gray-200 rounded-lg shadow">
+          <div className="overflow-x-auto">
+            <div className="inline-block min-w-full">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50 sticky top-0 z-10">
+                  <tr>
                     <TableHeader
                       label="Date"
                       sortKey="createdAt"
                       className="w-[clamp(80px,15vw,112px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
                     />
-                    <td className="w-[clamp(120px,20vw,160px)] px-2 py-2 whitespace-nowrap">
-                      <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[clamp(0.65rem,1vw,0.75rem)] font-medium capitalize ${
-                          transaction.type === "credit"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {transaction.type}
-                      </span>
-                    </td>
-                    <td className="w-[clamp(120px,20vw,160px)] px-2 py-2 whitespace-nowrap">
-                      <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[clamp(0.65rem,1vw,0.75rem)] font-medium capitalize ${
-                          transaction.status === "success"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {transaction.status}
-                      </span>
-                    </td>
-                    <td className="w-[60px] px-2 py-2 whitespace-nowrap">
-                      <button
-                        onClick={() => showModal(transaction)}
-                        className="text-blue-600 hover:text-blue-800 transition-colors"
-                      >
-                        <EyeOutlined className="text-lg" />
-                      </button>
-                    </td>
+                    <TableHeader
+                      label="Type"
+                      sortKey="type"
+                      className="w-[clamp(120px,20vw,160px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
+                    />
+                    <TableHeader
+                      label="Status"
+                      sortKey="status"
+                      className="w-[clamp(120px,20vw,160px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
+                    />
+                    <th className="w-[60px] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">
+                      Details
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {sortedTransactions.map((transaction, index) => (
+                    <tr
+                      key={transaction._id || index}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
+                      <td className="w-[clamp(80px,15vw,112px)] px-2 py-2 whitespace-nowrap text-[clamp(0.7rem,1.1vw,0.875rem)] text-gray-600">
+                        {format(
+                          new Date(transaction.createdAt),
+                          "dd/MM/yy HH:mm"
+                        )}
+                      </td>
+                      <td className="w-[clamp(120px,20vw,160px)] px-2 py-2 whitespace-nowrap">
+                        <span
+                          className={`inline-flex items-center px-2 py-0.5 rounded-full text-[clamp(0.65rem,1vw,0.75rem)] font-medium capitalize ${
+                            transaction.type === "credit"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {transaction.type}
+                        </span>
+                      </td>
+                      <td className="w-[clamp(120px,20vw,160px)] px-2 py-2 whitespace-nowrap">
+                        <span
+                          className={`inline-flex items-center px-2 py-0.5 rounded-full text-[clamp(0.65rem,1vw,0.75rem)] font-medium capitalize ${
+                            transaction.status === "success"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {transaction.status}
+                        </span>
+                      </td>
+                      <td className="w-[60px] px-2 py-2 whitespace-nowrap">
+                        <button
+                          onClick={() => showModal(transaction)}
+                          className="text-blue-600 hover:text-blue-800 transition-colors"
+                        >
+                          <EyeOutlined className="text-lg" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       ) : (
@@ -272,9 +275,11 @@ export default function VerificationsHistoryTable() {
             imageStyle={{ height: 60 }}
             description={
               <div className="text-center">
-                <p className="text-gray-500 text-lg mb-2">No Funding Records</p>
+                <p className="text-gray-500 text-lg mb-2">
+                  No NIN Verification Records
+                </p>
                 <p className="text-gray-400 text-sm">
-                  Your funding history will appear here
+                  Your NIN verification history will appear here
                 </p>
               </div>
             }

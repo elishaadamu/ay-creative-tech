@@ -1,6 +1,6 @@
 import React from "react";
-import BVNVerificationHistory from "./Verifications/BVNVerificationHistory";
-import NINVerificationHistory from "./Verifications/NINVerificationHistory";
+import BVNVerificationHistory from "./History/BVNVerificationHistory";
+import NINVerificationHistory from "./History/NINVerificationHistory";
 
 function Verifications() {
   return (

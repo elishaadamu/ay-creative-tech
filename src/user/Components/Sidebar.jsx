@@ -92,6 +92,11 @@ const sidebarSections = [
         icon: <MdHistory className="w-5 h-5" />,
         label: "Verifications History",
       },
+      {
+        to: "/dashboard/ipe-history", // This should match the route path above
+        icon: <FaPersonCircleCheck className="w-5 h-5" />,
+        label: "IPE Clearance History",
+      },
     ],
   },
   {

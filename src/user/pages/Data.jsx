@@ -158,36 +158,6 @@ function DataSub() {
     }
   };
 
-  // Add PIN check effect
-  useEffect(() => {
-    const checkPin = () => {
-      try {
-        const userStr = localStorage.getItem("user");
-        if (userStr) {
-          const userObj = decryptData(userStr);
-          if (!userObj?.hasPin) {
-            toast.info("Please set your transaction PIN first!", {
-              position: "top-right",
-              autoClose: 2000,
-            });
-
-            setTimeout(() => {
-              navigate("/dashboard/setpin", {
-                state: {
-                  returnPath: "/data",
-                },
-              });
-            }, 2000);
-          }
-        }
-      } catch (error) {
-        console.error("Error checking PIN status:", error);
-      }
-    };
-
-    checkPin();
-  }, [navigate]);
-
   return (
     <div>
       <Card
