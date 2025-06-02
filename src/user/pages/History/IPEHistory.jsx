@@ -156,7 +156,7 @@ export default function VerificationsHistoryTable() {
   return (
     <div className="p-4 w-full">
       <h2 className="text-[clamp(1.2rem,1.7vw,2rem)] font-bold mb-4 text-gray-500">
-        BVN Verifications History
+        IPE Clearance History
       </h2>
 
       {/* Search and Date Filter Controls */}
@@ -189,8 +189,8 @@ export default function VerificationsHistoryTable() {
       {loading}
 
       {!loading && sortedTransactions.length > 0 ? (
-        <div className="relative border border-gray-200 rounded-lg shadow">
-          <div className="overflow-x-auto">
+        <div className="relative border border-gray-200 rounded-lg shadow max-h-[calc(100vh-300px)]">
+          <div className="overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
             <div className="inline-block min-w-full">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50 sticky top-0 z-10">
@@ -200,11 +200,7 @@ export default function VerificationsHistoryTable() {
                       sortKey="createdAt"
                       className="w-[clamp(80px,15vw,112px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
                     />
-                    <TableHeader
-                      label="Tracking ID"
-                      sortKey="transactionReference"
-                      className="  sm:table-cell w-[clamp(70px,12vw,96px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
-                    />
+
                     <TableHeader
                       label="Ticket ID"
                       sortKey="type"
@@ -234,11 +230,7 @@ export default function VerificationsHistoryTable() {
                           "dd/MM/yy HH:mm"
                         )}
                       </td>
-                      <td className=" sm:table-cell w-[clamp(120px,20vw,160px)] px-2 py-2 whitespace-nowrap">
-                        <span className="text-[clamp(0.7rem,1.1vw,0.875rem)] text-gray-600">
-                          {transaction.transactionReference}
-                        </span>
-                      </td>
+
                       <td className="w-[clamp(70px,12vw,96px)] px-2 py-2 whitespace-nowrap">
                         <span
                           className={`inline-flex items-center px-2 py-0.5 rounded-full text-[clamp(0.65rem,1vw,0.75rem)] font-medium capitalize ${
