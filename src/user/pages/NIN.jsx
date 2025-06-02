@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import BasicImg from "../assets/images/information.png";
 import RegularImg from "../assets/images/regular.png";
 import StandardImg from "../assets/images/standard.png";
@@ -62,32 +62,6 @@ function NIN() {
   /* --------------------------------- render -------------------------------- */
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Check PIN setup with toast notification
-    try {
-      const userStr = localStorage.getItem("user");
-      if (userStr) {
-        const userObj = decryptData(userStr);
-        if (!userObj?.hasPin) {
-          toast.info("Please set your transaction PIN first!", {
-            position: "top-center",
-            autoClose: 2000,
-          });
-
-          // Wait for 2 seconds before redirecting
-          setTimeout(() => {
-            navigate("/dashboard/setpin", {
-              state: {
-                returnPath: "/verifications/nin",
-              },
-            });
-          }, 2000);
-          return;
-        }
-      }
-    } catch (error) {
-      console.error("Error checking PIN status:", error);
-    }
 
     if (!selectedVerify || !selectedSlip) {
       toast.error("Please select both verification type and slip layout");
@@ -191,35 +165,6 @@ function NIN() {
       [e.target.name]: e.target.value,
     });
   };
-
-  // Add this effect to check for PIN
-  useEffect(() => {
-    const checkPin = () => {
-      try {
-        const userStr = localStorage.getItem("user");
-        if (userStr) {
-          const userObj = decryptData(userStr);
-          if (!userObj?.hasPin) {
-            toast.info("Please set your transaction PIN first!", {
-              autoClose: 2000,
-            });
-
-            setTimeout(() => {
-              navigate("/dashboard/setpin", {
-                state: {
-                  returnPath: "/dashboard/verifications/nin",
-                },
-              });
-            }, 2000);
-          }
-        }
-      } catch (error) {
-        console.error("Error checking PIN status:", error);
-      }
-    };
-
-    checkPin();
-  }, [navigate]);
 
   return (
     <div className="w-full rounded-2xl mb-10 bg-white p-5 shadow-lg">

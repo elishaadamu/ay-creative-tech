@@ -49,31 +49,6 @@ function BVNVerify() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      const userStr = localStorage.getItem("user");
-      if (userStr) {
-        const userObj = decryptData(userStr);
-        if (!userObj?.hasPin) {
-          toast.info("Please set your transaction PIN first!", {
-            position: "top-right",
-            autoClose: 2000,
-          });
-
-          setTimeout(() => {
-            navigate("/dashboard/setpin", {
-              state: {
-                returnPath: "/verifications/bvn",
-              },
-            });
-          }, 2000);
-          return;
-        }
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      toast.error(error.response?.data?.message || "Verification failed");
-    }
-
     if (!selectedVerify || !selectedSlip) {
       toast.error("Please select verification type and details needed");
       return;
@@ -84,7 +59,6 @@ function BVNVerify() {
       return;
     }
 
-    // Add PIN validation
     if (!pin || pin.length !== 4) {
       toast.error("Please enter a valid 4-digit PIN");
       return;

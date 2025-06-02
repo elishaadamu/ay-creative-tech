@@ -116,25 +116,6 @@ function DataSub() {
 
   const onFinish = async (values) => {
     try {
-      const userStr = localStorage.getItem("user");
-      if (userStr) {
-        const userObj = decryptData(userStr);
-        if (!userObj?.hasPin) {
-          toast.info("Please set your transaction PIN first!", {
-            autoClose: 2000,
-          });
-
-          setTimeout(() => {
-            navigate("/dashboard/setpin", {
-              state: {
-                returnPath: "/dashboard/data",
-              },
-            });
-          }, 2000);
-          return;
-        }
-      }
-
       // Get data plan price based on selection
       const planPrice = 1000; // Replace with actual plan price logic
 

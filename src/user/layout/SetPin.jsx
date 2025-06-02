@@ -60,24 +60,23 @@ function SetPin() {
       );
 
       if (response.data) {
+        // Update user object in localStorage
+        const updatedUser = {
+          ...decryptedUser,
+          hasPin: true,
+        };
+        const encryptedUpdatedUser = CryptoJS.AES.encrypt(
+          JSON.stringify(updatedUser),
+          SECRET_KEY
+        ).toString();
+        localStorage.setItem("user", encryptedUpdatedUser);
+
+        // Show success toast and navigate
         toast.success("PIN set successfully!", {
+          position: "top-center",
           autoClose: 2000,
           onClose: () => {
-            // Update the user object in localStorage to include hasPin
-            const updatedUser = {
-              ...decryptedUser,
-              hasPin: true,
-            };
-            const encryptedUpdatedUser = CryptoJS.AES.encrypt(
-              JSON.stringify(updatedUser),
-              SECRET_KEY
-            ).toString();
-            localStorage.setItem("user", encryptedUpdatedUser);
-
-            // Redirect back to the previous page after 2 seconds
-            setTimeout(() => {
-              navigate(returnPath);
-            }, 2000);
+            navigate(returnPath);
           },
         });
       }
@@ -115,6 +114,7 @@ function SetPin() {
               prefix={<LockOutlined />}
               placeholder="Enter 4-digit PIN"
               maxLength={4}
+              size="large"
             />
           </Form.Item>
 
