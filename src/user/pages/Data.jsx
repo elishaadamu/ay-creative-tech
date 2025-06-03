@@ -7,6 +7,7 @@ import { fetchDataPlans } from "../services/DataPlanService";
 import axios from "axios";
 import { config } from "../../config/config";
 import CryptoJS from "crypto-js";
+import Swal from "sweetalert2";
 
 function DataSub() {
   const [form] = Form.useForm();
@@ -68,25 +69,31 @@ function DataSub() {
     initialize();
   }, []);
 
+  // Add this network mapping constant at the top of your component
+  const networkMapping = {
+    1: "MTN",
+    2: "AIRTEL",
+    3: "GLO",
+    4: "9MOBILE",
+  };
+
   // Handle network selection
   const handleNetworkChange = (value) => {
     form.setFieldsValue({ planType: undefined, dataplan: undefined });
-    const network = value.toUpperCase();
+    const network = networkMapping[value];
     const filtered = allPlans.filter((plan) => plan.network === network);
     setFilteredPlans(filtered);
-    setSelectedPlan(null); // Reset selected plan when network changes
+    setSelectedPlan(null);
   };
 
   // Handle plan type selection
   const handlePlanTypeChange = (value) => {
     form.setFieldsValue({ dataplan: undefined });
-    const network = form.getFieldValue("network").toUpperCase();
-
-    // Get all plans for the current network but mark selected plan type
-    const filtered = allPlans.filter((plan) => plan.network === network);
+    const network = networkMapping[form.getFieldValue("network")];
+    const filtered = allPlans.filter(
+      (plan) => plan.network === network && plan.plan_type === value
+    );
     setFilteredPlans(filtered);
-
-    // Reset selected plan when plan type changes
     setSelectedPlan(null);
   };
 
@@ -96,21 +103,56 @@ function DataSub() {
     setSelectedPlan(selected);
   };
 
+  const showConfirmation = async (values, selectedPlan) => {
+    const result = await Swal.fire({
+      title: "Confirm Data Purchase",
+      html: `
+      <p class="mb-2">Please confirm your purchase:</p>
+      <p class="mb-2">Network: ${selectedPlan.network}</p>
+      <p class="mb-2">Data Plan: ${selectedPlan.data_volume}</p>
+      <p class="mb-2">Phone Number: ${values.phoneNumber}</p>
+      <p class="mb-2">Amount: ${selectedPlan.price}</p>
+      <p class="mb-2">Validity: ${selectedPlan.validity}</p>
+    `,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#f59e0b",
+      cancelButtonColor: "#d10",
+      confirmButtonText: "Yes, proceed",
+      cancelButtonText: "Cancel",
+    });
+
+    return result.isConfirmed;
+  };
+
   const onFinish = async (values) => {
     if (!selectedPlan) {
-      toast.error("Please select a data plan!");
+      Swal.fire({
+        title: "Error!",
+        text: "Please select a data plan!",
+        icon: "error",
+        confirmButtonColor: "#d10",
+      });
       return;
     }
 
-    // Get price without the ₦ symbol and comma
     const planPrice = parseFloat(
       selectedPlan.price.replace("₦", "").replace(",", "")
     );
 
     if (planPrice > (account?.balance || 0)) {
-      toast.error("Insufficient balance!");
+      Swal.fire({
+        title: "Error!",
+        text: "Insufficient balance!",
+        icon: "error",
+        confirmButtonColor: "#d10",
+      });
       return;
     }
+
+    // Show confirmation dialog
+    const confirmed = await showConfirmation(values, selectedPlan);
+    if (!confirmed) return;
 
     setLoading(true);
     try {
@@ -119,43 +161,86 @@ function DataSub() {
       const userId = userData?._id || userData?.id;
 
       if (!userId) {
-        toast.error("Please login to continue");
+        Swal.fire({
+          title: "Error!",
+          text: "Please login to continue",
+          icon: "error",
+          confirmButtonColor: "#d10",
+        });
         return;
       }
 
+      // Update the payload in onFinish function
       const payload = {
-        network: selectedPlan.network,
+        network: Number(values.network), // Convert network to number based on reverse mapping
         phone: values.phoneNumber,
         dataPlan: selectedPlan.id,
         userId: userId,
         amount: planPrice,
         pin: values.transactionPin,
       };
-      console.log("Transaction payload:", payload);
+      console.log("Payload:", payload);
       const response = await axios.post(
         `${config.apiBaseUrl}${config.endpoints.dataSubscription}`,
         payload
       );
 
-      if (response.data.success) {
-        toast.success("Data purchase successful!");
+      if (response.data?.data?.status === "success") {
+        try {
+          // Refresh account balance first
+          const accountResponse = await axios.get(
+            `${config.apiBaseUrl}/virtualAccount/${userId}`
+          );
 
-        // Refresh account balance
-        const accountResponse = await axios.get(
-          `${config.apiBaseUrl}/virtualAccount/${userId}`
-        );
-        setAccount(accountResponse.data);
+          // Update account state with new balance
+          const newAccountData = accountResponse.data;
+          setAccount(newAccountData);
 
-        form.resetFields();
-        setSelectedPlan(null);
+          // Wait for state update
+          await new Promise((resolve) => setTimeout(resolve, 100));
+
+          // Show success message after balance update
+          await Swal.fire({
+            title: "Success!",
+            html: `
+            <p class="mb-2">Data purchase successful!</p>
+            <p class="mb-2">New Balance: ₦${newAccountData.balance.toFixed(
+              2
+            )}</p>
+          `,
+            icon: "success",
+            confirmButtonColor: "#f59e0b",
+          });
+
+          form.resetFields();
+          setSelectedPlan(null);
+        } catch (error) {
+          console.error("Error updating balance:", error);
+          Swal.fire({
+            title: "Warning!",
+            text: "Transaction successful but balance may be outdated. Please refresh.",
+            icon: "warning",
+            confirmButtonColor: "#f59e0b",
+          });
+        }
       } else {
-        toast.error(response.data.message || "Transaction failed");
+        Swal.fire({
+          title: "Error!",
+          text: response.data.message || "Transaction failed",
+          icon: "error",
+          confirmButtonColor: "#d10",
+        });
       }
     } catch (error) {
       console.error("Transaction error:", error);
-      toast.error(
-        error.response?.data?.message || "Transaction failed. Please try again."
-      );
+      Swal.fire({
+        title: "Error!",
+        text:
+          error.response?.data?.message ||
+          "Transaction failed. Please try again.",
+        icon: "error",
+        confirmButtonColor: "#d10",
+      });
     } finally {
       setLoading(false);
     }
@@ -195,10 +280,10 @@ function DataSub() {
               size="large"
               onChange={handleNetworkChange}
             >
-              <Select.Option value="mtn">MTN</Select.Option>
-              <Select.Option value="airtel">AIRTEL</Select.Option>
-              <Select.Option value="glo">GLO</Select.Option>
-              <Select.Option value="9mobile">9MOBILE</Select.Option>
+              <Select.Option value="1">MTN</Select.Option>
+              <Select.Option value="2">AIRTEL</Select.Option>
+              <Select.Option value="3">GLO</Select.Option>
+              <Select.Option value="4">9MOBILE</Select.Option>
             </Select>
           </Form.Item>
 
@@ -212,13 +297,24 @@ function DataSub() {
               size="large"
               onChange={handlePlanTypeChange}
             >
-              {[...new Set(filteredPlans.map((plan) => plan.plan_type))].map(
-                (type) => (
+              {/* Show all available plan types for the selected network */}
+              {allPlans
+                .filter(
+                  (plan) =>
+                    plan.network ===
+                    networkMapping[form.getFieldValue("network")]
+                )
+                .reduce((types, plan) => {
+                  if (!types.includes(plan.plan_type)) {
+                    types.push(plan.plan_type);
+                  }
+                  return types;
+                }, [])
+                .map((type) => (
                   <Select.Option key={type} value={type}>
                     {type}
                   </Select.Option>
-                )
-              )}
+                ))}
             </Select>
           </Form.Item>
 
