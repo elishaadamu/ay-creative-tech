@@ -59,11 +59,20 @@ function AirtimeSub() {
     fetchUserData();
   }, []);
 
+  // Network name mapping
+  const networkNames = {
+    1: "MTN",
+    2: "AIRTEL",
+    3: "GLO",
+    4: "9MOBILE",
+  };
+
   const showConfirmation = async (values, amount) => {
     const result = await Swal.fire({
       title: "Confirm Airtime Purchase",
       html: `
         <p class="mb-2">Please confirm your purchase:</p>
+        <p class="mb-2">Network: ${networkNames[values.network]}</p>
         <p class="mb-2">Phone Number: ${values.phoneNumber}</p>
         <p class="mb-2">Amount: ₦${amount}</p>
       `,
@@ -112,7 +121,7 @@ function AirtimeSub() {
         userId: userId,
         amount: amount,
         pin: values.transactionPin,
-        plan_type: values.plan_type, // Add the selected plan_type
+        plan_type: values.plan_type,
       };
       console.log("Transaction payload:", payload);
 
@@ -238,7 +247,6 @@ function AirtimeSub() {
             name="amount"
             label="Amount"
             rules={[
-              { required: true, message: "Please enter amount!" },
               {
                 validator: async (_, value) => {
                   if (!value) {
