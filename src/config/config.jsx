@@ -12,5 +12,7 @@ export const config = {
     VerificationHistory: "/transactions/history/",
     setPin: "/virtualAccount/setPin",
     checkPin: "/virtualAccount/checkPin",
+    dataSubscription: "/vtu/data",
+    airtimeSubscription: "/vtu/airtime",
   },
 };

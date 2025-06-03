@@ -63,3 +63,8 @@
 | Bank Agency (Submission) |
 | - Form Fields |
 +------------------------------+
+
+1. COOPERATE GIFTING - 22
+2. Gifting - 43
+3. Gifting Promo - 33
+4. SME - 15
