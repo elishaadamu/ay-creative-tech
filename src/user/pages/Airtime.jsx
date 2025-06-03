@@ -120,8 +120,8 @@ function AirtimeSub() {
         `${config.apiBaseUrl}${config.endpoints.airtimeSubscription}`,
         payload
       );
-      console.log("Airtime response:", response.data?.data.message);
-      if (response.data.success) {
+      console.log("Airtime response:", response.data?.data.status);
+      if (response.data?.data.status === "success") {
         try {
           // Refresh account balance first
           const accountResponse = await axios.get(
