@@ -5,6 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { config } from "../../config/config";
 import CryptoJS from "crypto-js";
+import Swal from "sweetalert2";
 
 function AirtimeSub() {
   const [form] = Form.useForm();
@@ -57,11 +58,31 @@ function AirtimeSub() {
 
     fetchUserData();
   }, []);
+
+  const showConfirmation = async (values, amount) => {
+    const result = await Swal.fire({
+      title: "Confirm Airtime Purchase",
+      html: `
+        <p class="mb-2">Please confirm your purchase:</p>
+        <p class="mb-2">Phone Number: ${values.phoneNumber}</p>
+        <p class="mb-2">Amount: ₦${amount}</p>
+      `,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#f59e0b",
+      cancelButtonColor: "#d10",
+      confirmButtonText: "Yes, proceed",
+      cancelButtonText: "Cancel",
+    });
+
+    return result.isConfirmed;
+  };
+
   const onFinish = async (values) => {
     const amount = Number(values.amount);
 
-    if (isNaN(amount) || amount < 50) {
-      toast.error("Minimum airtime amount is ₦50!");
+    if (isNaN(amount) || amount < 10) {
+      toast.error("Minimum airtime amount is ₦10!");
       return;
     }
 
@@ -69,6 +90,10 @@ function AirtimeSub() {
       toast.error("Insufficient balance!");
       return;
     }
+
+    // Show confirmation dialog
+    const confirmed = await showConfirmation(values, amount);
+    if (!confirmed) return;
 
     setLoading(true);
     try {
@@ -82,7 +107,7 @@ function AirtimeSub() {
       }
 
       const payload = {
-        network: values.network.toUpperCase(),
+        network: values.network,
         phone: values.phoneNumber,
         userId: userId,
         amount: amount,
@@ -95,25 +120,63 @@ function AirtimeSub() {
         `${config.apiBaseUrl}${config.endpoints.airtimeSubscription}`,
         payload
       );
-
+      console.log("Airtime response:", response.data?.data.message);
       if (response.data.success) {
-        toast.success("Airtime purchase successful!");
+        try {
+          // Refresh account balance first
+          const accountResponse = await axios.get(
+            `${config.apiBaseUrl}/virtualAccount/${userId}`
+          );
 
-        // Refresh account balance
-        const accountResponse = await axios.get(
-          `${config.apiBaseUrl}/virtualAccount/${userId}`
-        );
-        setAccount(accountResponse.data);
+          // Update account state with new balance
+          const newAccountData = accountResponse.data;
+          setAccount(newAccountData);
 
-        form.resetFields();
+          // Wait for state update
+          await new Promise((resolve) => setTimeout(resolve, 100));
+
+          // Show success message after balance update
+          await Swal.fire({
+            title: "Success!",
+            html: `
+              <p class="mb-2">Airtime purchase successful!</p>
+              <p class="mb-2">New Balance: ₦${newAccountData.balance.toFixed(
+                2
+              )}</p>
+            `,
+            icon: "success",
+            confirmButtonColor: "#f59e0b",
+          });
+
+          // Reset form after showing success message
+          form.resetFields();
+        } catch (error) {
+          console.error("Error updating balance:", error);
+          Swal.fire({
+            title: "Warning!",
+            text: "Transaction successful but balance may be outdated. Please refresh.",
+            icon: "warning",
+            confirmButtonColor: "#f59e0b",
+          });
+        }
       } else {
-        toast.error(response.data.message || "Transaction failed");
+        Swal.fire({
+          title: "Error!",
+          text: response.data.message || "Transaction failed",
+          icon: "error",
+          confirmButtonColor: "#d10",
+        });
       }
     } catch (error) {
       console.error("Transaction error:", error);
-      toast.error(
-        error.response?.data?.message || "Transaction failed. Please try again."
-      );
+      Swal.fire({
+        title: "Error!",
+        text:
+          error.response?.data?.message ||
+          "Transaction failed. Please try again.",
+        icon: "error",
+        confirmButtonColor: "#d10",
+      });
     } finally {
       setLoading(false);
     }
@@ -134,7 +197,7 @@ function AirtimeSub() {
           </div>
         }
         className="shadow-md rounded-lg"
-        style={{ maxWidth: 600, margin: "0 auto", marginTop: 32 }}
+        style={{ maxWidth: 600, margin: "0 auto", marginTop: 10 }}
       >
         <Form
           form={form}
@@ -150,10 +213,10 @@ function AirtimeSub() {
             rules={[{ required: true, message: "Please select a network!" }]}
           >
             <Select placeholder="Select network" size="large">
-              <Select.Option value="mtn">MTN</Select.Option>
-              <Select.Option value="airtel">AIRTEL</Select.Option>
-              <Select.Option value="glo">GLO</Select.Option>
-              <Select.Option value="9mobile">9MOBILE</Select.Option>
+              <Select.Option value="1">MTN</Select.Option>
+              <Select.Option value="2">AIRTEL</Select.Option>
+              <Select.Option value="3">GLO</Select.Option>
+              <Select.Option value="4">9MOBILE</Select.Option>
             </Select>
           </Form.Item>
 
@@ -185,8 +248,8 @@ function AirtimeSub() {
                   if (isNaN(numValue)) {
                     return Promise.reject("Please enter a valid number!");
                   }
-                  if (numValue < 50) {
-                    return Promise.reject("Minimum amount is ₦50!");
+                  if (numValue < 10) {
+                    return Promise.reject("Minimum amount is ₦10!");
                   }
                   return Promise.resolve();
                 },
@@ -197,7 +260,7 @@ function AirtimeSub() {
               type="number"
               placeholder="Enter amount"
               size="large"
-              min={50}
+              min={10}
               prefix="₦"
             />
           </Form.Item>

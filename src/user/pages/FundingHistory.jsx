@@ -224,11 +224,12 @@ export default function VerificationsHistoryTable() {
                     key={transaction._id || index}
                     className="hover:bg-gray-50 transition-colors"
                   >
-                    <TableHeader
-                      label="Date"
-                      sortKey="createdAt"
-                      className="w-[clamp(80px,15vw,112px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
-                    />
+                    <td className="w-[clamp(80px,15vw,112px)] px-2 py-2 whitespace-nowrap text-[clamp(0.8rem,1vw,0.75rem)] text-gray-900">
+                      {format(
+                        new Date(transaction.createdAt),
+                        "dd/MM/yyyy HH:mm"
+                      )}
+                    </td>
                     <td className="w-[clamp(120px,20vw,160px)] px-2 py-2 whitespace-nowrap">
                       <span
                         className={`inline-flex items-center px-2 py-0.5 rounded-full text-[clamp(0.65rem,1vw,0.75rem)] font-medium capitalize ${
