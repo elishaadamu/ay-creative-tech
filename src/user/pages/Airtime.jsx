@@ -62,9 +62,9 @@ function AirtimeSub() {
   // Network name mapping
   const networkNames = {
     1: "MTN",
-    2: "AIRTEL",
-    3: "GLO",
-    4: "9MOBILE",
+    2: "GLO",
+    3: "9MOBILE",
+    4: "AIRTEL",
   };
 
   const showConfirmation = async (values, amount) => {
@@ -223,9 +223,9 @@ function AirtimeSub() {
           >
             <Select placeholder="Select network" size="large">
               <Select.Option value="1">MTN</Select.Option>
-              <Select.Option value="2">AIRTEL</Select.Option>
-              <Select.Option value="3">GLO</Select.Option>
-              <Select.Option value="4">9MOBILE</Select.Option>
+              <Select.Option value="4">AIRTEL</Select.Option>
+              <Select.Option value="2">GLO</Select.Option>
+              <Select.Option value="3">9MOBILE</Select.Option>
             </Select>
           </Form.Item>
 
