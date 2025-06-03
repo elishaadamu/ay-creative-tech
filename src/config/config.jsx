@@ -14,5 +14,6 @@ export const config = {
     checkPin: "/virtualAccount/checkPin",
     dataSubscription: "/vtu/data",
     airtimeSubscription: "/vtu/airtime",
+    ipe: "/verify/ipe",
   },
 };

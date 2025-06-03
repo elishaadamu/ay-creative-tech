@@ -34,7 +34,7 @@ export default function VerificationsHistoryTable() {
   const userId = user?._id || user?.id;
 
   // Set the API link using the userId
-  const apiLink = `${config.apiBaseUrl}${config.endpoints.VerificationHistory}${userId}`;
+  const apiLink = `${config.apiBaseUrl}${config.endpoints.ipe}${userId}`;
 
   const [loading, setLoading] = React.useState(false);
   const [apiData, setApiData] = React.useState([]);
