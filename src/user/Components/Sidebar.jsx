@@ -63,6 +63,11 @@ const sidebarSections = [
         label: "Enrollment",
       },
       {
+        to: "/dashboard/cac",
+        icon: <IoEnterSharp className="w-5 h-5" />,
+        label: "CAC Registration",
+      },
+      {
         to: "/dashboard/ipe-clearance",
         icon: <FaPersonCircleCheck className="w-5 h-5" />,
         label: "IPE Clearance",

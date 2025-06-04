@@ -235,7 +235,7 @@ function Dashboard() {
       id: 12,
       name: "CAC REGISTRATION",
       icon: CAC,
-      to: "/court-doc",
+      to: "/dashboard/cac",
     },
     {
       id: 13,

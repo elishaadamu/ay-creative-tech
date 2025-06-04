@@ -327,7 +327,16 @@ export default function VerificationsHistoryTable() {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500">Status</p>
-                <p className="mt-1 text-sm text-gray-900">
+                <p
+                  className={`mt-1 text-sm font-medium capitalize px-1  rounded-md inline-block
+    ${
+      selectedTransaction.status === "success"
+        ? "bg-green-400 text-gray-900"
+        : selectedTransaction.status === "pending"
+        ? "bg-blue-100 text-blue-400"
+        : "bg-red-100 text-red-400"
+    }`}
+                >
                   {selectedTransaction.status}
                 </p>
               </div>

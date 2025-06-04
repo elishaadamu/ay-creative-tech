@@ -20,6 +20,7 @@ import IPEClearance from "../pages/IPEClearance";
 import SetPin from "../layout/SetPin";
 import ResetPin from "../layout/ResetPin";
 import IPEClearanceHistory from "../pages/History/IPEHistory";
+import CAC from "../pages/CAC";
 
 function RoutesConfig() {
   return (
@@ -43,6 +44,8 @@ function RoutesConfig() {
         <Route path="/reset-pin" element={<ResetPin />} />
         <Route path="/ipe-clearance" element={<IPEClearance />} />
         <Route path="/ipe-history" element={<IPEClearanceHistory />} />
+        <Route path="/cac" element={<CAC />} />
+        {/* Catch-all route for 404 Not Found */}
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />
