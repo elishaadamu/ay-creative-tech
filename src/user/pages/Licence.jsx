@@ -96,7 +96,7 @@ function BVNLicence() {
 
       const data = await response.json();
 
-      if (data.message === "BVN licensing submitted successfully") {
+      if (response.status === 200) {
         await Swal.fire({
           icon: "success",
           title: "Registration Successful!",
@@ -273,6 +273,7 @@ function BVNLicence() {
         </Form.Item>
         <Form.Item
           name="dob"
+          size="large"
           label="Date of Birth"
           rules={[{ required: true }]}
         >

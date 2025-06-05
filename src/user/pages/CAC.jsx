@@ -182,9 +182,9 @@ function CAC() {
       console.log("API Response Status:", response.status);
 
       const data = await response.json();
-      console.log("API Response:", data.message);
+      console.log("API Response:", data);
 
-      if (data.message === "Registration saved successfully") {
+      if (response.status === 200) {
         await Swal.fire({
           icon: "success",
           title: "Registration Successful!",
@@ -279,6 +279,7 @@ function CAC() {
         <Form.Item
           name="dob"
           label="Date of Birth"
+          size="large"
           rules={[{ required: true }]}
         >
           <DatePicker className="w-full" />

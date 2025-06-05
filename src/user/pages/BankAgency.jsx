@@ -192,7 +192,7 @@ function BankAgency() {
 
       const data = await response.json();
 
-      if (data.message === "BVN data submitted successfully") {
+      if (response.status === 200) {
         await Swal.fire({
           icon: "success",
           title: "Registration Successful!",
@@ -414,6 +414,7 @@ function BankAgency() {
         <Form.Item
           name="dob"
           label="Date of Birth"
+          size="large"
           rules={[{ required: true }]}
         >
           <DatePicker className="w-full" size="large" />
