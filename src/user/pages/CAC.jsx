@@ -444,7 +444,7 @@ function CAC() {
           <Select
             size="large"
             onChange={handleStateChange}
-            onDropdownVisibleChange={(open) => setIsStateOpen(open)}
+            onOpenChange={(open) => setIsStateOpen(open)}
             getPopupContainer={(trigger) => trigger.parentNode}
             styles={{
               popup: {
@@ -469,7 +469,7 @@ function CAC() {
         >
           <Select
             size="large"
-            onDropdownVisibleChange={(open) => setIsLgaOpen(open)}
+            onOpenChange={(open) => setIsLgaOpen(open)}
             getPopupContainer={(trigger) => trigger.parentNode}
             styles={{
               popup: {

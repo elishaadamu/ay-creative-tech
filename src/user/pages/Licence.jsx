@@ -182,6 +182,8 @@ function BVNLicence() {
             <Select.Option value="WINDOWS">WINDOWS BVN LICENCE</Select.Option>
           </Select>
         </Form.Item>
+        // Replace the existing Select component for bank name with this updated
+        version:
         <Form.Item
           name="bankName"
           label="Bank Name"
@@ -190,24 +192,19 @@ function BVNLicence() {
           <Select
             size="large"
             placeholder="Select a bank"
-            loading={banksLoading}
             showSearch
-            optionFilterProp="children"
             onOpenChange={(open) => setIsBankOpen(open)}
             getPopupContainer={(trigger) => trigger.parentNode}
-            styles={{
-              popup: {
-                root: {
-                  maxHeight: "50vh",
-                },
-              },
+            dropdownStyle={{
+              maxHeight: "200px",
+              position: "fixed",
             }}
             filterOption={(input, option) =>
-              option?.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
+              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
             }
           >
-            {banks.map((bank) => (
-              <Select.Option key={bank.id} value={bank.name}>
+            {banks.map((bank, index) => (
+              <Select.Option key={index} value={bank.value}>
                 {bank.name}
               </Select.Option>
             ))}
@@ -220,7 +217,6 @@ function BVNLicence() {
         >
           <Input.TextArea size="large" />
         </Form.Item>
-
         <Form.Item
           name="bvn"
           label="Agent BVN"
@@ -231,7 +227,6 @@ function BVNLicence() {
         >
           <Input size="large" />
         </Form.Item>
-
         <Form.Item
           name="accountNumber"
           label="Account Number"
@@ -245,7 +240,6 @@ function BVNLicence() {
         >
           <Input size="large" />
         </Form.Item>
-
         <Form.Item
           name="firstName"
           label="First Name"
@@ -253,7 +247,6 @@ function BVNLicence() {
         >
           <Input size="large" />
         </Form.Item>
-
         <Form.Item
           name="lastName"
           label="Last Name"
@@ -274,7 +267,6 @@ function BVNLicence() {
         >
           <Input size="large" />
         </Form.Item>
-
         <Form.Item
           name="alternativeEmail"
           label="Alternative Email"
@@ -282,7 +274,6 @@ function BVNLicence() {
         >
           <Input size="large" />
         </Form.Item>
-
         <Form.Item
           name="dob"
           label="Date of Birth"
@@ -290,7 +281,6 @@ function BVNLicence() {
         >
           <DatePicker className="w-full" size="large" />
         </Form.Item>
-
         <Form.Item
           name="phone"
           label="Phone Number"
@@ -301,7 +291,6 @@ function BVNLicence() {
         >
           <Input size="large" />
         </Form.Item>
-
         <Form.Item
           name="alternativePhone"
           label="Alternative Phone Number"
@@ -311,7 +300,6 @@ function BVNLicence() {
         >
           <Input size="large" />
         </Form.Item>
-
         <Form.Item
           name="stateOfResidence"
           label="State of Residence"
@@ -365,7 +353,6 @@ function BVNLicence() {
         <Form.Item name="address" label="Address" rules={[{ required: true }]}>
           <Input.TextArea size="large" />
         </Form.Item>
-
         <Form.Item
           name="geoPoliticalZone"
           label="Geo Political Zone"
@@ -380,7 +367,6 @@ function BVNLicence() {
             <Select.Option value="SW">South West</Select.Option>
           </Select>
         </Form.Item>
-
         <Form.Item>
           <Button
             type="primary"

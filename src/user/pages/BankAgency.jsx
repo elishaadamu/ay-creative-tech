@@ -242,14 +242,11 @@ function BankAgency() {
             size="large"
             placeholder="Select a bank"
             showSearch
-            onDropdownVisibleChange={(open) => setIsBankOpen(open)}
+            onOpenChange={(open) => setIsBankOpen(open)}
             getPopupContainer={(trigger) => trigger.parentNode}
-            styles={{
-              popup: {
-                root: {
-                  maxHeight: "50vh",
-                },
-              },
+            dropdownStyle={{
+              maxHeight: "200px",
+              position: "fixed",
             }}
             filterOption={(input, option) =>
               option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
@@ -273,7 +270,7 @@ function BankAgency() {
             onChange={handleStateChange}
             loading={locationLoading}
             placeholder="Select state"
-            onDropdownVisibleChange={(open) => setIsStateOpen(open)}
+            onOpenChange={(open) => setIsStateOpen(open)}
             getPopupContainer={(trigger) => trigger.parentNode}
             styles={{
               popup: {
@@ -298,7 +295,7 @@ function BankAgency() {
             loading={locationLoading}
             placeholder="Select LGA"
             disabled={!form.getFieldValue("stateOfResidence")}
-            onDropdownVisibleChange={(open) => setIsLgaOpen(open)}
+            onOpenChange={(open) => setIsLgaOpen(open)}
             getPopupContainer={(trigger) => trigger.parentNode}
             styles={{
               popup: {
