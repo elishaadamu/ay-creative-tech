@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Form, Input, Select, DatePicker, Upload, Button, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import Swal from "sweetalert2";
+import { ToastContainer, toast } from "react-toastify";
 import { config } from "../../config/config";
 
 function BankAgency() {
@@ -75,12 +76,21 @@ function BankAgency() {
     const validTypes = ["image/jpeg", "image/png", "application/pdf"];
     if (!validTypes.includes(file.type)) {
       setFileError("Please upload only JPG, PNG or PDF files");
+      message.error("Please upload only JPG, PNG or PDF files");
+      toast("Please upload only JPG, PNG or PDF files", {
+        type: "error",
+        position: "top-right",
+      });
       return false;
     }
 
     // Check file size (50KB = 51200 bytes)
     if (file.size > 51200) {
       setFileError("File size must be less than 50KB");
+      toast("File size must be less than 50KB", {
+        type: "error",
+        position: "top-right",
+      });
       return false;
     }
 
@@ -152,26 +162,21 @@ function BankAgency() {
         passport: passportBase64,
       };
 
-      // Debug logs
-      console.log("Passport Base64:", passportBase64 ? "Present" : "Null");
-      console.log("Full Payload:", payload);
-
-      const response = await fetch(`${config.apiBaseUrl}/agent/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify(payload),
-      });
+      const response = await fetch(
+        `${config.apiBaseUrl}${config.endpoints.bankAgentRegistration}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify(payload),
+        }
+      );
 
       const data = await response.json();
 
-      // Log the API response
-      console.log("API Response:", data);
-
-      if (data.success) {
-        // Show success sweet alert
+      if (data.message === "BVN data submitted successfully") {
         await Swal.fire({
           icon: "success",
           title: "Registration Successful!",
@@ -179,8 +184,11 @@ function BankAgency() {
           confirmButtonColor: "#f59e0b",
         });
 
+        // Reset form and previews
         form.resetFields();
         setPassportPreview(null);
+        setPreviewUrl(null);
+        setSelectedFile(null);
       } else {
         throw new Error(data.message || "Registration failed");
       }
@@ -200,6 +208,7 @@ function BankAgency() {
 
   return (
     <div className="w-full rounded-2xl mb-5 bg-white p-5 shadow-lg">
+      <ToastContainer />
       <h2 className="text-xl font-semibold mb-4">
         Bank Agency Registration Form
       </h2>
@@ -388,6 +397,7 @@ function BankAgency() {
         <Form.Item
           name="passport"
           label="Passport Photograph"
+          className="my-5"
           rules={[
             {
               required: true,
@@ -456,8 +466,9 @@ function BankAgency() {
         <Form.Item className="">
           <Button
             type="primary"
+            size="large"
             htmlType="submit"
-            className="w-full bg-amber-500 mt-[-5px]"
+            className="w-full flex items-center bg-amber-500 mt-[-5px]"
             loading={loading}
           >
             Submit Registration

@@ -16,5 +16,6 @@ export const config = {
     airtimeSubscription: "/vtu/airtime",
     ipe: "/verify/ipe",
     cacRegistration: "/cac/register",
+    bankAgentRegistration: "/bvn/register",
   },
 };

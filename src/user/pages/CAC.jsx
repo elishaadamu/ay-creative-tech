@@ -234,7 +234,7 @@ function CAC() {
             { required: true, message: "Please select registration type" },
           ]}
         >
-          <Select>
+          <Select size="large">
             <Select.Option value="BN">Business Name (BN)</Select.Option>
             <Select.Option value="LLC">
               Limited Liability Company (LLC)
@@ -246,7 +246,7 @@ function CAC() {
         </Form.Item>
 
         <Form.Item name="surname" label="Surname" rules={[{ required: true }]}>
-          <Input />
+          <Input size="large" />
         </Form.Item>
 
         <Form.Item
@@ -254,11 +254,11 @@ function CAC() {
           label="First Name"
           rules={[{ required: true }]}
         >
-          <Input />
+          <Input size="large" />
         </Form.Item>
 
         <Form.Item name="otherName" label="Other Name">
-          <Input />
+          <Input size="large" />
         </Form.Item>
 
         <Form.Item
@@ -270,7 +270,7 @@ function CAC() {
         </Form.Item>
 
         <Form.Item name="gender" label="Gender" rules={[{ required: true }]}>
-          <Select>
+          <Select size="large">
             <Select.Option value="m">Male</Select.Option>
             <Select.Option value="f">Female</Select.Option>
           </Select>
@@ -292,7 +292,7 @@ function CAC() {
           label="Home Address"
           rules={[{ required: true }]}
         >
-          <Input.TextArea />
+          <Input.TextArea size="large" />
         </Form.Item>
 
         <Form.Item
@@ -300,7 +300,7 @@ function CAC() {
           label="Office Address"
           rules={[{ required: true }]}
         >
-          <Input.TextArea />
+          <Input.TextArea size="large" />
         </Form.Item>
 
         <Form.Item
@@ -308,7 +308,7 @@ function CAC() {
           label="Nature of Business"
           rules={[{ required: true }]}
         >
-          <Input />
+          <Input size="large" />
         </Form.Item>
 
         <Form.Item
@@ -316,7 +316,7 @@ function CAC() {
           label="Business Name (First Choice)"
           rules={[{ required: true }]}
         >
-          <Input />
+          <Input size="large" />
         </Form.Item>
 
         <Form.Item
@@ -324,7 +324,7 @@ function CAC() {
           label="Business Name (Second Choice)"
           rules={[{ required: true }]}
         >
-          <Input />
+          <Input size="large" />
         </Form.Item>
 
         <Form.Item
@@ -335,11 +335,11 @@ function CAC() {
             { pattern: /^\d{11}$/, message: "BVN must be 11 digits" },
           ]}
         >
-          <Input />
+          <Input size="large" />
         </Form.Item>
 
         <Form.Item name="nin" label="NIN Number" rules={[{ required: true }]}>
-          <Input />
+          <Input size="large" />
         </Form.Item>
 
         <Form.Item
@@ -418,7 +418,7 @@ function CAC() {
             { type: "email", message: "Please enter a valid email" },
           ]}
         >
-          <Input />
+          <Input size="large" />
         </Form.Item>
 
         <Form.Item
@@ -426,7 +426,7 @@ function CAC() {
           label="State of Origin"
           rules={[{ required: true }]}
         >
-          <Select onChange={handleStateChange}>
+          <Select size="large" onChange={handleStateChange}>
             {states.map((state, idx) => (
               <Select.Option key={idx} value={state}>
                 {state}
@@ -440,7 +440,7 @@ function CAC() {
           label="Local Government of Origin"
           rules={[{ required: true }]}
         >
-          <Select>
+          <Select size="large">
             {lgas.map((lga, idx) => (
               <Select.Option key={idx} value={lga}>
                 {lga}
@@ -521,7 +521,8 @@ function CAC() {
           <Button
             type="primary"
             htmlType="submit"
-            className="w-full bg-amber-500 mt-[-5px]"
+            size="large"
+            className="w-full flex items-center bg-amber-500 mt-[-5px]"
             loading={loading} // Add loading state
           >
             Submit Registration
