@@ -223,13 +223,13 @@ function CAC() {
   // Close the select dropdowns when clicking outside
   useEffect(() => {
     if (isStateOpen || isLgaOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
 
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     };
   }, [isStateOpen, isLgaOpen]);
 
@@ -441,8 +441,8 @@ function CAC() {
           label="State of Origin"
           rules={[{ required: true }]}
         >
-          <Select 
-            size="large" 
+          <Select
+            size="large"
             onChange={handleStateChange}
             onDropdownVisibleChange={(open) => setIsStateOpen(open)}
             getPopupContainer={(trigger) => trigger.parentNode}
@@ -450,8 +450,8 @@ function CAC() {
               popup: {
                 root: {
                   maxHeight: "50vh",
-                }
-              }
+                },
+              },
             }}
           >
             {states.map((state, idx) => (
@@ -467,7 +467,7 @@ function CAC() {
           label="Local Government of Origin"
           rules={[{ required: true }]}
         >
-          <Select 
+          <Select
             size="large"
             onDropdownVisibleChange={(open) => setIsLgaOpen(open)}
             getPopupContainer={(trigger) => trigger.parentNode}
@@ -475,8 +475,8 @@ function CAC() {
               popup: {
                 root: {
                   maxHeight: "50vh",
-                }
-              }
+                },
+              },
             }}
           >
             {lgas.map((lga, idx) => (
@@ -546,13 +546,12 @@ function CAC() {
 
             <div className="text-xs text-gray-500 mt-2">
               File requirements:
-              <ul className="list-disc ml-4 mt-1"></ul>
+              <ul className="list-disc ml-4 mt-1">
                 <li>Maximum file size: 50KB</li>
                 <li>Allowed file types: JPG, JPEG, PNG, PDF</li>
                 <li>Clear signature on white background</li>
               </ul>
             </div>
-          </div>
           </div>
         </Form.Item>
 
