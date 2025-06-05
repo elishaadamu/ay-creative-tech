@@ -18,6 +18,8 @@ function CAC() {
   const [selectedSignature, setSelectedSignature] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [signaturePreviewUrl, setSignaturePreviewUrl] = useState(null);
+  const [isStateOpen, setIsStateOpen] = useState(false);
+  const [isLgaOpen, setIsLgaOpen] = useState(false);
 
   // Fetch states effect
   useEffect(() => {
@@ -217,6 +219,19 @@ function CAC() {
       setLoading(false);
     }
   };
+
+  // Close the select dropdowns when clicking outside
+  useEffect(() => {
+    if (isStateOpen || isLgaOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isStateOpen, isLgaOpen]);
 
   return (
     <div className="w-full rounded-2xl mb-5 bg-white p-5 shadow-lg">
@@ -426,7 +441,19 @@ function CAC() {
           label="State of Origin"
           rules={[{ required: true }]}
         >
-          <Select size="large" onChange={handleStateChange}>
+          <Select 
+            size="large" 
+            onChange={handleStateChange}
+            onDropdownVisibleChange={(open) => setIsStateOpen(open)}
+            getPopupContainer={(trigger) => trigger.parentNode}
+            styles={{
+              popup: {
+                root: {
+                  maxHeight: "50vh",
+                }
+              }
+            }}
+          >
             {states.map((state, idx) => (
               <Select.Option key={idx} value={state}>
                 {state}
@@ -440,7 +467,18 @@ function CAC() {
           label="Local Government of Origin"
           rules={[{ required: true }]}
         >
-          <Select size="large">
+          <Select 
+            size="large"
+            onDropdownVisibleChange={(open) => setIsLgaOpen(open)}
+            getPopupContainer={(trigger) => trigger.parentNode}
+            styles={{
+              popup: {
+                root: {
+                  maxHeight: "50vh",
+                }
+              }
+            }}
+          >
             {lgas.map((lga, idx) => (
               <Select.Option key={idx} value={lga}>
                 {lga}
@@ -508,12 +546,13 @@ function CAC() {
 
             <div className="text-xs text-gray-500 mt-2">
               File requirements:
-              <ul className="list-disc ml-4 mt-1">
+              <ul className="list-disc ml-4 mt-1"></ul>
                 <li>Maximum file size: 50KB</li>
                 <li>Allowed file types: JPG, JPEG, PNG, PDF</li>
                 <li>Clear signature on white background</li>
               </ul>
             </div>
+          </div>
           </div>
         </Form.Item>
 

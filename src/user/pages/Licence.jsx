@@ -193,7 +193,7 @@ function BVNLicence() {
             loading={banksLoading}
             showSearch
             optionFilterProp="children"
-            onDropdownVisibleChange={(open) => setIsBankOpen(open)}
+            onOpenChange={(open) => setIsBankOpen(open)}
             getPopupContainer={(trigger) => trigger.parentNode}
             styles={{
               popup: {
@@ -322,7 +322,7 @@ function BVNLicence() {
             onChange={handleStateChange}
             loading={locationLoading}
             placeholder="Select state"
-            onDropdownVisibleChange={(open) => setIsStateOpen(open)}
+            onOpenChange={(open) => setIsStateOpen(open)}
             getPopupContainer={(trigger) => trigger.parentNode}
             styles={{
               popup: {
@@ -345,7 +345,7 @@ function BVNLicence() {
             loading={locationLoading}
             placeholder="Select LGA"
             disabled={!form.getFieldValue("stateOfResidence")}
-            onDropdownVisibleChange={(open) => setIsLgaOpen(open)}
+            onOpenChange={(open) => setIsLgaOpen(open)}
             getPopupContainer={(trigger) => trigger.parentNode}
             styles={{
               popup: {

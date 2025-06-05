@@ -16,6 +16,9 @@ function BankAgency() {
   const [fileError, setFileError] = useState("");
   const [previewUrl, setPreviewUrl] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [isBankOpen, setIsBankOpen] = useState(false);
+  const [isStateOpen, setIsStateOpen] = useState(false);
+  const [isLgaOpen, setIsLgaOpen] = useState(false);
 
   // Fetch states effect
   useEffect(() => {
@@ -43,6 +46,18 @@ function BankAgency() {
         message.error("Failed to load banks");
       });
   }, []);
+
+  useEffect(() => {
+    if (isBankOpen || isStateOpen || isLgaOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isBankOpen, isStateOpen, isLgaOpen]);
 
   const handleStateChange = async (value) => {
     setLocationLoading(true);
@@ -227,6 +242,15 @@ function BankAgency() {
             size="large"
             placeholder="Select a bank"
             showSearch
+            onDropdownVisibleChange={(open) => setIsBankOpen(open)}
+            getPopupContainer={(trigger) => trigger.parentNode}
+            styles={{
+              popup: {
+                root: {
+                  maxHeight: "50vh",
+                },
+              },
+            }}
             filterOption={(input, option) =>
               option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
             }
@@ -249,6 +273,15 @@ function BankAgency() {
             onChange={handleStateChange}
             loading={locationLoading}
             placeholder="Select state"
+            onDropdownVisibleChange={(open) => setIsStateOpen(open)}
+            getPopupContainer={(trigger) => trigger.parentNode}
+            styles={{
+              popup: {
+                root: {
+                  maxHeight: "50vh",
+                },
+              },
+            }}
           >
             {states.map((state, idx) => (
               <Select.Option key={idx} value={state}>
@@ -265,6 +298,15 @@ function BankAgency() {
             loading={locationLoading}
             placeholder="Select LGA"
             disabled={!form.getFieldValue("stateOfResidence")}
+            onDropdownVisibleChange={(open) => setIsLgaOpen(open)}
+            getPopupContainer={(trigger) => trigger.parentNode}
+            styles={{
+              popup: {
+                root: {
+                  maxHeight: "50vh",
+                },
+              },
+            }}
           >
             {lgas.map((lga, idx) => (
               <Select.Option key={idx} value={lga}>
