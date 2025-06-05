@@ -177,6 +177,14 @@ function BVNLicence() {
             loading={banksLoading}
             showSearch
             optionFilterProp="children"
+            getPopupContainer={(trigger) => trigger.parentNode}
+            styles={{
+              popup: {
+                root: {
+                  maxHeight: "50vh",
+                },
+              },
+            }}
             filterOption={(input, option) =>
               option?.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0
             }
@@ -298,7 +306,13 @@ function BVNLicence() {
             loading={locationLoading}
             placeholder="Select state"
             getPopupContainer={(trigger) => trigger.parentNode}
-            dropdownStyle={{ maxHeight: "50vh" }}
+            styles={{
+              popup: {
+                root: {
+                  maxHeight: "50vh",
+                },
+              },
+            }}
           >
             {states.map((state, idx) => (
               <Select.Option key={idx} value={state}>
@@ -314,7 +328,13 @@ function BVNLicence() {
             placeholder="Select LGA"
             disabled={!form.getFieldValue("stateOfResidence")}
             getPopupContainer={(trigger) => trigger.parentNode}
-            dropdownStyle={{ maxHeight: "50vh" }}
+            styles={{
+              popup: {
+                root: {
+                  maxHeight: "50vh",
+                },
+              },
+            }}
           >
             {lgas.map((lga, idx) => (
               <Select.Option key={idx} value={lga}>
