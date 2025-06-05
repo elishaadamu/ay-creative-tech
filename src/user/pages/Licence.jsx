@@ -12,6 +12,9 @@ function BVNLicence() {
   const [banks, setBanks] = useState([]);
   const [locationLoading, setLocationLoading] = useState(false);
   const [banksLoading, setBanksLoading] = useState(false);
+  const [isBankOpen, setIsBankOpen] = useState(false);
+  const [isStateOpen, setIsStateOpen] = useState(false);
+  const [isLgaOpen, setIsLgaOpen] = useState(false);
 
   // Fetch states effect
   useEffect(() => {
@@ -147,6 +150,19 @@ function BVNLicence() {
       .finally(() => setBanksLoading(false));
   }, []);
 
+  // effect to handle body scroll
+  useEffect(() => {
+    if (isBankOpen || isStateOpen || isLgaOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isBankOpen, isStateOpen, isLgaOpen]);
+
   return (
     <div className="w-full rounded-2xl mb-5 bg-white p-5 shadow-lg">
       <h2 className="text-xl font-semibold mb-4">BVN License Registration</h2>
@@ -177,6 +193,7 @@ function BVNLicence() {
             loading={banksLoading}
             showSearch
             optionFilterProp="children"
+            onDropdownVisibleChange={(open) => setIsBankOpen(open)}
             getPopupContainer={(trigger) => trigger.parentNode}
             styles={{
               popup: {
@@ -305,6 +322,7 @@ function BVNLicence() {
             onChange={handleStateChange}
             loading={locationLoading}
             placeholder="Select state"
+            onDropdownVisibleChange={(open) => setIsStateOpen(open)}
             getPopupContainer={(trigger) => trigger.parentNode}
             styles={{
               popup: {
@@ -327,6 +345,7 @@ function BVNLicence() {
             loading={locationLoading}
             placeholder="Select LGA"
             disabled={!form.getFieldValue("stateOfResidence")}
+            onDropdownVisibleChange={(open) => setIsLgaOpen(open)}
             getPopupContainer={(trigger) => trigger.parentNode}
             styles={{
               popup: {
