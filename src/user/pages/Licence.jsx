@@ -64,7 +64,7 @@ function BVNLicence() {
       }
 
       const payload = {
-        userId,
+        userId: userId,
         licenseType: values.licenseType,
         bankName: values.bankName,
         bvn: values.bvn,
@@ -83,14 +83,12 @@ function BVNLicence() {
         geoPoliticalZone: values.geoPoliticalZone,
       };
 
-      console.log("Payload:", payload);
       const response = await fetch(
         `${config.apiBaseUrl}${config.endpoints.bvnLicenceRegistration}`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           body: JSON.stringify(payload),
         }
@@ -98,7 +96,7 @@ function BVNLicence() {
 
       const data = await response.json();
 
-      if (response.ok) {
+      if (data.message === "BVN licensing submitted successfully") {
         await Swal.fire({
           icon: "success",
           title: "Registration Successful!",

@@ -17,5 +17,6 @@ export const config = {
     ipe: "/verify/ipe",
     cacRegistration: "/cac/register",
     bankAgentRegistration: "/bvn/register",
+    bvnLicenceRegistration: "/bvn/licence",
   },
 };

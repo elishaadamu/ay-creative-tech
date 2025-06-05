@@ -159,6 +159,7 @@ function BankAgency() {
 
       // Construct payload
       const payload = {
+        userId: userId,
         bankName: values.bankName,
         stateOfResidence: values.stateOfResidence,
         lga: values.lga,

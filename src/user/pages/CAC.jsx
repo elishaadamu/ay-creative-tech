@@ -138,7 +138,7 @@ function CAC() {
 
       // Construct payload like NIN
       const payload = {
-        userId,
+        userId: userId,
         registrationType: values.registrationType,
         surname: values.surname,
         firstName: values.firstName,
@@ -310,11 +310,7 @@ function CAC() {
           <Input.TextArea size="large" />
         </Form.Item>
 
-        <Form.Item
-          name="officeAddress"
-          label="Office Address"
-          rules={[{ required: true }]}
-        >
+        <Form.Item name="officeAddress" label="Office Address">
           <Input.TextArea size="large" />
         </Form.Item>
 
