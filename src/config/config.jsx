@@ -15,5 +15,6 @@ export const config = {
     dataSubscription: "/vtu/data",
     airtimeSubscription: "/vtu/airtime",
     ipe: "/verify/ipe",
+    cacRegistration: "/cac/register",
   },
 };

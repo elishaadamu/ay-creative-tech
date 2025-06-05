@@ -64,8 +64,13 @@ const sidebarSections = [
       },
       {
         to: "/dashboard/cac",
-        icon: <IoEnterSharp className="w-5 h-5" />,
+        icon: <FaIdBadge className="w-5 h-5" />,
         label: "CAC Registration",
+      },
+      {
+        to: "/dashboard/bank-agency",
+        icon: <FaBuilding className="w-5 h-5" />,
+        label: "Banking Agency",
       },
       {
         to: "/dashboard/ipe-clearance",

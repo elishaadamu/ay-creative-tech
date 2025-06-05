@@ -1,14 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { Form, Input, Select, DatePicker, Upload, Button, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
+import Swal from "sweetalert2";
 import { config } from "../../config/config";
+import CryptoJS from "crypto-js";
 
 function CAC() {
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
   const [states, setStates] = useState([]);
   const [lgas, setLgas] = useState([]);
   const [passportPreview, setPassportPreview] = useState(null);
   const [signaturePreview, setSignaturePreview] = useState(null);
+  const [fileError, setFileError] = useState("");
+  const [signatureError, setSignatureError] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedSignature, setSelectedSignature] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [signaturePreviewUrl, setSignaturePreviewUrl] = useState(null);
 
   // Fetch states effect
   useEffect(() => {
@@ -26,52 +35,186 @@ function CAC() {
       .catch(() => setLgas([]));
   };
 
-  const onFinish = async (values) => {
+  const validateFile = (file, isSignature = false) => {
+    const validTypes = ["image/jpeg", "image/png", "application/pdf"];
+    if (!validTypes.includes(file.type)) {
+      const errorMsg = "Please upload only JPG, PNG or PDF files";
+      isSignature ? setSignatureError(errorMsg) : setFileError(errorMsg);
+      return false;
+    }
+
+    if (file.size > 51200) {
+      const errorMsg = "File size must be less than 50KB";
+      isSignature ? setSignatureError(errorMsg) : setFileError(errorMsg);
+      return false;
+    }
+
+    isSignature ? setSignatureError("") : setFileError("");
+    return true;
+  };
+
+  const handleFileChange = (e, isSignature = false) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (validateFile(file, isSignature)) {
+      isSignature ? setSelectedSignature(file) : setSelectedFile(file);
+
+      if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          isSignature
+            ? setSignaturePreviewUrl(reader.result)
+            : setPreviewUrl(reader.result);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        isSignature ? setSignaturePreviewUrl(null) : setPreviewUrl(null);
+      }
+    } else {
+      e.target.value = "";
+      isSignature ? setSelectedSignature(null) : setSelectedFile(null);
+      isSignature ? setSignaturePreviewUrl(null) : setPreviewUrl(null);
+    }
+  };
+
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        resolve(reader.result);
+      };
+      reader.onerror = (error) => {
+        reject(error);
+      };
+    });
+  };
+
+  const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
+
+  function decryptData(ciphertext) {
+    if (!ciphertext) return null;
     try {
-      // Create FormData object for file uploads
-      const formData = new FormData();
+      const bytes = CryptoJS.AES.decrypt(ciphertext, SECRET_KEY);
+      const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+      return JSON.parse(decrypted);
+    } catch {
+      return null;
+    }
+  }
 
-      // Append all form values
-      Object.keys(values).forEach((key) => {
-        if (key === "passport" || key === "signature") {
-          // Handle file uploads
-          if (values[key]?.[0]?.originFileObj) {
-            formData.append(key, values[key][0].originFileObj);
-          }
-        } else if (key === "dob") {
-          // Format date
-          formData.append(key, values[key].format("YYYY-MM-DD"));
-        } else {
-          formData.append(key, values[key]);
+  const onFinish = async (values) => {
+    setLoading(true);
+
+    try {
+      // Get userId from encrypted localStorage like NIN component
+      let userId = null;
+      try {
+        const userStr = localStorage.getItem("user");
+        if (userStr) {
+          const userObj = decryptData(userStr);
+          userId = userObj?._id || userObj?.id;
         }
-      });
-
-      // Make API call
-      const response = await fetch(`${config.apiBaseUrl}/cac/register`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // Add if authentication is required
-        },
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Registration failed");
+      } catch (error) {
+        console.error("Error getting userId:", error);
       }
 
-      const data = await response.json();
+      // Convert files to base64
+      let passportBase64 = null;
+      let signatureBase64 = null;
 
-      if (data.success) {
-        message.success("Business registration submitted successfully");
-        form.resetFields(); // Clear form
-        setPassportPreview(null); // Clear previews
-        setSignaturePreview(null);
+      if (selectedFile) {
+        const passportResult = await convertToBase64(selectedFile);
+        passportBase64 = passportResult.split(",")[1];
+      }
+
+      if (selectedSignature) {
+        const signatureResult = await convertToBase64(selectedSignature);
+        signatureBase64 = signatureResult.split(",")[1];
+      }
+
+      // Construct payload like NIN
+      const payload = {
+        userId,
+        registrationType: values.registrationType,
+        surname: values.surname,
+        firstName: values.firstName,
+        otherName: values.otherName || "",
+        dateOfBirth: values.dob.format("YYYY-MM-DD"),
+        gender: values.gender,
+        phoneNumber: values.phone,
+        homeAddress: values.homeAddress,
+        officeAddress: values.officeAddress,
+        natureOfBusiness: values.natureOfBusiness,
+        businessName1: values.businessName1,
+        businessName2: values.businessName2,
+        bvn: values.bvn,
+        nin: values.nin,
+        email: values.email,
+        stateOfOrigin: values.stateOfOrigin,
+        lgaOfOrigin: values.lgaOfOrigin,
+        passport: passportBase64,
+        signature: signatureBase64,
+      };
+
+      // Log payload like NIN
+      console.log("Sending payload:", {
+        ...payload,
+        passport: passportBase64,
+        signature: signatureBase64,
+      });
+
+      // Make API call like NIN
+      const response = await fetch(
+        `${config.apiBaseUrl}${config.endpoints.cacRegistration}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+      console.log("API Response Status:", response.status);
+
+      const data = await response.json();
+      console.log("API Response:", data.message);
+
+      if (data.message === "Registration saved successfully") {
+        await Swal.fire({
+          icon: "success",
+          title: "Registration Successful!",
+          text: "Your business registration has been submitted successfully.",
+          confirmButtonColor: "#f59e0b",
+        });
+
+        // Reset form and previews
+        form.resetFields();
+        setPreviewUrl(null);
+        setSignaturePreviewUrl(null);
+        setSelectedFile(null);
+        setSelectedSignature(null);
       } else {
-        message.error(data.message || "Registration failed");
+        throw new Error(data.message || "Registration failed");
       }
     } catch (error) {
       console.error("Registration error:", error);
-      message.error("Failed to submit registration. Please try again.");
+
+      const errorMessage = error.message.includes("Server error")
+        ? error.message
+        : "Failed to submit registration. Please check your internet connection and try again.";
+
+      Swal.fire({
+        icon: "error",
+        title: "Registration Failed",
+        text: errorMessage,
+        confirmButtonColor: "#f59e0b",
+        showConfirmButton: true,
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -128,8 +271,8 @@ function CAC() {
 
         <Form.Item name="gender" label="Gender" rules={[{ required: true }]}>
           <Select>
-            <Select.Option value="male">Male</Select.Option>
-            <Select.Option value="female">Female</Select.Option>
+            <Select.Option value="m">Male</Select.Option>
+            <Select.Option value="f">Female</Select.Option>
           </Select>
         </Form.Item>
 
@@ -205,82 +348,65 @@ function CAC() {
           rules={[
             {
               required: true,
-              validator: (_, fileList) => {
-                if (fileList && fileList.length > 0) {
-                  return Promise.resolve();
+              validator: (_, value) => {
+                if (!selectedFile) {
+                  return Promise.reject("Please upload a passport photograph");
                 }
-                return Promise.reject("Please upload your passport photo");
+                return Promise.resolve();
               },
             },
           ]}
-          valuePropName="fileList"
-          getValueFromEvent={(e) => {
-            if (Array.isArray(e)) {
-              return e;
-            }
-            return e?.fileList;
-          }}
         >
-          <Upload
-            maxCount={1}
-            accept=".jpg,.jpeg,.png,.pdf"
-            customRequest={({ file, onSuccess }) => {
-              setTimeout(() => {
-                onSuccess("ok");
-              }, 0);
-            }}
-            beforeUpload={(file) => {
-              const isValidType = [
-                "image/jpeg",
-                "image/png",
-                "application/pdf",
-              ].includes(file.type);
-              const isValidSize = file.size / 1024 <= 50;
-
-              if (!isValidType) {
-                message.error("You can only upload JPG/PNG/PDF files!");
-                return Upload.LIST_IGNORE;
-              }
-              if (!isValidSize) {
-                message.error("File must be smaller than 50KB!");
-                return Upload.LIST_IGNORE;
-              }
-
-              // Create preview
-              const reader = new FileReader();
-              reader.onload = (e) => {
-                setPassportPreview(e.target.result);
-                form.setFieldsValue({ passport: [file] }); // Update form value
-              };
-              reader.readAsDataURL(file);
-              return false;
-            }}
-            onRemove={() => {
-              setPassportPreview(null);
-              form.setFieldsValue({ passport: [] }); // Clear form value
-            }}
-            fileList={form.getFieldValue("passport") || []}
-          >
-            <Button icon={<UploadOutlined />} size="large">
-              Upload Passport Photo
-            </Button>
-          </Upload>
-          {passportPreview && (
-            <div className="mt-2">
-              <img
-                src={passportPreview}
-                alt="Passport preview"
-                className="max-w-[200px] max-h-[200px] object-contain"
-              />
+          <div className="space-y-2">
+            <div className="flex items-center justify-center w-full">
+              <label className="w-full mt-5 flex flex-col items-center px-4 py-6 bg-white rounded-lg border-2 border-dashed border-gray-300 cursor-pointer hover:bg-gray-50">
+                <div className="space-y-1 text-center">
+                  <svg
+                    className="mx-auto h-12 w-12 text-gray-400"
+                    stroke="currentColor"
+                    fill="none"
+                    viewBox="0 0 48 48"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+                <input
+                  type="file"
+                  className="hidden"
+                  accept=".jpg,.jpeg,.png,.pdf"
+                  onChange={(e) => handleFileChange(e, false)}
+                />
+              </label>
             </div>
-          )}
-          <div className="text-gray-500 text-sm mt-1">
-            File requirements:
-            <ul className="list-disc ml-4">
-              <li>Maximum file size: 50KB</li>
-              <li>Allowed file types: JPG, JPEG, PNG, PDF</li>
-              <li>Recent passport photograph with white background</li>
-            </ul>
+
+            {fileError && (
+              <p className="mt-1 text-sm text-red-600">{fileError}</p>
+            )}
+
+            {previewUrl && (
+              <div className="mt-5 relative">
+                <img
+                  src={previewUrl}
+                  alt="Preview"
+                  className="max-w-[100px] max-h-[100px] object-contain rounded border border-gray-200"
+                />
+              </div>
+            )}
+
+            <div className="text-xs text-gray-500 mt-2">
+              File requirements:
+              <ul className="list-disc ml-4 mt-1">
+                <li>Maximum file size: 50KB</li>
+                <li>Allowed file types: JPG, JPEG, PNG, PDF</li>
+                <li>Recent passport photograph with white background</li>
+              </ul>
+            </div>
           </div>
         </Form.Item>
 
@@ -329,82 +455,65 @@ function CAC() {
           rules={[
             {
               required: true,
-              validator: (_, fileList) => {
-                if (fileList && fileList.length > 0) {
-                  return Promise.resolve();
+              validator: (_, value) => {
+                if (!selectedSignature) {
+                  return Promise.reject("Please upload your signature");
                 }
-                return Promise.reject("Please upload your signature");
+                return Promise.resolve();
               },
             },
           ]}
-          valuePropName="fileList"
-          getValueFromEvent={(e) => {
-            if (Array.isArray(e)) {
-              return e;
-            }
-            return e?.fileList;
-          }}
         >
-          <Upload
-            maxCount={1}
-            accept=".jpg,.jpeg,.png,.pdf"
-            customRequest={({ file, onSuccess }) => {
-              setTimeout(() => {
-                onSuccess("ok");
-              }, 0);
-            }}
-            beforeUpload={(file) => {
-              const isValidType = [
-                "image/jpeg",
-                "image/png",
-                "application/pdf",
-              ].includes(file.type);
-              const isValidSize = file.size / 1024 <= 50;
-
-              if (!isValidType) {
-                message.error("You can only upload JPG/PNG/PDF files!");
-                return Upload.LIST_IGNORE;
-              }
-              if (!isValidSize) {
-                message.error("File must be smaller than 50KB!");
-                return Upload.LIST_IGNORE;
-              }
-
-              // Create preview
-              const reader = new FileReader();
-              reader.onload = (e) => {
-                setSignaturePreview(e.target.result);
-                form.setFieldsValue({ signature: [file] }); // Added this line to match passport setup
-              };
-              reader.readAsDataURL(file);
-              return false;
-            }}
-            onRemove={() => {
-              setSignaturePreview(null);
-              form.setFieldsValue({ signature: [] }); // Added this line to match passport setup
-            }}
-            fileList={form.getFieldValue("signature") || []} // Added this line to match passport setup
-          >
-            <Button icon={<UploadOutlined />} size="large">
-              Upload Signature
-            </Button>
-          </Upload>
-          {signaturePreview && (
-            <div className="mt-2">
-              <img
-                src={signaturePreview}
-                alt="Signature preview"
-                className="max-w-[200px] max-h-[200px] object-contain"
-              />
+          <div className="space-y-2">
+            <div className="flex items-center justify-center w-full">
+              <label className="w-full mt-5 flex flex-col items-center px-4 py-6 bg-white rounded-lg border-2 border-dashed border-gray-300 cursor-pointer hover:bg-gray-50">
+                <div className="space-y-1 text-center">
+                  <svg
+                    className="mx-auto h-12 w-12 text-gray-400"
+                    stroke="currentColor"
+                    fill="none"
+                    viewBox="0 0 48 48"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+                <input
+                  type="file"
+                  className="hidden"
+                  accept=".jpg,.jpeg,.png,.pdf"
+                  onChange={(e) => handleFileChange(e, true)}
+                />
+              </label>
             </div>
-          )}
-          <div className="text-gray-500 text-sm mt-1">
-            File requirements:
-            <ul className="list-disc ml-4">
-              <li>Maximum file size: 50KB</li>
-              <li>Allowed file types: JPG, JPEG, PNG, PDF</li>
-              <li>Clear signature on white background</li>
-            </ul>
+
+            {signatureError && (
+              <p className="mt-1 text-sm text-red-600">{signatureError}</p>
+            )}
+
+            {signaturePreviewUrl && (
+              <div className="mt-5 relative">
+                <img
+                  src={signaturePreviewUrl}
+                  alt="Signature Preview"
+                  className="max-w-[100px] max-h-[100px] object-contain rounded border border-gray-200"
+                />
+              </div>
+            )}
+
+            <div className="text-xs text-gray-500 mt-2">
+              File requirements:
+              <ul className="list-disc ml-4 mt-1">
+                <li>Maximum file size: 50KB</li>
+                <li>Allowed file types: JPG, JPEG, PNG, PDF</li>
+                <li>Clear signature on white background</li>
+              </ul>
+            </div>
           </div>
         </Form.Item>
 
@@ -412,7 +521,8 @@ function CAC() {
           <Button
             type="primary"
             htmlType="submit"
-            className="w-full bg-amber-500"
+            className="w-full bg-amber-500 mt-[-5px]"
+            loading={loading} // Add loading state
           >
             Submit Registration
           </Button>
