@@ -182,8 +182,7 @@ function BVNLicence() {
             <Select.Option value="WINDOWS">WINDOWS BVN LICENCE</Select.Option>
           </Select>
         </Form.Item>
-        // Replace the existing Select component for bank name with this updated
-        version:
+
         <Form.Item
           name="bankName"
           label="Bank Name"
