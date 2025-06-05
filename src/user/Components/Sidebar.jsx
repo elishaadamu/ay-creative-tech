@@ -73,6 +73,11 @@ const sidebarSections = [
         label: "Banking Agency",
       },
       {
+        to: "/dashboard/bvn-licence",
+        icon: <FaCar className="w-5 h-5" />,
+        label: "BVN Licence",
+      },
+      {
         to: "/dashboard/ipe-clearance",
         icon: <FaPersonCircleCheck className="w-5 h-5" />,
         label: "IPE Clearance",

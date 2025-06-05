@@ -22,6 +22,7 @@ import ResetPin from "../layout/ResetPin";
 import IPEClearanceHistory from "../pages/History/IPEHistory";
 import CAC from "../pages/CAC";
 import BankAgency from "../pages/BankAgency";
+import BVNLicence from "../pages/Licence";
 
 function RoutesConfig() {
   return (
@@ -47,6 +48,7 @@ function RoutesConfig() {
         <Route path="/ipe-history" element={<IPEClearanceHistory />} />
         <Route path="/cac" element={<CAC />} />
         <Route path="/bank-agency" element={<BankAgency />} />
+        <Route path="/bvn-licence" element={<BVNLicence />} />
         {/* Catch-all route for 404 Not Found */}
         <Route path="*" element={<NotFound />} />
       </Routes>

@@ -241,7 +241,7 @@ function Dashboard() {
       id: 13,
       name: "BVN LICENCES",
       icon: NIBSS,
-      to: "/police-report",
+      to: "/dashboard/bvn-licence",
     },
     {
       id: 14,
