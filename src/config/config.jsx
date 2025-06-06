@@ -18,6 +18,6 @@ export const config = {
     cacRegistration: "/cac/register",
     bankAgentRegistration: "/bvn/register",
     bvnLicenceRegistration: "/bvn/licence",
-    Modification: "/modification",
+    Modification: "/modify/register",
   },
 };

@@ -128,14 +128,7 @@ function DataSub() {
   const showConfirmation = async (values, selectedPlan) => {
     const result = await Swal.fire({
       title: "Confirm Data Purchase",
-      html: `
-      <p class="mb-2">Please confirm your purchase:</p>
-      <p class="mb-2">Network: ${selectedPlan.network}</p>
-      <p class="mb-2">Data Plan: ${selectedPlan.data_volume}</p>
-      <p class="mb-2">Phone Number: ${values.phoneNumber}</p>
-      <p class="mb-2">Amount: ${selectedPlan.price}</p>
-      <p class="mb-2">Validity: ${selectedPlan.validity}</p>
-    `,
+
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#f59e0b",
@@ -207,7 +200,7 @@ function DataSub() {
         payload
       );
       console.log("Response:", response);
-      if (response.data?.data?.status === "success") {
+      if (response.status === 200) {
         try {
           // Refresh account balance first
           const accountResponse = await axios.get(

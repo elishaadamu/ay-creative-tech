@@ -92,7 +92,7 @@ function Modification() {
         localGovernment: values.localGovernment,
         stateOfOrigin: values.stateOfOrigin,
       };
-      console.log("Payload:", payload);
+
       const response = await fetch(
         `${config.apiBaseUrl}${config.endpoints.Modification}`,
         {
@@ -104,7 +104,7 @@ function Modification() {
         }
       );
 
-      if (response.status === 200) {
+      if (response.ok) {
         await Swal.fire({
           icon: "success",
           title: "Modification Request Submitted!",
