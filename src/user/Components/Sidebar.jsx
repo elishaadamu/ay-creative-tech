@@ -53,6 +53,11 @@ const sidebarSections = [
         label: "NIN With Phone",
       },
       {
+        to: "/dashboard/modification",
+        icon: <RiPassportFill className="w-5 h-5" />,
+        label: "NIN Modification",
+      },
+      {
         to: "/dashboard/verifications/bvn",
         icon: <FaSimCard className="w-5 h-5" />,
         label: "BVN Verification",

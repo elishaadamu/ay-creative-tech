@@ -27,7 +27,6 @@ function CustomerCare() {
   }, []);
 
   const whatsappStyles = {
-    button: `fixed bottom-6 right-6 flex items-center space-x-2 z-50`,
     icon: `bg-green-500 text-white p-4 rounded-full shadow-lg 
            hover:bg-green-600 transition-all duration-300 animate-bounce-slow`,
     tooltip: `bg-white text-gray-800 px-4 py-2 rounded-lg shadow-lg 
@@ -52,7 +51,7 @@ function CustomerCare() {
   return (
     <>
       {/* WhatsApp Button with Tooltip */}
-      <div className={whatsappStyles.button}>
+      <div className="cursor-pointer fixed bottom-6 right-6 flex items-center space-x-2 z-50">
         {!showWhatsAppModal && showTooltip && (
           <div className={whatsappStyles.tooltip}>Message Us</div>
         )}

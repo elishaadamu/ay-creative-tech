@@ -3,7 +3,10 @@ import { Form, Input, Select, Button, Card } from "antd";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
-import { fetchDataPlans } from "../services/DataPlanService";
+import {
+  fetchDataPlans,
+  getDataPlansByType,
+} from "../services/DataPlanService";
 import axios from "axios";
 import { config } from "../../config/config";
 import CryptoJS from "crypto-js";
@@ -17,6 +20,10 @@ function DataSub() {
   const [filteredPlans, setFilteredPlans] = useState([]);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [account, setAccount] = useState(null);
+  const [planTypes, setPlanTypes] = useState([]); // Add state for plan types
+  const [isNetworkOpen, setIsNetworkOpen] = useState(false);
+  const [isPlanTypeOpen, setIsPlanTypeOpen] = useState(false);
+  const [isDataPlanOpen, setIsDataPlanOpen] = useState(false);
 
   const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
 
@@ -69,32 +76,42 @@ function DataSub() {
     initialize();
   }, []);
 
-  // Add this network mapping constant at the top of your component
+  // First, update the networkMapping object to match the correct order:
   const networkMapping = {
     1: "MTN",
-    2: "AIRTEL",
-    3: "GLO",
-    4: "9MOBILE",
+    2: "GLO",
+    3: "9MOBILE",
+    4: "AIRTEL",
   };
 
   // Handle network selection
   const handleNetworkChange = (value) => {
     form.setFieldsValue({ planType: undefined, dataplan: undefined });
     const network = networkMapping[value];
-    const filtered = allPlans.filter((plan) => plan.network === network);
-    setFilteredPlans(filtered);
+
+    // Get unique plan types for selected network
+    const networkPlans = allPlans.filter((plan) => plan.network === network);
+    const uniquePlanTypes = [
+      ...new Set(networkPlans.map((plan) => plan.plan_type)),
+    ];
+
+    setFilteredPlans(networkPlans);
+    setPlanTypes(uniquePlanTypes); // Add this state variable
     setSelectedPlan(null);
   };
 
   // Handle plan type selection
-  const handlePlanTypeChange = (value) => {
-    form.setFieldsValue({ dataplan: undefined });
+  const handlePlanTypeChange = async (value) => {
     const network = networkMapping[form.getFieldValue("network")];
-    const filtered = allPlans.filter(
-      (plan) => plan.network === network && plan.plan_type === value
-    );
+    const planData = await getDataPlansByType(value);
+
+    // Filter plans by both network and plan type
+    const filtered = planData.plans.filter((plan) => plan.network === network);
     setFilteredPlans(filtered);
     setSelectedPlan(null);
+
+    // Update form
+    form.setFieldsValue({ dataplan: undefined });
   };
 
   // Handle plan selection
@@ -184,7 +201,7 @@ function DataSub() {
         `${config.apiBaseUrl}${config.endpoints.dataSubscription}`,
         payload
       );
-
+      console.log("Response:", response);
       if (response.data?.data?.status === "success") {
         try {
           // Refresh account balance first
@@ -246,6 +263,19 @@ function DataSub() {
     }
   };
 
+  // Add this useEffect to handle body scroll
+  useEffect(() => {
+    if (isNetworkOpen || isPlanTypeOpen || isDataPlanOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isNetworkOpen, isPlanTypeOpen, isDataPlanOpen]);
+
   return (
     <div>
       <Card
@@ -279,11 +309,17 @@ function DataSub() {
               placeholder="Select network"
               size="large"
               onChange={handleNetworkChange}
+              onOpenChange={(open) => setIsNetworkOpen(open)}
+              getPopupContainer={(trigger) => trigger.parentNode}
+              dropdownStyle={{
+                maxHeight: "200px",
+                position: "fixed",
+              }}
             >
               <Select.Option value="1">MTN</Select.Option>
-              <Select.Option value="2">AIRTEL</Select.Option>
-              <Select.Option value="3">GLO</Select.Option>
-              <Select.Option value="4">9MOBILE</Select.Option>
+              <Select.Option value="2">GLO</Select.Option>
+              <Select.Option value="3">9MOBILE</Select.Option>
+              <Select.Option value="4">AIRTEL</Select.Option>
             </Select>
           </Form.Item>
 
@@ -296,25 +332,19 @@ function DataSub() {
               placeholder="Select plan type"
               size="large"
               onChange={handlePlanTypeChange}
+              disabled={!form.getFieldValue("network")}
+              onOpenChange={(open) => setIsPlanTypeOpen(open)}
+              getPopupContainer={(trigger) => trigger.parentNode}
+              dropdownStyle={{
+                maxHeight: "200px",
+                position: "fixed",
+              }}
             >
-              {/* Show all available plan types for the selected network */}
-              {allPlans
-                .filter(
-                  (plan) =>
-                    plan.network ===
-                    networkMapping[form.getFieldValue("network")]
-                )
-                .reduce((types, plan) => {
-                  if (!types.includes(plan.plan_type)) {
-                    types.push(plan.plan_type);
-                  }
-                  return types;
-                }, [])
-                .map((type) => (
-                  <Select.Option key={type} value={type}>
-                    {type}
-                  </Select.Option>
-                ))}
+              {planTypes.map((type) => (
+                <Select.Option key={type} value={type}>
+                  {type}
+                </Select.Option>
+              ))}
             </Select>
           </Form.Item>
 
@@ -327,18 +357,19 @@ function DataSub() {
               placeholder="Select data plan"
               size="large"
               onChange={handlePlanSelection}
+              disabled={!form.getFieldValue("planType")}
+              onOpenChange={(open) => setIsDataPlanOpen(open)}
+              getPopupContainer={(trigger) => trigger.parentNode}
+              dropdownStyle={{
+                maxHeight: "200px",
+                position: "fixed",
+              }}
             >
-              {filteredPlans
-                .filter(
-                  (plan) =>
-                    !form.getFieldValue("planType") ||
-                    plan.plan_type === form.getFieldValue("planType")
-                )
-                .map((plan) => (
-                  <Select.Option key={plan.id} value={plan.id}>
-                    {`${plan.data_volume} - ${plan.price} - ${plan.validity} (${plan.plan_type})`}
-                  </Select.Option>
-                ))}
+              {filteredPlans.map((plan) => (
+                <Select.Option key={plan.id} value={plan.id}>
+                  {`${plan.data_volume} - ${plan.price} - ${plan.validity}`}
+                </Select.Option>
+              ))}
             </Select>
           </Form.Item>
 
