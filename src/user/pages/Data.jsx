@@ -43,6 +43,11 @@ function DataSub() {
       try {
         // Fetch data plans
         const plans = await fetchDataPlans();
+        if (!plans || plans.length === 0) {
+          console.error("No data plans received");
+          toast.error("Error loading data plans");
+          return;
+        }
         setAllPlans(plans);
 
         // Fetch user account details

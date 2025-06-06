@@ -1,6 +1,10 @@
 export const fetchDataPlans = async () => {
   try {
-    const response = await fetch("/src/user/data_plan/dataPlan.json");
+    // Update the path to be relative to the public directory
+    const response = await fetch("/data_plan/dataPlan.json");
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     const plans = await response.json();
     return plans;
   } catch (error) {
