@@ -46,23 +46,22 @@ function BVNLicence() {
       return null;
     }
   }
+  // Get userId from encrypted localStorage
+  let userId = null;
+  try {
+    const userStr = localStorage.getItem("user");
+    if (userStr) {
+      const userObj = decryptData(userStr);
+      userId = userObj?._id || userObj?.id;
+    }
+  } catch (error) {
+    console.error("Error getting userId:", error);
+  }
 
   const onFinish = async (values) => {
     setLoading(true);
 
     try {
-      // Get userId from encrypted localStorage
-      let userId = null;
-      try {
-        const userStr = localStorage.getItem("user");
-        if (userStr) {
-          const userObj = decryptData(userStr);
-          userId = userObj?._id || userObj?.id;
-        }
-      } catch (error) {
-        console.error("Error getting userId:", error);
-      }
-
       const payload = {
         userId: userId,
         licenseType: values.licenseType,

@@ -3,6 +3,7 @@ import { Form, Input, Select, DatePicker, Button } from "antd";
 import { ToastContainer, toast } from "react-toastify";
 import Swal from "sweetalert2";
 import { config } from "../../config/config";
+import CryptoJS from "crypto-js";
 
 const MODIFICATION_TYPES = [
   { value: "name", label: "Change of Name", price: 5000 },
@@ -45,6 +46,29 @@ function Modification() {
     }
   };
 
+  const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
+
+  function decryptData(ciphertext) {
+    if (!ciphertext) return null;
+    try {
+      const bytes = CryptoJS.AES.decrypt(ciphertext, SECRET_KEY);
+      const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+      return JSON.parse(decrypted);
+    } catch {
+      return null;
+    }
+  }
+  // Get userId from encrypted localStorage
+  let userId = null;
+  try {
+    const userStr = localStorage.getItem("user");
+    if (userStr) {
+      const userObj = decryptData(userStr);
+      userId = userObj?._id || userObj?.id;
+    }
+  } catch (error) {
+    console.error("Error getting userId:", error);
+  }
   const onFinish = async (values) => {
     setLoading(true);
     try {
@@ -53,6 +77,7 @@ function Modification() {
       );
 
       const payload = {
+        userId: userId,
         modificationType: selected?.label || "Other Modification",
         modificationAmount: selected?.price || 0,
         newDob: values.newDob.format("YYYY-MM-DD"),
