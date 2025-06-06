@@ -1,27 +1,147 @@
 import React, { useState, useEffect } from "react";
-import { VscUnverified } from "react-icons/vsc";
-import { MdOutlineSendToMobile } from "react-icons/md";
+import {
+  Form,
+  Input,
+  Select,
+  DatePicker,
+  InputNumber,
+  Button,
+  message,
+} from "antd";
+import { ToastContainer, toast } from "react-toastify";
+import Swal from "sweetalert2";
+import { config } from "../../config/config";
 
 function Enrollment() {
-  const [form, setForm] = useState({
-    enrollmentType: "",
-    firstName: "",
-    middleName: "",
-    surname: "",
-    dob: "",
-    stateOfOrigin: "",
-    localOfOrigin: "",
-    areaOfResidence: "",
-    phone: "",
-    gender: "",
-    height: "",
-    file: null,
-  });
-
+  const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
   const [states, setStates] = useState([]);
   const [lgas, setLgas] = useState([]);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [fileError, setFileError] = useState(null);
 
-  // Fetch all states on mount
+  // File upload handler with validation
+  const validateFile = (file) => {
+    // Check file type
+    const validTypes = ["image/jpeg", "image/png", "application/pdf"];
+    if (!validTypes.includes(file.type)) {
+      setFileError("Please upload only JPG, PNG or PDF files");
+      message.error("Please upload only JPG, PNG or PDF files");
+      toast("Please upload only JPG, PNG or PDF files", {
+        type: "error",
+        position: "top-right",
+      });
+      return false;
+    }
+
+    // Check file size (50KB = 51200 bytes)
+    if (file.size > 51200) {
+      setFileError("File size must be less than 50KB");
+      toast("File size must be less than 50KB", {
+        type: "error",
+        position: "top-right",
+      });
+      return false;
+    }
+
+    setFileError("");
+    return true;
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (validateFile(file)) {
+      setSelectedFile(file);
+
+      // Create preview for images
+      if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPreviewUrl(reader.result);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        setPreviewUrl(null);
+      }
+    } else {
+      e.target.value = ""; // Reset file input
+      setSelectedFile(null);
+      setPreviewUrl(null);
+    }
+  };
+
+  const convertToBase64 = async (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result.split(",")[1];
+        resolve(base64String);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const onFinish = async (values) => {
+    setLoading(true);
+    try {
+      let passportBase64 = null;
+      if (selectedFile) {
+        passportBase64 = await convertToBase64(selectedFile);
+      }
+
+      // Construct payload
+      const payload = {
+        ...values,
+        passport: passportBase64,
+      };
+
+      const response = await fetch(
+        `${config.apiBaseUrl}${config.endpoints.enrollment}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        await Swal.fire({
+          icon: "success",
+          title: "Enrollment Successful!",
+          text: "Your enrollment has been submitted successfully.",
+          confirmButtonColor: "#f59e0b",
+        });
+
+        // Reset form and previews
+        form.resetFields();
+        setPreviewUrl(null);
+        setSelectedFile(null);
+      } else {
+        throw new Error(data.message || "Enrollment failed");
+      }
+    } catch (error) {
+      console.error("Enrollment error:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Enrollment Failed",
+        text: error.message || "Failed to submit enrollment. Please try again.",
+        confirmButtonColor: "#f59e0b",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch states and LGAs
   useEffect(() => {
     fetch("https://nga-states-lga.onrender.com/fetch")
       .then((res) => res.json())
@@ -29,284 +149,240 @@ function Enrollment() {
       .catch(() => setStates([]));
   }, []);
 
-  // Fetch LGAs when state changes
-  useEffect(() => {
-    if (form.stateOfOrigin) {
-      fetch(`https://nga-states-lga.onrender.com/?state=${form.stateOfOrigin}`)
+  const handleStateChange = (value) => {
+    form.setFieldsValue({ localOfOrigin: undefined });
+    if (value) {
+      fetch(`https://nga-states-lga.onrender.com/?state=${value}`)
         .then((res) => res.json())
         .then((data) => setLgas(data))
         .catch(() => setLgas([]));
     } else {
       setLgas([]);
     }
-  }, [form.stateOfOrigin]);
-
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: files ? files[0] : value,
-      // Reset LGA if state changes
-      ...(name === "stateOfOrigin" ? { localOfOrigin: "" } : {}),
-    }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Submit logic here
-    alert("Enrollment submitted!");
   };
 
   return (
     <div className="w-full rounded-2xl mb-5 bg-white p-5 shadow-lg">
+      <ToastContainer />
       <p className="text-[16px] text-gray-500">Enrollment</p>
-      <div className="ml-7 ">
-        <p className="text-[16px] mt-7 font-semibold text-gray-500">
+      <div className="ml-7">
+        <p className="text-[16px] mt-7 mb-5 font-semibold text-gray-500">
           Enrollment for non appearance
         </p>
-        <form onSubmit={handleSubmit} className="space-y-4 mt-3">
-          <div>
-            <label
-              htmlFor="enrollmentType"
-              className="block text-[14px] text-gray-500 mb-1 mt-5 "
-            >
-              ENROLLMENT TYPE
-            </label>
-            <select
-              id="enrollmentType"
-              name="enrollmentType"
-              value={form.enrollmentType}
-              onChange={handleChange}
-              required
-              className="pl-5 py-2 border border-gray-300 focus:border-gray-200 rounded-[6px] w-full max-w-md h-[40px] text-gray-500"
-            >
-              <option value="" className="text-gray-500">
-                -- Select an Option --
-              </option>
-              <option value="7000" className="text-gray-500">
-                Adult Enrollment @ ₦7,000
-              </option>
-              <option value="4000" className="text-gray-500">
-                Child Enrollment @ ₦4,000
-              </option>
-              <option value="4000" className="text-gray-500">
-                Old Slip Enrollment @ ₦4,000
-              </option>
-            </select>
-          </div>
-          <div>
-            <label
-              htmlFor="firstName"
-              className="block text-[14px] text-gray-500 mb-1 "
-            >
-              FIRST NAME
-            </label>
-            <input
-              id="firstName"
-              type="text"
-              className="pl-5 py-2 border border-gray-300 focus:border-gray-200 rounded-[6px] w-full max-w-md h-[40px]"
-              placeholder="First Name"
-              required
-              name="firstName"
-              value={form.firstName}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="middleName"
-              className="block text-[14px] text-gray-500 mb-1 "
-            >
-              MIDDLE NAME
-            </label>
-            <input
-              id="middleName"
-              type="text"
-              className="pl-5 py-2 border border-gray-300 focus:border-gray-200 rounded-[6px] w-full max-w-md h-[40px]"
-              placeholder="Middle Name"
-              name="middleName"
-              value={form.middleName}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="surname"
-              className="block text-[14px] text-gray-500 mb-1 "
-            >
-              SURNAME
-            </label>
-            <input
-              id="surname"
-              type="text"
-              className="pl-5 py-2 border border-gray-300 focus:border-gray-200 rounded-[6px] w-full max-w-md h-[40px]"
-              placeholder="Surname"
-              required
-              name="surname"
-              value={form.surname}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="dob"
-              className="block text-[14px] text-gray-500 mb-1 "
-            >
-              DATE OF BIRTH
-            </label>
-            <input
-              id="dob"
-              type="date"
-              className="pl-5 py-2 border text-gray-500 border-gray-300 focus:border-gray-200 rounded-[6px] w-full max-w-md h-[40px]"
-              placeholder="Date of Birth"
-              required
-              name="dob"
-              value={form.dob}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="stateOfOrigin"
-              className="block text-[14px] text-gray-500 mb-1 "
-            >
-              STATE OF ORIGIN
-            </label>
-            <select
-              id="stateOfOrigin"
-              name="stateOfOrigin"
-              value={form.stateOfOrigin}
-              onChange={handleChange}
-              required
-              className="pl-5 py-2 border border-gray-300 focus:border-gray-200 rounded-[6px] w-full max-w-md h-[40px] text-gray-500"
-            >
-              <option value="">-- Select State of Origin --</option>
-              {states.map((state, idx) => (
-                <option key={idx} value={state}>
-                  {state}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label
-              htmlFor="localOfOrigin"
-              className="block text-[14px] text-gray-500 mb-1 "
-            >
-              LGA OF ORIGIN
-            </label>
-            <select
-              id="localOfOrigin"
-              name="localOfOrigin"
-              value={form.localOfOrigin}
-              onChange={handleChange}
-              required
-              disabled={!form.stateOfOrigin}
-              className="pl-5 py-2 border border-gray-300 focus:border-gray-200 rounded-[6px] w-full max-w-md h-[40px] text-gray-500"
-            >
-              <option value="">-- Select LGA of Origin --</option>
-              {lgas.map((lga, idx) => (
-                <option key={idx} value={lga}>
-                  {lga}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label
-              htmlFor="phone"
-              className="block text-[14px] text-gray-500 mb-1 "
-            >
-              PHONE NUMBER
-            </label>
-            <input
-              id="phone"
-              type="tel"
-              className="pl-5 py-2 border border-gray-300 focus:border-gray-200 rounded-[6px] w-full max-w-md h-[40px]"
-              placeholder="Phone Number"
-              required
-              name="phone"
-              value={form.phone}
-              onChange={handleChange}
-              inputMode="numeric"
-              pattern="\d{11}"
-              maxLength="11"
-              title="Phone number must be exactly 11 digits"
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="gender"
-              className="block text-[14px] text-gray-500 mb-1 "
-            >
-              GENDER
-            </label>
-            <select
-              id="gender"
-              name="gender"
-              value={form.gender}
-              onChange={handleChange}
-              required
-              className="pl-5 text-gray-500 py-2 border border-gray-300 focus:border-gray-200 rounded-[6px] w-full max-w-md h-[40px]"
-            >
-              <option value="">-- Select Gender --</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-            </select>
-          </div>
-          <div>
-            <label
-              htmlFor="height"
-              className="block text-[14px] text-gray-500 mb-1 "
-            >
-              HEIGHT (CM)
-            </label>
-            <input
-              id="height"
-              type="number"
-              className="pl-5 py-2 border border-gray-300 focus:border-gray-200 rounded-[6px] w-full max-w-md h-[40px]"
-              placeholder="Height (cm)"
-              required
-              name="height"
-              value={form.height}
-              onChange={handleChange}
-              min="0"
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="file-upload"
-              className="block text-[14px] text-gray-500 mb-1 "
-            >
-              UPLOAD FILE
-            </label>
-            <div className="w-full max-w-md h-[40px] flex items-center border border-gray-300 rounded-[6px] focus-within:border-gray-200 bg-white overflow-hidden">
-              <label
-                htmlFor="file-upload"
-                className="flex-1/4 bg-gray-100  hover:bg-gray-200 cursor-pointer pl-1  py-2 md:pl-2 pr-0 text-gray-500 border-r border-gray-300"
-              >
-                <input
-                  id="file-upload"
-                  type="file"
-                  name="file"
-                  onChange={handleChange}
-                  className="hidden"
-                  required
-                />
-                <span className="text-[12px] md:text-[15px]">Choose file</span>
-              </label>
-              <span className="flex-3/4 pl-3 text-gray-600 text-sm truncate pr-2">
-                {form.file ? form.file.name : "No file has been chosen"}
-              </span>
-            </div>
-          </div>
-          <button
-            type="submit"
-            className="w-full max-w-md h-[40px] bg-amber-500 text-white rounded-[6px] font-semibold mt-3"
+        <Form form={form} onFinish={onFinish} layout="vertical" className="">
+          <Form.Item
+            size="large"
+            name="enrollmentType"
+            label="ENROLLMENT TYPE"
+            rules={[
+              { required: true, message: "Please select enrollment type" },
+            ]}
           >
-            Submit
-          </button>
-        </form>
+            <Select placeholder="-- Select an Option --">
+              <Select.Option value="7000">
+                Adult Enrollment @ ₦7,000
+              </Select.Option>
+              <Select.Option value="4000">
+                Child Enrollment @ ₦4,000
+              </Select.Option>
+              <Select.Option value="4000">
+                Old Slip Enrollment @ ₦4,000
+              </Select.Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            size="large"
+            name="firstName"
+            label="FIRST NAME"
+            rules={[{ required: true, message: "Please input first name" }]}
+          >
+            <Input placeholder="First Name" />
+          </Form.Item>
+
+          <Form.Item size="large" name="middleName" label="MIDDLE NAME">
+            <Input placeholder="Middle Name" />
+          </Form.Item>
+
+          <Form.Item
+            size="large"
+            name="surname"
+            label="SURNAME"
+            rules={[{ required: true, message: "Please input surname" }]}
+          >
+            <Input placeholder="Surname" />
+          </Form.Item>
+
+          <Form.Item
+            size="large"
+            name="dob"
+            label="DATE OF BIRTH"
+            rules={[{ required: true, message: "Please select date of birth" }]}
+          >
+            <DatePicker className="w-full" />
+          </Form.Item>
+
+          <Form.Item
+            size="large"
+            name="stateOfOrigin"
+            label="STATE OF ORIGIN"
+            rules={[
+              { required: true, message: "Please select state of origin" },
+            ]}
+          >
+            <Select
+              placeholder="-- Select State of Origin --"
+              onChange={handleStateChange}
+            >
+              {states.map((state) => (
+                <Select.Option key={state} value={state}>
+                  {state}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            size="large"
+            name="localOfOrigin"
+            label="LGA OF ORIGIN"
+            rules={[{ required: true, message: "Please select LGA of origin" }]}
+          >
+            <Select placeholder="-- Select LGA of Origin --">
+              {lgas.map((lga) => (
+                <Select.Option key={lga} value={lga}>
+                  {lga}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            size="large"
+            name="phone"
+            label="PHONE NUMBER"
+            rules={[
+              { required: true, message: "Please input phone number" },
+              {
+                pattern: /^\d{11}$/,
+                message: "Phone number must be 11 digits",
+              },
+            ]}
+          >
+            <Input placeholder="Phone Number" maxLength={11} />
+          </Form.Item>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Form.Item
+              size="large"
+              name="gender"
+              label="GENDER"
+              rules={[{ required: true, message: "Please select gender" }]}
+            >
+              <Select placeholder="-- Select Gender --">
+                <Select.Option value="male">Male</Select.Option>
+                <Select.Option value="female">Female</Select.Option>
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              size="large"
+              name="height"
+              label="HEIGHT (CM)"
+              rules={[{ required: true, message: "Please input height" }]}
+            >
+              <InputNumber
+                className="w-full"
+                min={0}
+                placeholder="Height (cm)"
+              />
+            </Form.Item>
+          </div>
+
+          <Form.Item
+            size="large"
+            name="passport"
+            label="Passport Photograph"
+            className="my-5"
+            rules={[
+              {
+                required: true,
+                validator: (_, value) => {
+                  if (!selectedFile) {
+                    return Promise.reject(
+                      "Please upload a passport photograph"
+                    );
+                  }
+                  return Promise.resolve();
+                },
+              },
+            ]}
+          >
+            <div className="space-y-2">
+              <div className="flex items-center justify-center w-full">
+                <label className="w-full mt-5 flex flex-col items-center px-4 py-6 bg-white rounded-lg border-2 border-dashed border-gray-300 cursor-pointer hover:bg-gray-50">
+                  <div className="space-y-1 text-center">
+                    <svg
+                      className="mx-auto h-12 w-12 text-gray-400"
+                      stroke="currentColor"
+                      fill="none"
+                      viewBox="0 0 48 48"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                        strokeWidth={2}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </div>
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept=".jpg,.jpeg,.png,.pdf"
+                    onChange={handleFileChange}
+                  />
+                </label>
+              </div>
+
+              {fileError && (
+                <p className="mt-1 text-sm text-red-600">{fileError}</p>
+              )}
+
+              {previewUrl && (
+                <div className="mt-5 relative">
+                  <img
+                    src={previewUrl}
+                    alt="Preview"
+                    className="max-w-[100px] max-h-[100px] object-contain rounded border border-gray-200"
+                  />
+                </div>
+              )}
+
+              <div className="text-xs text-gray-500 mt-2">
+                File requirements:
+                <ul className="list-disc ml-4 mt-1">
+                  <li>Maximum file size: 50KB</li>
+                  <li>Allowed file types: JPG, JPEG, PNG, PDF</li>
+                  <li>Recent passport photograph with white background</li>
+                </ul>
+              </div>
+            </div>
+          </Form.Item>
+
+          <Form.Item size="large">
+            <Button
+              type="primary"
+              size="large"
+              htmlType="submit"
+              className="w-full flex items-center bg-amber-500 mt-[-5px]"
+              loading={loading}
+            >
+              Submit Enrollment
+            </Button>
+          </Form.Item>
+        </Form>
       </div>
     </div>
   );

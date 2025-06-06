@@ -18,7 +18,7 @@ import { useNavigate } from "react-router-dom";
 
 function BVNVerify() {
   /* ---------------------------------- data --------------------------------- */
-  const cardVerify = [{ label: "BANK VERIFICATION NUMBER", value: "BVN" }];
+  const cardVerify = [{ label: "BANK VERIFICATION NUMBER", value: "bvn" }];
 
   const cardSlip = [
     { label: "Basic Details", value: "Basic", price: 0 },
@@ -26,7 +26,7 @@ function BVNVerify() {
   ];
 
   /* ---------------------------- component state ---------------------------- */
-  const [selectedVerify, setSelectedVerify] = useState(""); // unselected by default
+  const [selectedVerify, setSelectedVerify] = useState("bvn"); // unselected by default
   const [selectedSlip, setSelectedSlip] = useState(""); // unselected by default
   const [bvn, setBvn] = useState("");
   const [showSlip, setShowSlip] = useState(false);
@@ -179,7 +179,7 @@ function BVNVerify() {
             >
               <input
                 type="radio"
-                name="verifyWith"
+                name="bvn"
                 value={value}
                 checked={selectedVerify === value}
                 onChange={() => setSelectedVerify(value)}

@@ -24,7 +24,6 @@ function NIN() {
   const cardVerify = [
     { label: "NIN", value: "nin" },
     { label: "VNIN", value: "vnin" },
-    { label: "DOC", value: "doc" },
   ];
 
   const cardSlip = [
@@ -179,7 +178,7 @@ function NIN() {
         <p className="mt-7 text-[14px] text-gray-500">1. Verify With</p>
         <hr className="my-5 border-gray-200" />
 
-        <div className="grid gap-6 p-4 sm:grid-cols-2 md:grid-cols-3">
+        <div className="grid gap-6 p-4 sm:grid-cols-2 md:grid-cols-2">
           {cardVerify.map(({ label, value }) => (
             <label
               key={value}

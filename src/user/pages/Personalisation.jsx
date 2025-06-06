@@ -18,15 +18,15 @@ function NIN() {
   const navigate = useNavigate();
 
   /* ---------------------------------- data --------------------------------- */
-  const cardVerify = [{ label: "TRACKING ID", value: "tracking" }];
+  const cardVerify = [{ label: "TRACKING ID", value: "trackingId" }];
 
   const cardSlip = [
-    { label: "Regular Slip", value: "Regular", image: RegularImg, price: 300 },
+    { label: "Regular Slip", value: "regular", image: RegularImg, price: 200 },
   ];
 
   /* ---------------------------- component state ---------------------------- */
-  const [selectedVerify, setSelectedVerify] = useState(""); // unselected by default
-  const [selectedSlip, setSelectedSlip] = useState(""); // unselected by default
+  const [selectedVerify, setSelectedVerify] = useState("trackingId"); // unselected by default
+  const [selectedSlip, setSelectedSlip] = useState("regular"); // unselected by default
   const [formData, setFormData] = useState({
     nin: "",
     pin: "", // Add PIN to formData

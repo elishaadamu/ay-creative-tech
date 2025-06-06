@@ -22,7 +22,7 @@ function NINPhone() {
   ];
 
   /* ---------------------------- component state ---------------------------- */
-  const [selectedVerify, setSelectedVerify] = useState(""); // unselected by default
+  const [selectedVerify, setSelectedVerify] = useState("nin"); // Select "nin" by default
   const [selectedSlip, setSelectedSlip] = useState(""); // unselected by default
 
   /* --------------------------------- render -------------------------------- */
@@ -34,7 +34,7 @@ function NINPhone() {
         <p className="mt-7 text-[14px] text-gray-500">1. Verify With</p>
         <hr className="my-5 border-gray-200" />
 
-        <div className="grid gap-6 p-4 sm:grid-cols-2 md:grid-cols-1">
+        <div className="grid gap-6 p-4 sm:grid-cols-2 md:grid-cols-2">
           {cardVerify.map(({ label, value }) => (
             <label
               key={value}
