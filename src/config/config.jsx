@@ -14,6 +14,8 @@ export const config = {
     checkPin: "/virtualAccount/checkPin",
     dataSubscription: "/vtu/data",
     airtimeSubscription: "/vtu/airtime",
+    dataHistory: "/vtu/airtime",
+    airtimeHistory: "/vtu/airtime",
     ipe: "/verify/ipe",
     cacRegistration: "/cac/register",
     bankAgentRegistration: "/bvn/register",

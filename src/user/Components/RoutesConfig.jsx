@@ -24,6 +24,10 @@ import CAC from "../pages/CAC";
 import BankAgency from "../pages/BankAgency";
 import BVNLicence from "../pages/Licence";
 import Modification from "../pages/Modification";
+import DataHistory from "../pages/History/HistoryData";
+import AirtimeHistory from "../pages/History/AirtimeHistory";
+import Personalisation from "../pages/Personalisation";
+import AllHistory from "../pages/AllHistory";
 
 function RoutesConfig() {
   return (
@@ -51,6 +55,10 @@ function RoutesConfig() {
         <Route path="/bank-agency" element={<BankAgency />} />
         <Route path="/bvn-licence" element={<BVNLicence />} />
         <Route path="/modification" element={<Modification />} />
+        <Route path="/data-history" element={<DataHistory />} />
+        <Route path="/airtime-history" element={<AirtimeHistory />} />
+        <Route path="/personalisation" element={<Personalisation />} />
+        <Route path="/all-history" element={<AllHistory />} />
         {/* Catch-all route for 404 Not Found */}
         <Route path="*" element={<NotFound />} />
       </Routes>

@@ -1,6 +1,6 @@
 import * as React from "react";
 import axios from "axios";
-import { config } from "../../config/config.jsx";
+import { config } from "../../../config/config.jsx";
 import CryptoJS from "crypto-js";
 import { format } from "date-fns"; // Add this import for date formatting
 import DatePicker from "react-datepicker";
@@ -47,6 +47,8 @@ export default function VerificationsHistoryTable() {
   });
   const [isModalVisible, setIsModalVisible] = React.useState(false);
   const [selectedTransaction, setSelectedTransaction] = React.useState(null);
+  const [pageSize, setPageSize] = React.useState(10);
+  const [currentPage, setCurrentPage] = React.useState(1);
 
   const fetchVerificationHistory = async () => {
     if (!userId) return;
@@ -59,7 +61,7 @@ export default function VerificationsHistoryTable() {
           "Content-Type": "application/json",
         },
       });
-      console.log("Response data:", response.data?.transactions || []);
+
       setApiData(response.data.transactions || []);
     } catch (error) {
       console.error("Error fetching verification history:", error);
@@ -73,8 +75,9 @@ export default function VerificationsHistoryTable() {
     const searchStr = searchTerm.toLowerCase();
     const transactionDate = new Date(transaction.createdAt);
 
-    // Only include credit transactions
-    const isCreditTransaction = transaction.type === "credit";
+    // Only include Data-Purchase transactions
+    const isDataTransaction =
+      transaction.description?.includes("Data purchase");
 
     // Date filter
     const passesDateFilter =
@@ -88,7 +91,7 @@ export default function VerificationsHistoryTable() {
       transaction.status?.toLowerCase().includes(searchStr) ||
       transaction.description?.toLowerCase().includes(searchStr);
 
-    return isCreditTransaction && passesDateFilter && passesSearchFilter;
+    return isDataTransaction && passesDateFilter && passesSearchFilter;
   });
 
   const sortData = (key) => {
@@ -157,10 +160,18 @@ export default function VerificationsHistoryTable() {
 
   const sortedTransactions = getSortedData(filteredTransactions);
 
+  // Add this after sortedTransactions declaration
+  const paginatedData = sortedTransactions.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  const totalPages = Math.ceil(sortedTransactions.length / pageSize);
+
   return (
     <div className="p-4 w-full">
       <h2 className="text-[clamp(1.2rem,2vw,2rem)] font-bold mb-4">
-        Funding History
+        Data History
       </h2>
 
       {/* Search and Date Filter Controls */}
@@ -195,7 +206,7 @@ export default function VerificationsHistoryTable() {
       {!loading && sortedTransactions.length > 0 ? (
         <div className="relative overflow-hidden rounded-lg border border-gray-200 shadow">
           <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-            <table className="w-full table-auto divide-y divide-gray-200">
+            <table className="w-full table-auto divide-y divide-gray-200 transition-all duration-300 ease-in-out">
               <thead className="bg-gray-50">
                 <tr>
                   <TableHeader
@@ -204,9 +215,14 @@ export default function VerificationsHistoryTable() {
                     className="w-[clamp(80px,15vw,112px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
                   />
                   <TableHeader
-                    label="Type"
-                    sortKey="type"
+                    label="Phone Number"
+                    sortKey="accountNumber"
                     className="w-[clamp(120px,20vw,160px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
+                  />
+                  <TableHeader
+                    label="Amount"
+                    sortKey="amount"
+                    className="w-[clamp(80px,15vw,112px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
                   />
                   <TableHeader
                     label="Status"
@@ -219,7 +235,7 @@ export default function VerificationsHistoryTable() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {sortedTransactions.map((transaction, index) => (
+                {paginatedData.map((transaction, index) => (
                   <tr
                     key={transaction._id || index}
                     className="hover:bg-gray-50 transition-colors"
@@ -230,16 +246,11 @@ export default function VerificationsHistoryTable() {
                         "dd/MM/yyyy HH:mm"
                       )}
                     </td>
-                    <td className="w-[clamp(120px,20vw,160px)] px-2 py-2 whitespace-nowrap">
-                      <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[clamp(0.65rem,1vw,0.75rem)] font-medium capitalize ${
-                          transaction.type === "credit"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {transaction.type}
-                      </span>
+                    <td className="w-[clamp(120px,20vw,160px)] px-2 py-2 whitespace-nowrap text-[clamp(0.8rem,1vw,0.75rem)] text-gray-900">
+                      {transaction.accountNumber}
+                    </td>
+                    <td className="w-[clamp(80px,15vw,112px)] px-2 py-2 whitespace-nowrap text-[clamp(0.8rem,1vw,0.75rem)] text-gray-900">
+                      ₦{transaction.amount.toLocaleString()}
                     </td>
                     <td className="w-[clamp(120px,20vw,160px)] px-2 py-2 whitespace-nowrap">
                       <span
@@ -273,13 +284,87 @@ export default function VerificationsHistoryTable() {
             imageStyle={{ height: 60 }}
             description={
               <div className="text-center">
-                <p className="text-gray-500 text-lg mb-2">No Funding Records</p>
+                <p className="text-gray-500 text-lg mb-2">
+                  No Data Subscription Records
+                </p>
                 <p className="text-gray-400 text-sm">
-                  Your funding history will appear here
+                  Your Data Subscription history will appear here
                 </p>
               </div>
             }
           />
+        </div>
+      )}
+
+      {/* Pagination Controls - Add this section */}
+      {!loading && sortedTransactions.length > 0 && (
+        <div className="mt-4 flex items-center justify-between">
+          <div className="flex items-center space-x-2 wrap">
+            <span className="text-sm text-gray-700">Rows per page:</span>
+            <select
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="border rounded-md px-2 py-1 text-sm transition-colors duration-200 ease-in-out hover:border-blue-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            >
+              {/* <option value={1}>1</option>
+              <option value={3}>3</option> */}
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+            <span className="text-sm text-gray-700 transition-opacity duration-200 ease-in-out">
+              Showing {(currentPage - 1) * pageSize + 1} to{" "}
+              {Math.min(currentPage * pageSize, sortedTransactions.length)} of{" "}
+              {sortedTransactions.length} entries
+            </span>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className={`px-3 py-1 rounded-md transition-all duration-200 ease-in-out transform hover:scale-105 ${
+                currentPage === 1
+                  ? "bg-gray-100 text-gray-400"
+                  : "bg-blue-500 text-white hover:bg-blue-600"
+              }`}
+            >
+              Previous
+            </button>
+
+            <div className="flex items-center space-x-1">
+              {[...Array(totalPages)].map((_, i) => (
+                <button
+                  key={i + 1}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`px-3 py-1 rounded-md transition-all duration-200 ease-in-out transform hover:scale-105 ${
+                    currentPage === i + 1
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-100 hover:bg-gray-200"
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className={`px-3 py-1 rounded-md transition-all duration-200 ease-in-out transform hover:scale-105 ${
+                currentPage === totalPages
+                  ? "bg-gray-100 text-gray-400"
+                  : "bg-blue-500 text-white hover:bg-blue-600"
+              }`}
+            >
+              Next
+            </button>
+          </div>
         </div>
       )}
 
@@ -317,9 +402,15 @@ export default function VerificationsHistoryTable() {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500">Type</p>
-                <p className="mt-1 text-sm text-gray-900">
+                <span
+                  className={`mt-1 text-sm font-medium capitalize px-2 py-0.5 rounded-full inline-block ${
+                    selectedTransaction.type === "credit"
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800"
+                  }`}
+                >
                   {selectedTransaction.type}
-                </p>
+                </span>
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500">Status</p>
@@ -327,10 +418,10 @@ export default function VerificationsHistoryTable() {
                   className={`mt-1 text-sm font-medium capitalize px-1  rounded-md inline-block
     ${
       selectedTransaction.status === "success"
-        ? "bg-green-400 text-gray-900"
+        ? "bg-green-100 text-green-800"
         : selectedTransaction.status === "pending"
-        ? "bg-blue-100 text-blue-400"
-        : "bg-red-100 text-red-400"
+        ? "bg-blue-100 text-blue-800"
+        : "bg-red-100 text-red-800"
     }`}
                 >
                   {selectedTransaction.status}

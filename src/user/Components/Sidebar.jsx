@@ -26,6 +26,8 @@ import { IoEnterSharp } from "react-icons/io5";
 import { MdOutlineSubscriptions } from "react-icons/md";
 import { MdContactPhone } from "react-icons/md";
 import { FaPersonCircleCheck } from "react-icons/fa6";
+import { MdDataThresholding } from "react-icons/md";
+import { FaPhone } from "react-icons/fa";
 
 const sidebarSections = [
   {
@@ -40,7 +42,7 @@ const sidebarSections = [
     ],
   },
   {
-    section: "VERIFICATIONS",
+    section: "SERVICES",
     links: [
       {
         to: "/dashboard/verifications/nin",
@@ -88,6 +90,11 @@ const sidebarSections = [
         label: "IPE Clearance",
       },
       {
+        to: "/dashboard/personalisation",
+        icon: <FaLeaf className="w-5 h-5" />,
+        label: "Personalisation",
+      },
+      {
         to: "/dashboard/data",
         icon: <MdOutlineSubscriptions className="w-5 h-5" />,
         label: "Data Subscription",
@@ -103,6 +110,11 @@ const sidebarSections = [
     section: "SUMMARY AND HISTORY",
     links: [
       {
+        to: "/dashboard/all-history",
+        icon: <FiClock className="w-5 h-5" />,
+        label: "All History",
+      },
+      {
         to: "/dashboard/fundinghistory",
         icon: <FiFileText className="w-5 h-5" />,
         label: "Funding History",
@@ -111,6 +123,16 @@ const sidebarSections = [
         to: "/dashboard/verificationhistory",
         icon: <MdHistory className="w-5 h-5" />,
         label: "Verifications History",
+      },
+      {
+        to: "/dashboard/data-history",
+        icon: <MdDataThresholding className="w-5 h-5" />,
+        label: "Data History",
+      },
+      {
+        to: "/dashboard/airtime-history",
+        icon: <FaPhone className="w-5 h-5" />,
+        label: "Airtime History",
       },
       {
         to: "/dashboard/ipe-history", // This should match the route path above

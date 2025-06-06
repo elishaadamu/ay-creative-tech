@@ -187,13 +187,13 @@ function Dashboard() {
       id: 4,
       name: "MODIFICATION",
       icon: NIMC,
-      to: "/pvc-verify",
+      to: "/dashboard/modification",
     },
     {
       id: 5,
       name: "PERSONALIZATION",
       icon: NIMC,
-      to: "/passport",
+      to: "/dashboard/personalisation",
     },
     {
       id: 6,
@@ -247,7 +247,7 @@ function Dashboard() {
       id: 14,
       name: "BANK AGENCY",
       icon: Bank,
-      to: "/verification",
+      to: "/dashboard/bank-agency",
     },
   ];
 
@@ -263,56 +263,33 @@ function Dashboard() {
 
   const [showBalance, setShowBalance] = useState(true);
   const [verificationCount, setVerificationCount] = useState(0);
+  const [loadingVerifications, setLoadingVerifications] = useState(true); // Add this state variable at the top with other state declarations
 
-  // Add this new useEffect for fetching verification counts
+  // Update the useEffect for fetching verification counts
   useEffect(() => {
     const fetchVerificationCount = async () => {
       if (!userId) return;
 
+      setLoadingVerifications(true);
       try {
-        // Fetch both BVN and NIN verification histories
-        const [bvnResponse, ninResponse] = await Promise.all([
-          axios.get(
-            `${config.apiBaseUrl}${config.endpoints.VerificationHistory}${userId}`,
-            {
-              withCredentials: true,
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          ),
-          axios.get(
-            `${config.apiBaseUrl}${config.endpoints.VerificationHistory}${userId}`,
-            {
-              withCredentials: true,
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          ),
-        ]);
+        const response = await axios.get(
+          `${config.apiBaseUrl}${config.endpoints.VerificationHistory}${userId}`,
+          {
+            withCredentials: true,
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
-        // Filter and count successful verifications
-        const bvnCount =
-          bvnResponse.data.transactions?.filter(
-            (transaction) =>
-              transaction.TransactionType === "BVN-Verification" &&
-              transaction.status === "success"
-          ).length || 0;
-
-        const ninCount =
-          ninResponse.data.transactions?.filter(
-            (transaction) =>
-              transaction.TransactionType === "NIN-Verification" &&
-              transaction.status === "success"
-          ).length || 0;
-
-        // Set total verification count
-        const totalCount = bvnCount + ninCount;
+        const totalCount = response.data.count || 0;
+        console.log("Total transactions:", totalCount);
         setVerificationCount(totalCount);
       } catch (error) {
         console.error("Error fetching verification count:", error);
         setVerificationCount(0);
+      } finally {
+        setLoadingVerifications(false);
       }
     };
 
@@ -455,7 +432,7 @@ function Dashboard() {
               {dropdownOpen && (
                 <div className="absolute right-full top-1/2 -translate-y-1/2 mr-2 mt-[30px] bg-gray-50 shadow-lg rounded-md py-2 px-4 z-50 min-w-[120px]">
                   <NavLink
-                    to="/dashboard/verificationhistory"
+                    to="/dashboard/all-history"
                     className="block text-gray-700 hover:text-amber-600 py-1"
                     onClick={() => setDropdownOpen(false)}
                   >
@@ -468,8 +445,16 @@ function Dashboard() {
           <p className="text-gray-500 text-[16px] mt-8 font-normal">
             Verifications History
           </p>
-          <p className="text-gray-500 text-[24px] mt-2 font-bold">
-            {verificationCount}
+          <p className="mt-2">
+            {loadingVerifications ? (
+              <span className="text-amber-400 text-[18px] font-bold">
+                Loading...
+              </span>
+            ) : (
+              <span className="text-gray-500 text-[24px] font-bold">
+                {verificationCount}
+              </span>
+            )}
           </p>
         </div>
       </div>
