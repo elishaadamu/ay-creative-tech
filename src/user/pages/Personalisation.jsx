@@ -21,14 +21,14 @@ function NIN() {
   const cardVerify = [{ label: "TRACKING ID", value: "trackingId" }];
 
   const cardSlip = [
-    { label: "Regular Slip", value: "regular", image: RegularImg, price: 200 },
+    { label: "Regular Slip", value: "regular", image: RegularImg, price: 1 },
   ];
 
   /* ---------------------------- component state ---------------------------- */
   const [selectedVerify, setSelectedVerify] = useState("trackingId"); // unselected by default
   const [selectedSlip, setSelectedSlip] = useState("regular"); // unselected by default
   const [formData, setFormData] = useState({
-    nin: "",
+    trackingId: "", // Initialize with empty string
     pin: "", // Add PIN to formData
   });
   const [loading, setLoading] = useState(false);
@@ -64,7 +64,7 @@ function NIN() {
     }
 
     // Fixed price for Regular Slip
-    const slipAmount = 300;
+    const slipAmount = 1;
 
     // Show confirmation dialog
     const result = await Swal.fire({
@@ -102,10 +102,10 @@ function NIN() {
       pin: formData.pin,
     };
 
-    console.log("payload", payload);
+    console.log("payload:", payload);
     try {
       const response = await axios.post(
-        `${config.apiBaseUrl}${config.endpoints.NINVerify}`,
+        `${config.apiBaseUrl}${config.endpoints.Personalisation}`,
         payload,
         {
           withCredentials: true,
@@ -162,7 +162,7 @@ function NIN() {
         <p className="mt-7 text-[14px] text-gray-500">1. Verify With</p>
         <hr className="my-5 border-gray-200" />
 
-        <div className="grid gap-6 p-4 sm:grid-cols-2 md:grid-cols-1">
+        <div className="grid gap-6 p-4 sm:grid-cols-1 md:grid-cols-1">
           {cardVerify.map(({ label, value }) => (
             <label
               key={value}
@@ -207,7 +207,7 @@ function NIN() {
         <p className="mt-7 text-[14px] text-gray-500">2. Slip Layout</p>
         <hr className="my-5 border-gray-200" />
 
-        <div className="grid gap-6 p-4 sm:grid-cols-2 md:grid-cols-1">
+        <div className="grid gap-6 p-4 sm:grid-cols-1 md:grid-cols-1">
           {cardSlip.map(({ label, value, image, price }) => (
             <label
               key={value}
@@ -271,7 +271,7 @@ function NIN() {
             placeholder="TRACKING ID"
             required
             name="trackingId"
-            value={formData.trackingId}
+            value={formData.trackingId || ""} // Provide fallback empty string
             onChange={handleInputChange}
             inputMode="text"
             autoComplete="off"
@@ -291,7 +291,7 @@ function NIN() {
                 placeholder="Enter 4-digit Transaction PIN"
                 required
                 name="pin"
-                value={formData.pin}
+                value={formData.pin || ""} // Provide fallback empty string
                 onChange={handleInputChange}
                 inputMode="numeric"
                 maxLength="4"

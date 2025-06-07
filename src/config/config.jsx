@@ -21,5 +21,6 @@ export const config = {
     bankAgentRegistration: "/bvn/register",
     bvnLicenceRegistration: "/bvn/licence",
     Modification: "/modify/register",
+    Personalisation: "/verify/personalisation",
   },
 };
