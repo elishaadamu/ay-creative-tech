@@ -12,7 +12,7 @@ function BasicBVN({ apiData }) {
 
   // Example: apiData = { data: { ...fields }, ... }
   const user = apiData || {};
-
+  console.log("User Data:", user);
   const handlePrint = () => {
     toast.info("Printing BVN Slip...", { autoClose: 2000 });
     const prevTitle = document.title;

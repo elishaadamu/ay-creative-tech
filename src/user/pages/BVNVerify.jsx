@@ -154,7 +154,7 @@ function BVNVerify() {
   }
 
   if (showSlip && selectedSlip === "Advanced") {
-    return <AdvancedBVNSlip />;
+    return <AdvancedBVNSlip apiData={apiData} />; // Add the apiData prop here
   }
 
   /* --------------------------------- render -------------------------------- */

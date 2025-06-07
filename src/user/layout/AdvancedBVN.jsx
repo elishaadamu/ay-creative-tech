@@ -8,11 +8,17 @@ import { BsFillHandIndexThumbFill } from "react-icons/bs";
 
 function AdvancedBVNSlip({ apiData }) {
   useEffect(() => {
+    console.log("Advanced BVN Data:", apiData); // Debug log
     toast.success("BVN verified successfully!");
-  }, []);
+  }, [apiData]);
 
   // Get user data from props with fallback
-  const user = apiData || {};
+  const user = apiData?.data || apiData || {};
+
+  // Use base64 image if available, else fallback
+  const avatarSrc = user.base64Image
+    ? `data:image/jpeg;base64,${user.base64Image}`
+    : Avatar;
 
   const handlePrint = () => {
     toast.info("Printing BVN Slip...", { autoClose: 2000 });
@@ -25,11 +31,6 @@ function AdvancedBVNSlip({ apiData }) {
       }, 1000);
     }, 1200);
   };
-
-  // Use base64 image if available, else fallback
-  const avatarSrc = user.base64Image
-    ? `data:image/jpeg;base64,${user.base64Image}`
-    : Avatar;
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-6">
@@ -44,7 +45,7 @@ function AdvancedBVNSlip({ apiData }) {
 
       {/* Print styles */}
 
-      <div className="w-full max-w-2xl bg-white shadow-lg rounded-lg px-12 py-7 print-slip relative">
+      <div className="w-full max-w-2xl bg-white border border-1 shadow-lg rounded-lg px-12 py-7 print-slip relative">
         <div className="flex items-center mb-4">
           <img src={BVNlogo} alt="BVN Logo" className="w-70 h-40 mr-4" />
         </div>
@@ -110,9 +111,9 @@ function AdvancedBVNSlip({ apiData }) {
             <img
               src={Fingerprint}
               alt="Fingerprint"
-              className="w-45 h-70 mr-4"
+              className="w-42 h-65 mr-4"
             />
-            <p className="text-green-600 text-[25px] ml-[-20px] text-center font-semibold">
+            <p className="text-green-600 text-[20px] ml-[-20px] text-center font-semibold">
               NGA
             </p>
           </div>
@@ -139,6 +140,7 @@ function AdvancedBVNSlip({ apiData }) {
               margin: 0 !important;
               box-shadow: none !important;
               background: white !important;
+              border: 1px solid #ccc !important;
             }
             .no-print {
               display: none !important;
