@@ -45,7 +45,7 @@ function AdvancedBVNSlip({ apiData }) {
 
       {/* Print styles */}
 
-      <div className="w-full max-w-2xl bg-white border border-1 shadow-lg rounded-lg px-12 py-7 print-slip relative">
+      <div className="w-full max-w-2xl bg-white border shadow-lg rounded-lg px-12 py-7 print-slip relative">
         <div className="flex items-center mb-4">
           <img src={BVNlogo} alt="BVN Logo" className="w-70 h-40 mr-4" />
         </div>

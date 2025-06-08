@@ -12,6 +12,7 @@ import {
 } from "@heroicons/react/24/solid";
 import { Empty, Modal } from "antd";
 import { InboxOutlined, EyeOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 // Add your secret key for decryption
 const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
@@ -28,6 +29,8 @@ function decryptData(ciphertext) {
 }
 
 export default function VerificationsHistoryTable() {
+  const navigate = useNavigate();
+
   // Get encrypted user data from localStorage
   const encryptedUser = localStorage.getItem("user");
   const user = decryptData(encryptedUser);
@@ -62,7 +65,29 @@ export default function VerificationsHistoryTable() {
         },
       });
 
-      setApiData(response.data.transactions || []);
+      const details = response.data?.findData || [];
+      // console.log("All Verification Details:");
+      // details.forEach((detail, index) => {
+      //   console.log(`Verification ${index + 1}:`, {
+      //     id: detail._id,
+      //     date: detail.createdAt,
+      //     verificationType: detail.verifyWith,
+      //     slipType: detail.slipLayout,
+      //     dataFor: detail.dataFor,
+      //     status: detail.data?.verification?.status,
+      //     reference: detail.data?.verification?.reference,
+      //     endpointName: detail.data?.endpoint_name,
+      //     responseDetail: detail.data?.detail,
+      //     // Additional verification data based on type
+      //     verificationData:
+      //       detail.verifyWith === "nin"
+      //         ? detail.data?.nin_data
+      //         : detail.data?.data,
+      //   });
+      // });
+
+      // Set the API data
+      setApiData(details || []);
     } catch (error) {
       console.error("Error fetching verification history:", error);
     } finally {
@@ -80,13 +105,17 @@ export default function VerificationsHistoryTable() {
       (!startDate || transactionDate >= startDate) &&
       (!endDate || transactionDate <= endDate);
 
-    // Text search filter
+    // Text search filter - updated to match verification data structure
     const passesSearchFilter =
-      transaction.accountNumber?.toLowerCase().includes(searchStr) ||
-      transaction.transactionReference?.toLowerCase().includes(searchStr) ||
-      transaction.status?.toLowerCase().includes(searchStr) ||
-      transaction.type?.toLowerCase().includes(searchStr) ||
-      transaction.description?.toLowerCase().includes(searchStr);
+      transaction.dataFor?.toLowerCase().includes(searchStr) ||
+      transaction.data?.verification?.reference
+        ?.toLowerCase()
+        .includes(searchStr) ||
+      transaction.data?.verification?.status
+        ?.toLowerCase()
+        .includes(searchStr) ||
+      transaction.verifyWith?.toLowerCase().includes(searchStr) ||
+      transaction.data?.detail?.toLowerCase().includes(searchStr);
 
     return passesDateFilter && passesSearchFilter;
   });
@@ -151,6 +180,28 @@ export default function VerificationsHistoryTable() {
     setIsModalVisible(true);
   };
 
+  const handleViewSlip = (transaction) => {
+    const slipType = transaction.slipLayout;
+    const verificationType = transaction.verifyWith;
+    const apiData = transaction.data?.data;
+    console.log("Transaction Data:", apiData);
+    if (verificationType === "nin") {
+      navigate("/dashboard/verifications/ninslip", {
+        state: { userData: transaction.data?.nin_data },
+      });
+    } else if (verificationType === "bvn") {
+      if (slipType === "Basic") {
+        navigate("/dashboard/verifications/basicbvn", {
+          state: { apiData: transaction.data?.data }, // Match the structure from BVNVerify
+        });
+      } else {
+        navigate("/dashboard/verifications/advancedbvn", {
+          state: { apiData: transaction.data?.data?.data }, // Match the structure from BVNVerify
+        });
+      }
+    }
+  };
+
   React.useEffect(() => {
     fetchVerificationHistory();
   }, [userId]);
@@ -212,15 +263,13 @@ export default function VerificationsHistoryTable() {
                     className="w-[clamp(80px,15vw,112px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
                   />
                   <TableHeader
-                    label="Type"
-                    sortKey="type"
+                    label="Data For"
+                    sortKey="dataFor"
                     className="w-[clamp(120px,20vw,160px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
                   />
-                  <TableHeader
-                    label="Status"
-                    sortKey="status"
-                    className="w-[clamp(120px,20vw,160px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
-                  />
+                  <th className="w-[60px] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">
+                    View Slip
+                  </th>
                   <th className="w-[60px] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">
                     Details
                   </th>
@@ -239,26 +288,17 @@ export default function VerificationsHistoryTable() {
                       )}
                     </td>
                     <td className="w-[clamp(120px,20vw,160px)] px-2 py-2 whitespace-nowrap">
-                      <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[clamp(0.65rem,1vw,0.75rem)] font-medium capitalize ${
-                          transaction.type === "credit"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {transaction.type}
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[clamp(0.65rem,1vw,0.75rem)] font-medium capitalize bg-blue-100 text-blue-800">
+                        {transaction.dataFor}
                       </span>
                     </td>
-                    <td className="w-[clamp(120px,20vw,160px)] px-2 py-2 whitespace-nowrap">
-                      <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[clamp(0.65rem,1vw,0.75rem)] font-medium capitalize ${
-                          transaction.status === "success"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
+                    <td className="w-[60px] px-2 py-2 whitespace-nowrap">
+                      <button
+                        onClick={() => handleViewSlip(transaction)}
+                        className="text-green-600 hover:text-green-800 transition-colors"
                       >
-                        {transaction.status}
-                      </span>
+                        <EyeOutlined className="text-lg" />
+                      </button>
                     </td>
                     <td className="w-[60px] px-2 py-2 whitespace-nowrap">
                       <button
@@ -413,7 +453,7 @@ export default function VerificationsHistoryTable() {
 
       {/* Add Modal */}
       <Modal
-        title="Transaction Details"
+        title="Verification Details"
         open={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
         footer={null}
@@ -432,48 +472,43 @@ export default function VerificationsHistoryTable() {
                 </p>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500">Reference</p>
+                <p className="text-sm font-medium text-gray-500">Data For</p>
                 <p className="mt-1 text-sm text-gray-900">
-                  {selectedTransaction.transactionReference}
+                  {selectedTransaction.dataFor}
                 </p>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500">Amount</p>
-                <p className="mt-1 text-sm text-gray-900">
-                  ₦{selectedTransaction.amount.toLocaleString()}
+                <p className="text-sm font-medium text-gray-500">
+                  Verification Type
                 </p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Type</p>
-                <span
-                  className={`mt-1 text-sm font-medium capitalize px-2 py-0.5 rounded-full inline-block ${
-                    selectedTransaction.type === "credit"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-red-100 text-red-800"
-                  }`}
-                >
-                  {selectedTransaction.type}
-                </span>
+                <p className="mt-1 text-sm text-gray-900">
+                  {selectedTransaction.verifyWith}
+                </p>
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500">Status</p>
-                <p
-                  className={`mt-1 text-sm font-medium capitalize px-1  rounded-md inline-block
-    ${
-      selectedTransaction.status === "success"
-        ? "bg-green-100 text-gren-800"
-        : selectedTransaction.status === "pending"
-        ? "bg-blue-100 text-blue-800"
-        : "bg-red-100 text-red-800"
-    }`}
-                >
-                  {selectedTransaction.status}
+                <span className="mt-1 text-sm font-medium capitalize px-2 py-0.5 rounded-full inline-block bg-blue-100 text-blue-800">
+                  {selectedTransaction.data?.verification?.status || "N/A"}
+                </span>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Reference</p>
+                <p className="mt-1 text-sm text-gray-900">
+                  {selectedTransaction.data?.verification?.reference || "N/A"}
                 </p>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500">Description</p>
+                <p className="text-sm font-medium text-gray-500">Endpoint</p>
                 <p className="mt-1 text-sm text-gray-900">
-                  {selectedTransaction.description}
+                  {selectedTransaction.data?.endpoint_name || "N/A"}
+                </p>
+              </div>
+              <div className="col-span-2">
+                <p className="text-sm font-medium text-gray-500">
+                  Response Detail
+                </p>
+                <p className="mt-1 text-sm text-gray-900">
+                  {selectedTransaction.data?.detail || "N/A"}
                 </p>
               </div>
             </div>

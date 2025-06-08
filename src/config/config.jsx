@@ -9,7 +9,7 @@ export const config = {
     virtualAccount: "/virtualAccount",
     NINVerify: "/verify/nin",
     BVNVerify: "/verify/bvn",
-    VerificationHistory: "/transactions/history/",
+    VerificationHistory: "/transactions/dataHistory/",
     setPin: "/virtualAccount/setPin",
     checkPin: "/virtualAccount/checkPin",
     dataSubscription: "/vtu/data",
