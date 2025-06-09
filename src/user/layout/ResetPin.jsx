@@ -37,18 +37,28 @@ function ResetPin() {
         toast.error("Please login to continue");
         return;
       }
+      const UserId = userData.id;
 
-      const response = await axios.post(`${config.apiBaseUrl}/user/reset-pin`, {
-        userId: userData._id,
+      const payLoad = {
+        userId: UserId,
         oldPin: values.oldPin,
         newPin: values.newPin,
-      });
+      };
+      const response = await axios.post(
+        `${config.apiBaseUrl}${config.endpoints.ResetPin}`,
+        payLoad,
+        { withCredentials: true }
+      );
 
-      if (response.data.success) {
+      console.log("Response Data:", response);
+      if (response.status === 200) {
         toast.success("Transaction PIN reset successfully!");
         form.resetFields();
+      } else {
+        toast.error(response.data.message || "Failed to reset PIN");
       }
     } catch (error) {
+      console.error("Error resetting PIN:", error);
       toast.error(error.response?.data?.message || "Failed to reset PIN");
     } finally {
       setLoading(false);
@@ -75,11 +85,11 @@ function ResetPin() {
             label="Current PIN"
             rules={[
               { required: true, message: "Please enter your current PIN" },
-              { len: 6, message: "PIN must be 6 digits" },
+              { len: 4, message: "PIN must be 4 digits" },
             ]}
           >
             <Input.Password
-              maxLength={6}
+              maxLength={4}
               placeholder="Enter current PIN"
               size="large"
             />
@@ -90,11 +100,11 @@ function ResetPin() {
             label="New PIN"
             rules={[
               { required: true, message: "Please enter your new PIN" },
-              { len: 6, message: "PIN must be 6 digits" },
+              { len: 4, message: "PIN must be 4 digits" },
             ]}
           >
             <Input.Password
-              maxLength={6}
+              maxLength={4}
               placeholder="Enter new PIN"
               size="large"
             />
@@ -105,11 +115,11 @@ function ResetPin() {
             label="Confirm New PIN"
             rules={[
               { required: true, message: "Please confirm your new PIN" },
-              { len: 6, message: "PIN must be 6 digits" },
+              { len: 4, message: "PIN must be 4 digits" },
             ]}
           >
             <Input.Password
-              maxLength={6}
+              maxLength={4}
               placeholder="Confirm new PIN"
               size="large"
             />

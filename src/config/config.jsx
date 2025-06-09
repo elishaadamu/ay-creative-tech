@@ -1,3 +1,5 @@
+import ResetPin from "../user/layout/ResetPin";
+
 export const config = {
   apiBaseUrl: import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api",
   endpoints: {
@@ -11,7 +13,7 @@ export const config = {
     BVNVerify: "/verify/bvn",
     VerificationHistory: "/transactions/dataHistory/",
     setPin: "/virtualAccount/setPin",
-    checkPin: "/virtualAccount/checkPin",
+    ResetPin: "/virtualAccount/resetPin",
     dataSubscription: "/vtu/data",
     airtimeSubscription: "/vtu/airtime",
     dataHistory: "/vtu/airtime",
