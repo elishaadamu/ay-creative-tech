@@ -28,6 +28,8 @@ import { MdContactPhone } from "react-icons/md";
 import { FaPersonCircleCheck } from "react-icons/fa6";
 import { MdDataThresholding } from "react-icons/md";
 import { FaPhone } from "react-icons/fa";
+import { MdLocationSearching } from "react-icons/md";
+import { GrValidate } from "react-icons/gr";
 
 const sidebarSections = [
   {
@@ -93,6 +95,16 @@ const sidebarSections = [
         to: "/dashboard/personalisation",
         icon: <FaLeaf className="w-5 h-5" />,
         label: "Personalisation",
+      },
+      {
+        to: "/dashboard/demographic-search",
+        icon: <MdLocationSearching className="w-5 h-5" />,
+        label: "Demographic Search",
+      },
+      {
+        to: "/dashboard/validation",
+        icon: <GrValidate className="w-5 h-5" />,
+        label: "Validation",
       },
       {
         to: "/dashboard/data",

@@ -28,6 +28,8 @@ import DataHistory from "../pages/History/HistoryData";
 import AirtimeHistory from "../pages/History/AirtimeHistory";
 import Personalisation from "../pages/Personalisation";
 import AllHistory from "../pages/AllHistory";
+import DemographicSearch from "../pages/DemographicSearch";
+import Validation from "../pages/Validation";
 
 function RoutesConfig() {
   return (
@@ -59,6 +61,8 @@ function RoutesConfig() {
         <Route path="/airtime-history" element={<AirtimeHistory />} />
         <Route path="/personalisation" element={<Personalisation />} />
         <Route path="/all-history" element={<AllHistory />} />
+        <Route path="/demographic-search" element={<DemographicSearch />} />
+        <Route path="/validation" element={<Validation />} />
         {/* Catch-all route for 404 Not Found */}
         <Route path="*" element={<NotFound />} />
       </Routes>

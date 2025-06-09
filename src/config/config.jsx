@@ -22,5 +22,6 @@ export const config = {
     bvnLicenceRegistration: "/bvn/licence",
     Modification: "/modify/register",
     Personalisation: "/verify/personalisation",
+    DemographicSearch: "/demographic/search",
   },
 };

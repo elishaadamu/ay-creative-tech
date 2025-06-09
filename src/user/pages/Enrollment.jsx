@@ -164,7 +164,9 @@ function Enrollment() {
   return (
     <div className="w-full rounded-2xl mb-5 bg-white p-5 shadow-lg">
       <ToastContainer />
-      <p className="text-[16px] text-gray-500">Enrollment</p>
+      <p className="text-3xl text-center text-amber-500 font-semibold">
+        Enrollment
+      </p>
       <div className="ml-7">
         <p className="text-[16px] mt-7 mb-5 font-semibold text-gray-500">
           Enrollment for non appearance
