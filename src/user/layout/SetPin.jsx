@@ -71,6 +71,9 @@ function SetPin() {
         ).toString();
         localStorage.setItem("user", encryptedUpdatedUser);
 
+        // Dispatch event to notify dashboard
+        window.dispatchEvent(new Event('pinSetSuccess'));
+
         // Show success toast and navigate
         toast.success("PIN set successfully!", {
           position: "top-center",

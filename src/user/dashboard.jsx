@@ -1,25 +1,44 @@
 import React, { useState, useEffect } from "react";
-import { Dropdown, Space } from "antd";
+import { Dropdown, Space, Modal } from "antd";
 import {
   UserOutlined,
   SettingOutlined,
   LogoutOutlined,
   HomeOutlined,
 } from "@ant-design/icons";
-import { useNavigate, NavLink } from "react-router-dom";
+import { useNavigate, NavLink, useLocation } from "react-router-dom";
 import Sidebar from "./Components/Sidebar";
 import "./assets/css/style.css";
 import Logo from "../assets/images/logo-ay.png";
 import RoutesConfig from "./Components/RoutesConfig";
 import CustomerCare from "./Components/CustomerCare";
+import axios from "axios";
+import { config } from "../config/config"; // Adjust the path as necessary
+import CryptoJS from "crypto-js";
 
 const ONE_HOUR = 60 * 60 * 1000; // 3 600 000 ms
+const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
+const PIN_CHECK_DISABLED_KEY = 'pinCheckDisabled';
+
+function decryptData(ciphertext) {
+  if (!ciphertext) return null;
+  try {
+    const bytes = CryptoJS.AES.decrypt(ciphertext, SECRET_KEY);
+    const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+    return JSON.parse(decrypted);
+  } catch {
+    return null;
+  }
+}
 
 function UserDashBoard() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [isPinModalVisible, setIsPinModalVisible] = useState(false);
+  const [isPinCheckEnabled, setIsPinCheckEnabled] = useState(true);
 
   useEffect(() => {
     // Only show modal if just logged in
@@ -29,6 +48,60 @@ function UserDashBoard() {
     }
   }, []);
 
+  // Get user data using decryption
+  const user = decryptData(localStorage.getItem("user"));
+  const userId = user?._id || user?.id;
+
+  useEffect(() => {
+    // Disable PIN check if we're on the setpin page
+    if (location.pathname === '/dashboard/setpin') {
+      setIsPinCheckEnabled(false);
+      localStorage.setItem(PIN_CHECK_DISABLED_KEY, 'true');
+    } else {
+      const isDisabled = localStorage.getItem(PIN_CHECK_DISABLED_KEY);
+      setIsPinCheckEnabled(!isDisabled);
+    }
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const checkPin = async () => {
+      // Don't check if disabled or no userId
+      if (!isPinCheckEnabled || !userId) return;
+
+      try {
+        const response = await axios.get(
+          `${config.apiBaseUrl}/virtualAccount/${userId}`,
+          {
+            // Add retry configuration
+            retry: 3,
+            retryDelay: 2000,
+            timeout: 5000
+          }
+        );
+
+        if (response.data?.customerPin === null) {
+          setIsPinModalVisible(true);
+        }
+      } catch (error) {
+        // Ignore 429 errors but log other errors
+        if (error.response?.status !== 429) {
+          console.error("Error checking PIN:", error);
+        }
+        // Continue showing modal if we had previously determined PIN was needed
+        if (isPinModalVisible) {
+          setIsPinModalVisible(true);
+        }
+      }
+    };
+
+    // Only set up interval if checks are enabled
+    if (isPinCheckEnabled) {
+      checkPin();
+      const interval = setInterval(checkPin, 120000);
+      return () => clearInterval(interval);
+    }
+  }, [userId, isPinCheckEnabled]);
+
   const handleCloseModal = () => {
     setShowModal(false);
   };
@@ -37,6 +110,24 @@ function UserDashBoard() {
     localStorage.removeItem("user");
     navigate("/login");
   };
+
+  const handleSetupPin = () => {
+    setIsPinModalVisible(false);
+    setIsPinCheckEnabled(false);
+    localStorage.setItem(PIN_CHECK_DISABLED_KEY, 'true');
+    navigate("/dashboard/setpin");
+  };
+
+  // Add cleanup when user sets PIN successfully
+  useEffect(() => {
+    const cleanupPinCheck = () => {
+      localStorage.removeItem(PIN_CHECK_DISABLED_KEY);
+      setIsPinCheckEnabled(true);
+    };
+
+    window.addEventListener('pinSetSuccess', cleanupPinCheck);
+    return () => window.removeEventListener('pinSetSuccess', cleanupPinCheck);
+  }, []);
 
   const items = [
     {
@@ -166,6 +257,29 @@ function UserDashBoard() {
 
       {/* Customer Care Component */}
       <CustomerCare />
+
+      {/* Add PIN Setup Modal */}
+      <Modal
+        title="Transaction PIN Required"
+        open={isPinModalVisible}
+        onOk={handleSetupPin}
+        onCancel={() => setIsPinModalVisible(false)}
+        okText="Setup PIN Now"
+        cancelText="Remind Me Later"
+        okButtonProps={{
+          style: { backgroundColor: "#f59e0b" },
+        }}
+      >
+        <div className="py-4">
+          <p className="text-gray-600 mb-2">
+            You haven't set up your transaction PIN yet. This is required for
+            making transactions on our platform.
+          </p>
+          <p className="text-gray-600">
+            Please set up your PIN to continue using our services securely.
+          </p>
+        </div>
+      </Modal>
     </div>
   );
 }

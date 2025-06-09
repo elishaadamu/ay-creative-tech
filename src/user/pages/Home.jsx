@@ -78,6 +78,7 @@ function Dashboard() {
         const res = await axios.get(
           `${config.apiBaseUrl}/virtualAccount/${userId}`
         );
+        console.log("res.data", res.data.customerPin);
         setAccount(res.data); // <-- use res.data, not res.data.account
       } catch (err) {
         setAccount(null);
@@ -199,13 +200,13 @@ function Dashboard() {
       id: 6,
       name: "DEMOGRAPHIC SEARCH",
       icon: NIMC,
-      to: "/drivers-license",
+      to: "/dashboard/demographic-search",
     },
     {
       id: 7,
       name: "VALIDATION",
       icon: NIMC,
-      to: "/voter",
+      to: "/dashboard/validation",
     },
     {
       id: 8,
