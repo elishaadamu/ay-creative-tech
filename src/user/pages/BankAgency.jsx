@@ -4,6 +4,20 @@ import { UploadOutlined } from "@ant-design/icons";
 import Swal from "sweetalert2";
 import { ToastContainer, toast } from "react-toastify";
 import { config } from "../../config/config";
+import CryptoJS from "crypto-js";
+
+const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
+
+function decryptData(ciphertext) {
+  if (!ciphertext) return null;
+  try {
+    const bytes = CryptoJS.AES.decrypt(ciphertext, SECRET_KEY);
+    const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+    return JSON.parse(decrypted);
+  } catch {
+    return null;
+  }
+}
 
 function BankAgency() {
   const [form] = Form.useForm();
@@ -152,14 +166,31 @@ function BankAgency() {
   const onFinish = async (values) => {
     setLoading(true);
     try {
+      // Get userId from encrypted localStorage
+      let userId = null;
+      try {
+        const userStr = localStorage.getItem("user");
+        if (userStr) {
+          const userObj = decryptData(userStr);
+          userId = userObj?._id || userObj?.id;
+        }
+      } catch (error) {
+        console.error("Error decrypting user data:", error);
+        throw new Error("User authentication failed");
+      }
+
+      if (!userId) {
+        throw new Error("User ID not found");
+      }
+
       let passportBase64 = null;
       if (selectedFile) {
         passportBase64 = await convertToBase64(selectedFile);
       }
 
-      // Construct payload
+      // Construct payload with userId
       const payload = {
-        userId: userId,
+        userId, // Add userId here
         bankName: values.bankName,
         stateOfResidence: values.stateOfResidence,
         lga: values.lga,
@@ -177,6 +208,8 @@ function BankAgency() {
         geoPoliticalZone: values.geoPoliticalZone,
         passport: passportBase64,
       };
+
+      console.log("Payload:", payload);
 
       const response = await fetch(
         `${config.apiBaseUrl}${config.endpoints.bankAgentRegistration}`,

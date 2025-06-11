@@ -21,8 +21,8 @@ function BVNVerify() {
   const cardVerify = [{ label: "BANK VERIFICATION NUMBER", value: "bvn" }];
 
   const cardSlip = [
-    { label: "Basic Details", value: "Basic", price: 0 },
-    { label: "Advanced Details", value: "Advanced", price: 0 },
+    { label: "Basic Details", value: "Basic", price: 200 },
+    { label: "Advanced Details", value: "Advanced", price: 200 },
   ];
 
   /* ---------------------------- component state ---------------------------- */

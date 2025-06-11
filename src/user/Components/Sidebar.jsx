@@ -30,6 +30,9 @@ import { MdDataThresholding } from "react-icons/md";
 import { FaPhone } from "react-icons/fa";
 import { MdLocationSearching } from "react-icons/md";
 import { GrValidate } from "react-icons/gr";
+import { VscVerified } from "react-icons/vsc";
+import { Menu, Dropdown } from "antd";
+import { DownOutlined } from "@ant-design/icons";
 
 const sidebarSections = [
   {
@@ -122,39 +125,53 @@ const sidebarSections = [
     section: "SUMMARY AND HISTORY",
     links: [
       {
-        to: "/dashboard/all-history",
+        isDropdown: true,
         icon: <FiClock className="w-5 h-5" />,
-        label: "All History",
-      },
-      {
-        to: "/dashboard/fundinghistory",
-        icon: <FiFileText className="w-5 h-5" />,
-        label: "Funding History",
-      },
-      {
-        to: "/dashboard/bvnhistory",
-        icon: <MdHistory className="w-5 h-5" />,
-        label: "BVN History",
-      },
-      {
-        to: "/dashboard/ninhistory",
-        icon: <MdHistory className="w-5 h-5" />,
-        label: "NIN History",
-      },
-      {
-        to: "/dashboard/data-history",
-        icon: <MdDataThresholding className="w-5 h-5" />,
-        label: "Data History",
-      },
-      {
-        to: "/dashboard/airtime-history",
-        icon: <FaPhone className="w-5 h-5" />,
-        label: "Airtime History",
-      },
-      {
-        to: "/dashboard/ipe-history", // This should match the route path above
-        icon: <FaPersonCircleCheck className="w-5 h-5" />,
-        label: "IPE Clearance History",
+        label: "History",
+        items: [
+          {
+            key: "all",
+            to: "/dashboard/all-history",
+            icon: <FiClock className="w-5 h-5" />,
+            label: "All History",
+          },
+          {
+            key: "funding",
+            to: "/dashboard/fundinghistory",
+            icon: <FiFileText className="w-5 h-5" />,
+            label: "Funding History",
+          },
+          {
+            key: "bvn",
+            to: "/dashboard/bvnhistory",
+            icon: <VscVerified className="w-5 h-5" />,
+            label: "BVN History",
+          },
+          {
+            key: "nin",
+            to: "/dashboard/ninhistory",
+            icon: <MdHistory className="w-5 h-5" />,
+            label: "NIN History",
+          },
+          {
+            key: "data",
+            to: "/dashboard/data-history",
+            icon: <MdDataThresholding className="w-5 h-5" />,
+            label: "Data History",
+          },
+          {
+            key: "airtime",
+            to: "/dashboard/airtime-history",
+            icon: <FaPhone className="w-5 h-5" />,
+            label: "Airtime History",
+          },
+          {
+            key: "ipe",
+            to: "/dashboard/ipe-history",
+            icon: <FaPersonCircleCheck className="w-5 h-5" />,
+            label: "IPE Clearance History",
+          },
+        ],
       },
     ],
   },
@@ -268,6 +285,53 @@ function Sidebar({ collapsed, setCollapsed }) {
                     );
                   })}
                 </>
+              ) : section.section === "SUMMARY AND HISTORY" ? (
+                // Special handling for SUMMARY AND HISTORY section
+                section.links.map((link, j) => {
+                  if (link.isDropdown) {
+                    const menu = (
+                      <Menu
+                        items={link.items.map((item) => ({
+                          key: item.key,
+                          label: (
+                            <NavLink
+                              to={item.to}
+                              className="flex items-center text-sm font-medium"
+                            >
+                              {item.icon}
+                              <span className="ml-3">{item.label}</span>
+                            </NavLink>
+                          ),
+                        }))}
+                        className="bg-gray-800 border border-gray-700"
+                      />
+                    );
+
+                    return (
+                      <Dropdown
+                        key={j}
+                        overlay={menu}
+                        trigger={["click"]}
+                        overlayClassName="history-dropdown"
+                      >
+                        <div
+                          className={`flex items-center px-6 py-2 text-sm font-medium border-l-4 cursor-pointer
+          ${collapsed ? "justify-center px-0" : ""}
+          border-transparent text-gray-300 hover:text-amber-300 hover:bg-gray-800`}
+                        >
+                          {link.icon}
+                          {!collapsed && (
+                            <>
+                              <span className="ml-3">{link.label}</span>
+                              <DownOutlined className="ml-2" />
+                            </>
+                          )}
+                        </div>
+                      </Dropdown>
+                    );
+                  }
+                  return null;
+                })
               ) : (
                 // All other sections
                 section.links.map((link, j) => {

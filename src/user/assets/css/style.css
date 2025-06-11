@@ -23,3 +23,18 @@
   justify-content: center;
   padding: 1rem;
 }
+
+/* Add this to your CSS file */
+.history-dropdown .ant-dropdown-menu {
+  background-color: #1f2937 !important;
+  border: 1px solid #374151 !important;
+}
+
+.history-dropdown .ant-dropdown-menu-item {
+  color: #d1d5db !important;
+}
+
+.history-dropdown .ant-dropdown-menu-item:hover {
+  background-color: #374151 !important;
+  color: #fbbf24 !important;
+}

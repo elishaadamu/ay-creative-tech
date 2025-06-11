@@ -27,7 +27,7 @@ function NIN() {
   ];
 
   const cardSlip = [
-    { label: "Information Slip", value: "Basic", image: BasicImg, price: 0 },
+    { label: "Information Slip", value: "Basic", image: BasicImg, price: 200 },
     { label: "Regular Slip", value: "Regular", image: RegularImg, price: 200 },
     {
       label: "Standard Slip",

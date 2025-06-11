@@ -93,11 +93,28 @@ function Enrollment() {
         passportBase64 = await convertToBase64(selectedFile);
       }
 
+      // Format date to DD-MM-YYYY
+      const formattedDOB = values.dob.format("DD-MM-YYYY");
+
       // Construct payload
       const payload = {
-        ...values,
+        userId: JSON.parse(localStorage.getItem("user"))?.id,
+        enrollmentType: values.enrollmentType,
+        firstName: values.firstName,
+        middleName: values.middleName || "",
+        surname: values.surname,
+        dateOfBirth: formattedDOB,
+        stateOfOrigin: values.stateOfOrigin,
+        localOfOrigin: values.localOfOrigin,
+        phoneNumber: values.phone,
+        gender: values.gender,
+        height: values.height,
         passport: passportBase64,
+        amount: parseInt(values.enrollmentType),
+        pin: values.pin,
       };
+
+      console.log("Enrollment payload:", payload);
 
       const response = await fetch(
         `${config.apiBaseUrl}${config.endpoints.enrollment}`,
@@ -112,6 +129,7 @@ function Enrollment() {
       );
 
       const data = await response.json();
+      console.log("API Response:", data);
 
       if (response.ok) {
         await Swal.fire({
