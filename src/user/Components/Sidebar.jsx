@@ -132,9 +132,14 @@ const sidebarSections = [
         label: "Funding History",
       },
       {
-        to: "/dashboard/verificationhistory",
+        to: "/dashboard/bvnhistory",
         icon: <MdHistory className="w-5 h-5" />,
-        label: "Verifications History",
+        label: "BVN History",
+      },
+      {
+        to: "/dashboard/ninhistory",
+        icon: <MdHistory className="w-5 h-5" />,
+        label: "NIN History",
       },
       {
         to: "/dashboard/data-history",
