@@ -64,6 +64,7 @@ export default function VerificationsHistoryTable() {
           "Content-Type": "application/json",
         },
       });
+      console.log("API Response:", response.data);
 
       const details = response.data?.findData || [];
       // console.log("All Verification Details:");
@@ -293,12 +294,16 @@ export default function VerificationsHistoryTable() {
                       </span>
                     </td>
                     <td className="w-[60px] px-2 py-2 whitespace-nowrap">
-                      <button
-                        onClick={() => handleViewSlip(transaction)}
-                        className="text-green-600 hover:text-green-800 transition-colors"
-                      >
-                        <EyeOutlined className="text-lg" />
-                      </button>
+                      {transaction.dataFor !== "IPE-Slip" ? (
+                        <button
+                          onClick={() => handleViewSlip(transaction)}
+                          className="text-green-600 hover:text-green-800 transition-colors"
+                        >
+                          <EyeOutlined className="text-lg" />
+                        </button>
+                      ) : (
+                        <span className="text-gray-400">N/A</span>
+                      )}
                     </td>
                     <td className="w-[60px] px-2 py-2 whitespace-nowrap">
                       <button
@@ -461,57 +466,129 @@ export default function VerificationsHistoryTable() {
       >
         {selectedTransaction && (
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Date</p>
-                <p className="mt-1 text-sm text-gray-900">
-                  {format(
-                    new Date(selectedTransaction.createdAt),
-                    "dd/MM/yyyy HH:mm:ss"
-                  )}
-                </p>
+            {selectedTransaction.dataFor === "IPE-Slip" ? (
+              // IPE-Slip specific details
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Date</p>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {format(
+                      new Date(selectedTransaction.createdAt),
+                      "dd/MM/yyyy HH:mm:ss"
+                    )}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Status</p>
+                  <span className="mt-1 text-sm font-medium capitalize px-2 py-0.5 rounded-full inline-block bg-green-100 text-green-800">
+                    {selectedTransaction.data?.transactionStatus || "N/A"}
+                  </span>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Name</p>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {selectedTransaction.data?.reply?.name || "N/A"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">
+                    Date of Birth
+                  </p>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {selectedTransaction.data?.reply?.dob || "N/A"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">New NIN</p>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {selectedTransaction.data?.newNIN || "N/A"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">
+                    New Tracking ID
+                  </p>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {selectedTransaction.data?.newTracking_id || "N/A"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">
+                    Old Tracking ID
+                  </p>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {selectedTransaction.data?.old_tracking_id || "N/A"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">
+                    Verification Status
+                  </p>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {selectedTransaction.data?.verificationStatus || "N/A"}
+                  </p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-sm font-medium text-gray-500">Message</p>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {selectedTransaction.data?.message || "N/A"}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Data For</p>
-                <p className="mt-1 text-sm text-gray-900">
-                  {selectedTransaction.dataFor}
-                </p>
+            ) : (
+              // Existing modal content for other verification types
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Date</p>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {format(
+                      new Date(selectedTransaction.createdAt),
+                      "dd/MM/yyyy HH:mm:ss"
+                    )}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Data For</p>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {selectedTransaction.dataFor}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">
+                    Verification Type
+                  </p>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {selectedTransaction.verifyWith}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Status</p>
+                  <span className="mt-1 text-sm font-medium capitalize px-2 py-0.5 rounded-full inline-block bg-blue-100 text-blue-800">
+                    {selectedTransaction.data?.verification?.status || "N/A"}
+                  </span>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Reference</p>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {selectedTransaction.data?.verification?.reference || "N/A"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Endpoint</p>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {selectedTransaction.data?.endpoint_name || "N/A"}
+                  </p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-sm font-medium text-gray-500">
+                    Response Detail
+                  </p>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {selectedTransaction.data?.detail || "N/A"}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">
-                  Verification Type
-                </p>
-                <p className="mt-1 text-sm text-gray-900">
-                  {selectedTransaction.verifyWith}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Status</p>
-                <span className="mt-1 text-sm font-medium capitalize px-2 py-0.5 rounded-full inline-block bg-blue-100 text-blue-800">
-                  {selectedTransaction.data?.verification?.status || "N/A"}
-                </span>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Reference</p>
-                <p className="mt-1 text-sm text-gray-900">
-                  {selectedTransaction.data?.verification?.reference || "N/A"}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Endpoint</p>
-                <p className="mt-1 text-sm text-gray-900">
-                  {selectedTransaction.data?.endpoint_name || "N/A"}
-                </p>
-              </div>
-              <div className="col-span-2">
-                <p className="text-sm font-medium text-gray-500">
-                  Response Detail
-                </p>
-                <p className="mt-1 text-sm text-gray-900">
-                  {selectedTransaction.data?.detail || "N/A"}
-                </p>
-              </div>
-            </div>
+            )}
           </div>
         )}
       </Modal>
