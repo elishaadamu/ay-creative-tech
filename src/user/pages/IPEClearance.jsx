@@ -13,6 +13,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import { config } from "../../config/config.jsx";
 import CryptoJS from "crypto-js";
+import { Link } from "react-router-dom";
 
 function IPEClearance() {
   const navigate = useNavigate();
@@ -206,13 +207,14 @@ function IPEClearance() {
         open={isSuccessModalVisible}
         onCancel={() => setIsSuccessModalVisible(false)}
         footer={[
-          <button
+          <Link
+            to="/dashboard/ipe-history"
             key="view-status"
             onClick={handleViewStatus}
             className="bg-amber-500 cursor-pointer flex justify-center hover:bg-amber-600 text-white font-medium py-2 px-4 rounded-xl transition-colors"
           >
             View Status
-          </button>,
+          </Link>,
         ]}
       >
         <div className="py-4 text-center">

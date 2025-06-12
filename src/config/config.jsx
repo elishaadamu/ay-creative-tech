@@ -25,5 +25,6 @@ export const config = {
     Modification: "/modify/register",
     Personalisation: "/verify/personalisation",
     DemographicSearch: "/demographic/search",
+    Enrollment: "/enrollment/register",
   },
 };

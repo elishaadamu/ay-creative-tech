@@ -153,13 +153,13 @@ function Enrollment() {
       }
 
       // Format date to DD-MM-YYYY
-      const formattedDOB = values.dob.format("DD-MM-YYYY");
+      const formattedDOB = values.dob.format("DD-MM-YY");
 
       // Construct payload with amount and passport
       const payload = {
         userId,
         enrollmentType: values.enrollmentType,
-        amount: getEnrollmentAmount(values.enrollmentType), // Add amount based on type
+        amount: 1,
         firstName: values.firstName,
         middleName: values.middleName || "",
         surname: values.surname,
@@ -179,7 +179,7 @@ function Enrollment() {
       });
 
       const response = await fetch(
-        `${config.apiBaseUrl}${config.endpoints.enrollment}`,
+        `${config.apiBaseUrl}${config.endpoints.Enrollment}`,
         {
           method: "POST",
           headers: {
@@ -191,7 +191,7 @@ function Enrollment() {
       );
 
       const data = await response.json();
-      console.log("API Response:", data);
+      console.log("API Response:", response);
 
       if (response.ok) {
         await Swal.fire({
@@ -373,11 +373,7 @@ function Enrollment() {
               label="HEIGHT (CM)"
               rules={[{ required: true, message: "Please input height" }]}
             >
-              <InputNumber
-                className="w-full"
-                min={0}
-                placeholder="Height (cm)"
-              />
+              <InputNumber className="w-full" min={0} placeholder="e.g 165cm" />
             </Form.Item>
           </div>
 
