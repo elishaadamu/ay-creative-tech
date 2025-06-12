@@ -159,7 +159,7 @@ function Enrollment() {
       const payload = {
         userId,
         enrollmentType: values.enrollmentType,
-        amount: 1,
+        amount: getEnrollmentAmount(values.enrollmentType), // Add amount based on type,
         firstName: values.firstName,
         middleName: values.middleName || "",
         surname: values.surname,
