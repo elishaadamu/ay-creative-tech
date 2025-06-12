@@ -11,6 +11,34 @@ import {
 import { ToastContainer, toast } from "react-toastify";
 import Swal from "sweetalert2";
 import { config } from "../../config/config";
+import CryptoJS from "crypto-js";
+
+const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
+
+function decryptData(ciphertext) {
+  if (!ciphertext) return null;
+  try {
+    const bytes = CryptoJS.AES.decrypt(ciphertext, SECRET_KEY);
+    const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+    return JSON.parse(decrypted);
+  } catch {
+    return null;
+  }
+}
+
+// Helper function to get enrollment amount based on type
+const getEnrollmentAmount = (type) => {
+  switch (type) {
+    case "adult_7000":
+      return 7000;
+    case "child_4000":
+      return 4000;
+    case "old_4000":
+      return 4000;
+    default:
+      return 0;
+  }
+};
 
 function Enrollment() {
   const [form] = Form.useForm();
@@ -73,33 +101,65 @@ function Enrollment() {
     }
   };
 
-  const convertToBase64 = async (file) => {
+  // Update the convertToBase64 function
+  const convertToBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onloadend = () => {
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        // Get the base64 string without the data URL prefix
         const base64String = reader.result.split(",")[1];
         resolve(base64String);
       };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
+      reader.onerror = (error) => reject(error);
     });
   };
 
   const onFinish = async (values) => {
     setLoading(true);
     try {
+      // Get userId from encrypted localStorage
+      let userId = null;
+      try {
+        const userStr = localStorage.getItem("user");
+        if (userStr) {
+          const userObj = decryptData(userStr);
+          userId = userObj?._id || userObj?.id;
+        }
+      } catch (error) {
+        console.error("Error getting userId:", error);
+        throw new Error("User authentication failed");
+      }
+
+      if (!userId) {
+        throw new Error("User ID not found");
+      }
+
+      // Handle passport file
       let passportBase64 = null;
       if (selectedFile) {
-        passportBase64 = await convertToBase64(selectedFile);
+        try {
+          passportBase64 = await convertToBase64(selectedFile);
+          console.log("Passport converted successfully");
+        } catch (error) {
+          console.error("Error converting passport:", error);
+          throw new Error("Failed to process passport image");
+        }
+      }
+
+      // Verify we have the required passport
+      if (!passportBase64) {
+        throw new Error("Passport photo is required");
       }
 
       // Format date to DD-MM-YYYY
       const formattedDOB = values.dob.format("DD-MM-YYYY");
 
-      // Construct payload
+      // Construct payload with amount and passport
       const payload = {
-        userId: JSON.parse(localStorage.getItem("user"))?.id,
+        userId,
         enrollmentType: values.enrollmentType,
+        amount: getEnrollmentAmount(values.enrollmentType), // Add amount based on type
         firstName: values.firstName,
         middleName: values.middleName || "",
         surname: values.surname,
@@ -109,12 +169,14 @@ function Enrollment() {
         phoneNumber: values.phone,
         gender: values.gender,
         height: values.height,
-        passport: passportBase64,
-        amount: parseInt(values.enrollmentType),
-        pin: values.pin,
+        passport: passportBase64, // Base64 encoded passport image
       };
 
-      console.log("Enrollment payload:", payload);
+      // Add debug logging
+      console.log("Sending payload with passport:", {
+        ...payload,
+        passport: passportBase64 ? ` ${passportBase64}` : "No passport",
+      });
 
       const response = await fetch(
         `${config.apiBaseUrl}${config.endpoints.enrollment}`,
@@ -199,13 +261,13 @@ function Enrollment() {
             ]}
           >
             <Select placeholder="-- Select an Option --">
-              <Select.Option value="7000">
+              <Select.Option value="adult_7000">
                 Adult Enrollment @ ₦7,000
               </Select.Option>
-              <Select.Option value="4000">
+              <Select.Option value="child_4000">
                 Child Enrollment @ ₦4,000
               </Select.Option>
-              <Select.Option value="4000">
+              <Select.Option value="old_4000">
                 Old Slip Enrollment @ ₦4,000
               </Select.Option>
             </Select>

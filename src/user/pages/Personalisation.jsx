@@ -21,7 +21,7 @@ function NIN() {
   const cardVerify = [{ label: "TRACKING ID", value: "trackingId" }];
 
   const cardSlip = [
-    { label: "Regular Slip", value: "regular", image: RegularImg, price: 1 },
+    { label: "Regular Slip", value: "regular", image: RegularImg, price: 150 },
   ];
 
   /* ---------------------------- component state ---------------------------- */
@@ -64,7 +64,7 @@ function NIN() {
     }
 
     // Fixed price for Regular Slip
-    const slipAmount = 1;
+    const slipAmount = 150;
 
     // Show confirmation dialog
     const result = await Swal.fire({

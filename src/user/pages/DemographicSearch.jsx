@@ -65,7 +65,7 @@ function DemographicSearch() {
       // Simplified payload to match new requirements
       const payload = {
         userId: userId,
-        amount: 1,
+        amount: 450,
         firstName: values.firstName,
         lastName: values.lastName,
         dob: values.dob.format("DD-MM-YY"),
