@@ -127,9 +127,7 @@ function IPEClearance() {
   return (
     <>
       <div className="w-full rounded-2xl mb-10 bg-white p-5 shadow-lg">
-        <p className="text-[20px] text-amber-500 font-bold text-center">
-          IPE CLEARANCE
-        </p>
+        <p className="text-[18px] text-gray-500  ">IPE CLEARANCE</p>
         <form onSubmit={handleSubmit}>
           <div>
             <p className="mt-7 text-[14px] text-gray-500">Supply Tracking ID</p>

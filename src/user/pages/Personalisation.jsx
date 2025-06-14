@@ -156,7 +156,7 @@ function NIN() {
 
   return (
     <div className="w-full rounded-2xl mb-10 bg-white p-5 shadow-lg">
-      <p className="text-[18px] text-gray-500">NIN Verification</p>
+      <p className="text-[18px] text-gray-500">Personalisation</p>
       <form onSubmit={handleSubmit}>
         {/* ------------------------------- Step #1 ------------------------------- */}
         <p className="mt-7 text-[14px] text-gray-500">1. Verify With</p>

@@ -258,7 +258,7 @@ function BankAgency() {
   return (
     <div className="w-full rounded-2xl mb-5 bg-white p-5 shadow-lg">
       <ToastContainer />
-      <h2 className="text-xl font-semibold mb-4">
+      <h2 className="text-3xl font-semibold mb-4 text-center text-amber-500">
         Bank Agency Registration Form
       </h2>
       <Form

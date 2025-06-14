@@ -235,7 +235,9 @@ function CAC() {
 
   return (
     <div className="w-full rounded-2xl mb-5 bg-white p-5 shadow-lg">
-      <h2 className="text-xl font-semibold mb-4">Business Registration Form</h2>
+      <h2 className="text-3xl font-semibold mb-4 text-center text-amber-500">
+        Business Registration Form
+      </h2>
       <Form
         form={form}
         layout="vertical"

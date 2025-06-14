@@ -182,7 +182,7 @@ function Dashboard() {
       id: 3,
       name: "IPE CLEARANCE",
       icon: NIMC,
-      to: "/tin-verify",
+      to: "/dashboard/ipe-clearance",
     },
     {
       id: 4,
