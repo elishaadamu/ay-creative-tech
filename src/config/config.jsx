@@ -1,3 +1,4 @@
+import { Subscript } from "lucide-react";
 import ResetPin from "../user/layout/ResetPin";
 
 export const config = {
@@ -16,8 +17,7 @@ export const config = {
     ResetPin: "/virtualAccount/resetPin",
     dataSubscription: "/vtu/data",
     airtimeSubscription: "/vtu/airtime",
-    dataHistory: "/vtu/airtime",
-    airtimeHistory: "/vtu/airtime",
+    subscriptionHistory: "/transactions/history/",
     ipe: "/verify/ipe",
     cacRegistration: "/cac/register",
     bankAgentRegistration: "/bvn/register",

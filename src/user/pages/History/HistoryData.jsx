@@ -34,7 +34,7 @@ export default function VerificationsHistoryTable() {
   const userId = user?._id || user?.id;
 
   // Set the API link using the userId
-  const apiLink = `${config.apiBaseUrl}${config.endpoints.VerificationHistory}${userId}`;
+  const apiLink = `${config.apiBaseUrl}${config.endpoints.subscriptionHistory}${userId}`;
 
   const [loading, setLoading] = React.useState(false);
   const [apiData, setApiData] = React.useState([]);
@@ -214,11 +214,7 @@ export default function VerificationsHistoryTable() {
                     sortKey="createdAt"
                     className="w-[clamp(80px,15vw,112px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
                   />
-                  <TableHeader
-                    label="Phone Number"
-                    sortKey="accountNumber"
-                    className="w-[clamp(120px,20vw,160px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
-                  />
+
                   <TableHeader
                     label="Amount"
                     sortKey="amount"
@@ -246,9 +242,7 @@ export default function VerificationsHistoryTable() {
                         "dd/MM/yyyy HH:mm"
                       )}
                     </td>
-                    <td className="w-[clamp(120px,20vw,160px)] px-2 py-2 whitespace-nowrap text-[clamp(0.8rem,1vw,0.75rem)] text-gray-900">
-                      {transaction.accountNumber}
-                    </td>
+
                     <td className="w-[clamp(80px,15vw,112px)] px-2 py-2 whitespace-nowrap text-[clamp(0.8rem,1vw,0.75rem)] text-gray-900">
                       ₦{transaction.amount.toLocaleString()}
                     </td>

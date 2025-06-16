@@ -123,14 +123,12 @@ function AirtimeSub() {
         pin: values.transactionPin,
         plan_type: values.plan_type,
       };
-      console.log("Transaction payload:", payload);
 
       const response = await axios.post(
         `${config.apiBaseUrl}${config.endpoints.airtimeSubscription}`,
         payload
       );
-      console.log("Airtime response:", response.data?.data.status);
-      if (response.data?.data.status === "success") {
+      if (response.data?.data.Status === "successful") {
         try {
           // Refresh account balance first
           const accountResponse = await axios.get(
@@ -256,8 +254,8 @@ function AirtimeSub() {
                   if (isNaN(numValue)) {
                     return Promise.reject("Please enter a valid number!");
                   }
-                  if (numValue < 10) {
-                    return Promise.reject("Minimum amount is ₦10!");
+                  if (numValue < 50) {
+                    return Promise.reject("Minimum amount is ₦50!");
                   }
                   return Promise.resolve();
                 },

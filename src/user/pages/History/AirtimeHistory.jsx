@@ -34,7 +34,7 @@ export default function VerificationsHistoryTable() {
   const userId = user?._id || user?.id;
 
   // Set the API link using the userId
-  const apiLink = `${config.apiBaseUrl}${config.endpoints.VerificationHistory}${userId}`;
+  const apiLink = `${config.apiBaseUrl}${config.endpoints.subscriptionHistory}${userId}`;
 
   const [loading, setLoading] = React.useState(false);
   const [apiData, setApiData] = React.useState([]);
@@ -217,12 +217,17 @@ export default function VerificationsHistoryTable() {
                   <TableHeader
                     label="Type"
                     sortKey="type"
-                    className="w-[clamp(120px,20vw,160px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
+                    className="w-[clamp(80px,15vw,120px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
                   />
                   <TableHeader
                     label="Status"
                     sortKey="status"
-                    className="w-[clamp(120px,20vw,160px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
+                    className="w-[clamp(80px,15vw,120px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
+                  />
+                  <TableHeader
+                    label="Amount"
+                    sortKey="Amount"
+                    className="w-[clamp(80px,15vw,120px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
                   />
                   <th className="w-[60px] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">
                     Details
@@ -241,7 +246,7 @@ export default function VerificationsHistoryTable() {
                         "dd/MM/yyyy HH:mm"
                       )}
                     </td>
-                    <td className="w-[clamp(120px,20vw,160px)] px-2 py-2 whitespace-nowrap">
+                    <td className="w-[clamp(80px,15vw,120px)] px-2 py-2 whitespace-nowrap">
                       <span
                         className={`inline-flex items-center px-2 py-0.5 rounded-full text-[clamp(0.65rem,1vw,0.75rem)] font-medium capitalize ${
                           transaction.type === "credit"
@@ -252,7 +257,7 @@ export default function VerificationsHistoryTable() {
                         {transaction.type}
                       </span>
                     </td>
-                    <td className="w-[clamp(120px,20vw,160px)] px-2 py-2 whitespace-nowrap">
+                    <td className="w-[clamp(80px,15vw,120px)] px-2 py-2 whitespace-nowrap">
                       <span
                         className={`inline-flex items-center px-2 py-0.5 rounded-full text-[clamp(0.65rem,1vw,0.75rem)] font-medium capitalize ${
                           transaction.status === "success"
@@ -261,6 +266,14 @@ export default function VerificationsHistoryTable() {
                         }`}
                       >
                         {transaction.status}
+                      </span>
+                    </td>
+                    <td className="w-[clamp(80px,15vw,120px)] px-2 py-2 whitespace-nowrap">
+                      <span
+                        className="inline-flex items-center px-2 py-0.5 rounded-full text-[clamp(0.65rem,1vw,0.75rem)] font-medium capitalize
+                           bg-green-100 text-green-800"
+                      >
+                        {transaction.amount}
                       </span>
                     </td>
                     <td className="w-[60px] px-2 py-2 whitespace-nowrap">

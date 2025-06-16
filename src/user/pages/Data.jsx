@@ -194,12 +194,12 @@ function DataSub() {
         amount: planPrice,
         pin: values.transactionPin,
       };
-      console.log("Payload:", payload);
+
       const response = await axios.post(
         `${config.apiBaseUrl}${config.endpoints.dataSubscription}`,
         payload
       );
-      console.log("Response:", response);
+
       if (response.status === 200) {
         try {
           // Refresh account balance first
