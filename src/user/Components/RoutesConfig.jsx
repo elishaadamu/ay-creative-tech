@@ -29,6 +29,7 @@ import Personalisation from "../pages/Personalisation";
 import AllHistory from "../pages/AllHistory";
 import DemographicSearch from "../pages/DemographicSearch";
 import Validation from "../pages/Validation";
+import ApiDocumentation from "../pages/ApiDocumentation";
 
 function RoutesConfig() {
   return (
@@ -61,6 +62,7 @@ function RoutesConfig() {
         <Route path="/all-history" element={<AllHistory />} />
         <Route path="/demographic-search" element={<DemographicSearch />} />
         <Route path="/validation" element={<Validation />} />
+        <Route path="/api-documentation" element={<ApiDocumentation />} />
         {/* Catch-all route for 404 Not Found */}
         <Route path="*" element={<NotFound />} />
       </Routes>

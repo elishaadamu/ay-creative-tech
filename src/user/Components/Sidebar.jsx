@@ -179,7 +179,7 @@ const sidebarSections = [
     section: "DEVELOPER AND SECURITY",
     links: [
       {
-        to: "/documentation",
+        to: "/dashboard/api-documentation",
         icon: <FiKey className="w-5 h-5" />,
         label: "Documentation",
       },
