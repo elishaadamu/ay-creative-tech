@@ -151,6 +151,7 @@ function CAC() {
         natureOfBusiness: values.natureOfBusiness,
         businessName1: values.businessName1,
         businessName2: values.businessName2,
+        businessName3: values.businessName3,
         bvn: values.bvn,
         nin: values.nin,
         email: values.email,
@@ -318,8 +319,36 @@ function CAC() {
         </Form.Item>
 
         <Form.Item
-          name="natureOfBusiness"
-          label="Nature of Business"
+          name="natureOfBusiness1"
+          label="Nature of Business (One)"
+          rules={[{ required: true }]}
+        >
+          <Input size="large" />
+        </Form.Item>
+        <Form.Item
+          name="natureOfBusiness2"
+          label="Nature of Business (Two)"
+          rules={[{ required: true }]}
+        >
+          <Input size="large" />
+        </Form.Item>
+        <Form.Item
+          name="AddressofBusiness"
+          label="Address of Principal Place of Business"
+          rules={[{ required: true }]}
+        >
+          <Input size="large" />
+        </Form.Item>
+        <Form.Item
+          name="BusinessCity"
+          label="City of Business"
+          rules={[{ required: true }]}
+        >
+          <Input size="large" />
+        </Form.Item>
+        <Form.Item
+          name="LGAofBusiness"
+          label="Local Government Area of Business"
           rules={[{ required: true }]}
         >
           <Input size="large" />
@@ -336,6 +365,13 @@ function CAC() {
         <Form.Item
           name="businessName2"
           label="Business Name (Second Choice)"
+          rules={[{ required: true }]}
+        >
+          <Input size="large" />
+        </Form.Item>
+        <Form.Item
+          name="businessName3"
+          label="Business Name (Third Choice)"
           rules={[{ required: true }]}
         >
           <Input size="large" />

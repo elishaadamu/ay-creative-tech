@@ -1,10 +1,32 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { config } from "../../config/config";
+import CryptoJS from "crypto-js";
+import { Modal, Button, Spin } from "antd";
+import { CopyOutlined, LoadingOutlined } from "@ant-design/icons";
+import { toast } from "react-toastify";
 
 const ApiDocumentation = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [activeEndpoint, setActiveEndpoint] = useState("nin-verification");
   const [selectedLanguage, setSelectedLanguage] = useState("javascript");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [apiToken, setApiToken] = useState(null);
+
+  const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
+
+  const decryptData = (ciphertext) => {
+    if (!ciphertext) return null;
+    try {
+      const bytes = CryptoJS.AES.decrypt(ciphertext, SECRET_KEY);
+      const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+      return JSON.parse(decrypted);
+    } catch {
+      return null;
+    }
+  };
 
   const codeExamples = {
     javascript: {
@@ -356,6 +378,65 @@ $response = curl_exec($ch);
     },
   ];
 
+  const handleGetApiKey = async () => {
+    setLoading(true);
+    try {
+      // Get userId from encrypted localStorage
+      const userStr = localStorage.getItem("user");
+      if (!userStr) {
+        toast.error("Please login to generate API key");
+        return;
+      }
+
+      const userObj = decryptData(userStr);
+      const userId = userObj?._id || userObj?.id;
+
+      if (!userId) {
+        toast.error("User ID not found");
+        return;
+      }
+
+      const response = await axios.post(
+        `${config.apiBaseUrl}${config.endpoints.apitoken}`,
+        { userId },
+        { withCredentials: true }
+      );
+      console.log("Get response:", response.data.token);
+      console.log("Get userId:", userId);
+
+      if (response.data) {
+        setApiToken(response.data.token);
+        setIsModalVisible(true);
+      }
+    } catch (error) {
+      console.error("Error generating API key:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to generate API key"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const copyToClipboard = async (text, type) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success(`${type} copied successfully!`, {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    } catch (error) {
+      toast.error("Failed to copy to clipboard", {
+        position: "top-right",
+        autoClose: 2000,
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
@@ -399,7 +480,12 @@ $response = curl_exec($ch);
               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                 v1.0.0
               </span>
-              <button className="bg-blue-600 hover:bg-blue-700 text-white px-2 md:px-4 py-2 rounded-md text-sm font-medium">
+              <button
+                onClick={handleGetApiKey}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-2 md:px-4 py-2 rounded-md text-sm font-medium flex items-center"
+                disabled={loading}
+              >
+                {loading ? <LoadingOutlined className="mr-2" /> : null}
                 Get API Key
               </button>
             </div>
@@ -1711,6 +1797,70 @@ $response = curl_exec($ch);
           </div>
         </div>
       </div>
+
+      <Modal
+        title="Your API Credentials"
+        open={isModalVisible}
+        onCancel={() => setIsModalVisible(false)}
+        footer={[
+          <Button key="close" onClick={() => setIsModalVisible(false)}>
+            Close
+          </Button>,
+        ]}
+      >
+        {apiToken ? (
+          <div className="space-y-4">
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm font-medium text-gray-500">
+                  API Key
+                </span>
+                <Button
+                  icon={<CopyOutlined />}
+                  size="small"
+                  onClick={() => copyToClipboard(apiToken.apiKey)}
+                >
+                  Copy
+                </Button>
+              </div>
+              <p className="font-mono text-sm break-all">{apiToken.apiKey}</p>
+            </div>
+
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm font-medium text-gray-500">
+                  API Secret
+                </span>
+                <Button
+                  icon={<CopyOutlined />}
+                  size="small"
+                  onClick={() => copyToClipboard(apiToken.secretKey)}
+                >
+                  Copy
+                </Button>
+              </div>
+              <p className="font-mono text-sm break-all">
+                {apiToken.secretKey}
+              </p>
+            </div>
+
+            <div className="mt-4">
+              <h4 className="text-sm font-medium text-red-600 mb-2">
+                Important:
+              </h4>
+              <ul className="text-sm text-gray-600 list-disc pl-4 space-y-1">
+                <li>Store these credentials securely</li>
+                <li>Never share your API secret</li>
+                <li>Use environment variables in production</li>
+              </ul>
+            </div>
+          </div>
+        ) : (
+          <div className="flex justify-center items-center h-32">
+            <Spin />
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };

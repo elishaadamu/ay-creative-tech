@@ -26,5 +26,6 @@ export const config = {
     Personalisation: "/verify/personalisation",
     DemographicSearch: "/demographic/search",
     Enrollment: "/enrollment/register",
+    apitoken: "/developer/tokens",
   },
 };
