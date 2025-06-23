@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import BasicImg from "../assets/images/information.png";
 import RegularImg from "../assets/images/regular.png";
 import StandardImg from "../assets/images/standard.png";
@@ -26,16 +26,64 @@ function NIN() {
     { label: "VNIN", value: "vnin" },
   ];
 
+  // Add new state for API prices
+  const [apiPrices, setApiPrices] = useState(null);
+
+  // Add useEffect to fetch prices when component mounts
+  useEffect(() => {
+    const fetchPrices = async () => {
+      try {
+        const response = await axios.get(
+          `${config.apiBaseUrl}${config.endpoints.currentapipricing}`,
+          { withCredentials: true }
+        );
+        console.log("API Prices Response:", response.data);
+        // Find NIN pricing
+        const ninPricing = response.data.find((item) => item.key === "nin");
+        console.log("NIN Pricing:", ninPricing.prices.agent);
+        if (ninPricing) {
+          // Update cardSlip with new prices
+          const updatedCardSlip = cardSlip.map((slip) => ({
+            ...slip,
+            price: ninPricing.prices.agent,
+          }));
+
+          setApiPrices(updatedCardSlip);
+        }
+      } catch (error) {
+        console.error("Error fetching API prices:", error);
+        toast.error("Failed to fetch current prices");
+      }
+    };
+
+    fetchPrices();
+  }, []);
+
   const cardSlip = [
-    { label: "Information Slip", value: "Basic", image: BasicImg, price: 200 },
-    { label: "Regular Slip", value: "Regular", image: RegularImg, price: 200 },
+    {
+      label: "Information Slip",
+      value: "Basic",
+      image: BasicImg,
+      price: apiPrices?.find((p) => p.value === "Basic")?.price || 200,
+    },
+    {
+      label: "Regular Slip",
+      value: "Regular",
+      image: RegularImg,
+      price: apiPrices?.find((p) => p.value === "Regular")?.price || 200,
+    },
     {
       label: "Standard Slip",
       value: "Standard",
       image: StandardImg,
-      price: 200,
+      price: apiPrices?.find((p) => p.value === "Standard")?.price || 200,
     },
-    { label: "Premium Slip", value: "Premium", image: PremiumImg, price: 300 },
+    {
+      label: "Premium Slip",
+      value: "Premium",
+      image: PremiumImg,
+      price: apiPrices?.find((p) => p.value === "Premium")?.price || 300,
+    },
   ];
 
   /* ---------------------------- component state ---------------------------- */
@@ -77,8 +125,10 @@ function NIN() {
       return;
     }
 
-    // Find the selected slip's price
-    const selectedSlipObj = cardSlip.find((s) => s.value === selectedSlip);
+    // Find the selected slip's price from the updated prices
+    const selectedSlipObj =
+      apiPrices?.find((s) => s.value === selectedSlip) ||
+      cardSlip.find((s) => s.value === selectedSlip);
     const slipAmount = selectedSlipObj ? selectedSlipObj.price : 0;
 
     // Show confirmation dialog
@@ -183,11 +233,11 @@ function NIN() {
             <label
               key={value}
               className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border p-6 text-center transition
-            ${
-              selectedVerify === value
-                ? "border-amber-400 ring-2 ring-amber-300 shadow-lg"
-                : "border-gray-200 shadow-md hover:shadow-lg"
-            }`}
+      ${
+        selectedVerify === value
+          ? "border-amber-400 ring-2 ring-amber-300 shadow-lg"
+          : "border-gray-200 shadow-md hover:shadow-lg"
+      }`}
             >
               <input
                 type="radio"
@@ -195,8 +245,9 @@ function NIN() {
                 value={value}
                 checked={selectedVerify === value}
                 onChange={() => setSelectedVerify(value)}
-                className="hidden"
-                required
+                className="sr-only" // Change from hidden to sr-only
+                aria-label={`Select ${label}`} // Add aria-label for accessibility
+                tabIndex={0} // Make it focusable
               />
 
               <h3 className="mb-4 text-lg font-semibold text-gray-600">

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import { Modal } from "antd";
 import { MdOutlineSendToMobile } from "react-icons/md";
@@ -27,9 +27,7 @@ function IPEClearance() {
   const [loading, setLoading] = useState(false);
   const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
   const [verificationResult, setVerificationResult] = useState(null);
-
-  // Fixed amount for IPE Clearance
-  const amount = 1;
+  const [amount, setAmount] = useState(0); // Default amount
 
   const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
 
@@ -49,10 +47,9 @@ function IPEClearance() {
     const result = await Swal.fire({
       title: "Confirm IPE Clearance",
       html: `
-        <p class="mb-2 text-gray-500 ">Please confirm your details:</p>
-        
-        <p class="mb-2 text-gray-500 ">Tracking ID: ${formData.trackingId}</p>
-        <p class="mb-2 text-gray-500 ">Amount: ₦${amount}</p>
+        <p class="mb-2 text-gray-500">Please confirm your details:</p>
+        <p class="mb-2 text-gray-500">Tracking ID: ${formData.trackingId}</p>
+        <p class="mb-2 text-gray-500">Amount: ₦${amount.toLocaleString()}</p>
       `,
       icon: "warning",
       showCancelButton: true,
@@ -85,7 +82,7 @@ function IPEClearance() {
     setLoading(true);
     const payload = {
       trackingId: formData.trackingId,
-      amount,
+      amount, // Use dynamic amount
       userId,
       pin: formData.pin,
     };
@@ -123,6 +120,31 @@ function IPEClearance() {
     // Close the modal after navigation
     setIsSuccessModalVisible(false);
   };
+
+  // Add useEffect to fetch IPE pricing
+  useEffect(() => {
+    const fetchPrices = async () => {
+      try {
+        const response = await axios.get(
+          `${config.apiBaseUrl}${config.endpoints.currentapipricing}`,
+          { withCredentials: true }
+        );
+
+        // Find IPE pricing
+        const ipePricing = response.data.find((item) => item.key === "ipe");
+
+        if (ipePricing?.prices?.agent) {
+          setAmount(ipePricing.prices.agent);
+          console.log("IPE Price fetched:", ipePricing.prices.agent);
+        }
+      } catch (error) {
+        console.error("Error fetching IPE price:", error);
+        toast.error("Failed to fetch current price");
+      }
+    };
+
+    fetchPrices();
+  }, []);
 
   return (
     <>

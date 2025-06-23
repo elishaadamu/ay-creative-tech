@@ -20,11 +20,6 @@ function BVNVerify() {
   /* ---------------------------------- data --------------------------------- */
   const cardVerify = [{ label: "BANK VERIFICATION NUMBER", value: "bvn" }];
 
-  const cardSlip = [
-    { label: "Basic Details", value: "Basic", price: 200 },
-    { label: "Advanced Details", value: "Advanced", price: 200 },
-  ];
-
   /* ---------------------------- component state ---------------------------- */
   const [selectedVerify, setSelectedVerify] = useState("bvn"); // unselected by default
   const [selectedSlip, setSelectedSlip] = useState(""); // unselected by default
@@ -34,6 +29,11 @@ function BVNVerify() {
   const [apiData, setApiData] = useState(null); // <-- Add this state
   const [pin, setPin] = useState(""); // Add state for Transaction PIN
   const [showPin, setShowPin] = useState(false); // Add state for PIN visibility
+  const [apiPrices, setApiPrices] = useState(null);
+  const [cardSlip, setCardSlip] = useState([
+    { label: "Basic Details", value: "Basic", price: 200 },
+    { label: "Advanced Details", value: "Advanced", price: 200 },
+  ]);
 
   const navigate = useNavigate();
 
@@ -69,8 +69,10 @@ function BVNVerify() {
       return;
     }
 
-    // Find the selected slip's price
-    const selectedSlipObj = cardSlip.find((s) => s.value === selectedSlip);
+    // Find the selected slip's price from the updated prices
+    const selectedSlipObj =
+      apiPrices?.find((s) => s.value === selectedSlip) ||
+      cardSlip.find((s) => s.value === selectedSlip);
     const slipAmount = selectedSlipObj ? selectedSlipObj.price : 0;
 
     // Show confirmation dialog
@@ -148,6 +150,41 @@ function BVNVerify() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const fetchPrices = async () => {
+      try {
+        const response = await axios.get(
+          `${config.apiBaseUrl}${config.endpoints.currentapipricing}`,
+          { withCredentials: true }
+        );
+
+        // Find BVN pricing
+        const bvnPricing = response.data.find((item) => item.key === "bvn");
+
+        if (bvnPricing) {
+          // Update cardSlip with new prices
+          setCardSlip([
+            {
+              label: "Basic Details",
+              value: "Basic",
+              price: bvnPricing.prices.agent,
+            },
+            {
+              label: "Advanced Details",
+              value: "Advanced",
+              price: bvnPricing.prices.agent,
+            },
+          ]);
+        }
+      } catch (error) {
+        console.error("Error fetching API prices:", error);
+        toast.error("Failed to fetch current prices");
+      }
+    };
+
+    fetchPrices();
+  }, []);
 
   if (showSlip && selectedSlip === "Basic") {
     return <BasicBVN apiData={apiData} />; // <-- Pass apiData as prop
