@@ -93,7 +93,6 @@ function IPEClearance() {
         payload,
         { withCredentials: true }
       );
-      console.log("IPE response:", response.data?.data);
 
       setVerificationResult(response.data?.data);
       setIsSuccessModalVisible(true);
@@ -135,7 +134,6 @@ function IPEClearance() {
 
         if (ipePricing?.prices?.agent) {
           setAmount(ipePricing.prices.agent);
-          console.log("IPE Price fetched:", ipePricing.prices.agent);
         }
       } catch (error) {
         console.error("Error fetching IPE price:", error);
@@ -150,6 +148,12 @@ function IPEClearance() {
     <>
       <div className="w-full rounded-2xl mb-10 bg-white p-5 shadow-lg">
         <p className="text-[18px] text-gray-500  ">IPE CLEARANCE</p>
+        <p className="text-[18px] text-black mt-2 ">
+          Amount:{" "}
+          <span className="p-1 bg-green-200 text-green-900 rounded">
+            ₦{amount}
+          </span>
+        </p>
         <form onSubmit={handleSubmit}>
           <div>
             <p className="mt-7 text-[14px] text-gray-500">Supply Tracking ID</p>
