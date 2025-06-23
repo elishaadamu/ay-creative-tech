@@ -149,8 +149,8 @@ function IPEClearance() {
       <div className="w-full rounded-2xl mb-10 bg-white p-5 shadow-lg">
         <p className="text-[18px] text-gray-500  ">IPE CLEARANCE</p>
         <p className="text-[18px] text-black mt-2 ">
-          Amount:{" "}
-          <span className="p-1 bg-green-200 text-green-900 rounded">
+          This service will cost you:{" "}
+          <span className="p-1 text-lg bg-green-100 text-green-900 rounded">
             ₦{amount}
           </span>
         </p>
