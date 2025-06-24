@@ -38,7 +38,7 @@ const HeroSection = () => {
             href="#"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex justify-center md:justify-start"
+            className="flex justify-center xl:justify-start"
           >
             <div className="flex gap-3">
               <NavLink

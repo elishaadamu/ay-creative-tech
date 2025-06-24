@@ -8,12 +8,12 @@ body.light h1 {
 }
 /* Hero Section Style */
 .hero--section {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  display: flex;
   padding: 133.333px 85.333px 133.333px;
   justify-content: space-between;
   gap: 32px;
   background-color: var(--bg-shade);
+  flex-direction: row-reverse;
 }
 
 .hero--section--content-box {
@@ -113,10 +113,8 @@ body.dark .consult--button:nth-child(2):hover {
     padding-top: 100px;
   }
   .hero--section--content > p {
-    text-align: center !important;
   }
   .hero--section--title {
-    text-align: center;
   }
   .hero--section-description {
     font-size: 18px;
@@ -146,13 +144,18 @@ body.dark .consult--button:nth-child(2):hover {
   }
 }
 
-@media screen and (max-width: 1024px) {
+@media screen and (max-width: 1280px) {
   .hero--section {
     display: grid;
     grid-template-columns: repeat(1, 1fr);
     padding: 133.333px 85.333px 133.333px;
     justify-content: space-between;
-    gap: 32px;
+    gap: 60px;
     background-color: var(--bg-shade);
+  }
+  .hero--section--content,
+  .hero--section--content--box {
+    align-items: center;
+    justify-content: center;
   }
 }
