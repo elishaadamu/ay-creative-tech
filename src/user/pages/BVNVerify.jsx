@@ -15,6 +15,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { config } from "../../config/config.jsx";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import { useBVNSlip } from "../../context/BVNSlipContext";
 
 function BVNVerify() {
   /* ---------------------------------- data --------------------------------- */
@@ -36,6 +37,7 @@ function BVNVerify() {
   ]);
 
   const navigate = useNavigate();
+  const { viewSlip } = useBVNSlip();
 
   // Add your secret key for decryption
   const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
@@ -120,6 +122,9 @@ function BVNVerify() {
         { withCredentials: true }
       );
 
+      // Store the verification data in context
+      viewSlip(response.data?.data?.data, selectedSlip);
+
       // Show success alert
       await Swal.fire({
         title: "Verification Successful!",
@@ -128,18 +133,12 @@ function BVNVerify() {
         confirmButtonColor: "#f59e0b",
       });
 
-      toast.success("BVN verified successfully!", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
-
-      const bvnData = response.data?.data?.data;
-      setApiData(bvnData);
-      setShowSlip(true);
+      // Navigate to appropriate slip view
+      if (selectedSlip === "Basic") {
+        navigate("/dashboard/verifications/basicbvn");
+      } else {
+        navigate("/dashboard/verifications/advancedbvn");
+      }
     } catch (error) {
       console.error("Verification error:", error);
       toast.error(
@@ -185,14 +184,6 @@ function BVNVerify() {
 
     fetchPrices();
   }, []);
-
-  if (showSlip && selectedSlip === "Basic") {
-    return <BasicBVN apiData={apiData} />; // <-- Pass apiData as prop
-  }
-
-  if (showSlip && selectedSlip === "Advanced") {
-    return <AdvancedBVNSlip apiData={apiData} />; // Add the apiData prop here
-  }
 
   /* --------------------------------- render -------------------------------- */
   return (

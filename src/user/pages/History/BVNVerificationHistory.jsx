@@ -13,6 +13,7 @@ import {
 import { Empty, Modal } from "antd";
 import { InboxOutlined, EyeOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { useBVNSlip } from "../../../context/BVNSlipContext";
 
 // Add your secret key for decryption
 const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
@@ -29,6 +30,7 @@ function decryptData(ciphertext) {
 }
 
 export default function VerificationsHistoryTable() {
+  const { viewSlip } = useBVNSlip();
   const navigate = useNavigate();
 
   // Get encrypted user data from localStorage
@@ -186,25 +188,17 @@ export default function VerificationsHistoryTable() {
     setIsModalVisible(true);
   };
 
+  // Update handleViewSlip function
   const handleViewSlip = (transaction) => {
     const slipType = transaction.slipLayout;
-    const verificationType = transaction.verifyWith;
     const apiData = transaction.data?.data;
-    console.log("Transaction Data:", apiData);
-    if (verificationType === "nin") {
-      navigate("/dashboard/verifications/ninslip", {
-        state: { userData: transaction.data?.nin_data },
-      });
-    } else if (verificationType === "bvn") {
-      if (slipType === "Basic") {
-        navigate("/dashboard/verifications/basicbvn", {
-          state: { apiData: transaction.data?.data }, // Match the structure from BVNVerify
-        });
-      } else {
-        navigate("/dashboard/verifications/advancedbvn", {
-          state: { apiData: transaction.data?.data?.data }, // Match the structure from BVNVerify
-        });
-      }
+
+    viewSlip(apiData, slipType);
+
+    if (slipType === "Basic") {
+      navigate("/dashboard/verifications/basicbvn");
+    } else {
+      navigate("/dashboard/verifications/advancedbvn");
     }
   };
 
@@ -225,7 +219,7 @@ export default function VerificationsHistoryTable() {
   return (
     <div className="p-4 w-full">
       <h2 className="text-[clamp(1.2rem,2vw,2rem)] font-bold mb-4">
-        Summary of All Transaction History
+        BVN Verification History
       </h2>
 
       {/* Search and Date Filter Controls */}

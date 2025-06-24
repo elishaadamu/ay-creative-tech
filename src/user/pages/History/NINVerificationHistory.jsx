@@ -225,7 +225,7 @@ export default function VerificationsHistoryTable() {
   return (
     <div className="p-4 w-full">
       <h2 className="text-[clamp(1.2rem,2vw,2rem)] font-bold mb-4">
-        Summary of All Transaction History
+        NIN Verification History
       </h2>
 
       {/* Search and Date Filter Controls */}

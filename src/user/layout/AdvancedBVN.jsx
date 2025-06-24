@@ -5,15 +5,25 @@ import BVNlogo from "../assets/images/BVN-logo.png";
 import Avatar from "../assets/images/1.png";
 import Fingerprint from "../assets/images/finger-print.png";
 import { BsFillHandIndexThumbFill } from "react-icons/bs";
+import { useBVNSlip } from "../../context/BVNSlipContext";
+import { useNavigate } from "react-router-dom";
 
-function AdvancedBVNSlip({ apiData }) {
+function AdvancedBVNSlip() {
+  const { slipData, clearSlip } = useBVNSlip();
+  const navigate = useNavigate();
+
   useEffect(() => {
-    console.log("Advanced BVN Data:", apiData); // Debug log
-    toast.success("BVN verified successfully!");
-  }, [apiData]);
+    if (!slipData) {
+      navigate("/dashboard/bvnhistory");
+      return;
+    }
 
-  // Get user data from props with fallback
-  const user = apiData?.data || apiData || {};
+    toast.success("BVN verified successfully!");
+
+    return () => clearSlip(); // Clean up when component unmounts
+  }, []);
+
+  const user = slipData || {};
 
   // Use base64 image if available, else fallback
   const avatarSrc = user.base64Image
@@ -106,7 +116,7 @@ function AdvancedBVNSlip({ apiData }) {
         </div>
 
         <div className="absolute top-0 right-0 gap-10 mt-12 flex items-center justify-center">
-          <BsFillHandIndexThumbFill className="w-20 h-20 text-blue-500" />
+          <BsFillHandIndexThumbFill className="w-20 h-24 text-green-500" />
           <div>
             <img
               src={Fingerprint}

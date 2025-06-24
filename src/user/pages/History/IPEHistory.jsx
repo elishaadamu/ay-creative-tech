@@ -2,7 +2,7 @@ import * as React from "react";
 import axios from "axios";
 import { config } from "../../../config/config.jsx";
 import CryptoJS from "crypto-js";
-import { format } from "date-fns"; // Add this import for date formatting
+import { format, formatDistanceToNow, differenceInMinutes } from "date-fns"; // Add this import for date formatting
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {
@@ -10,7 +10,7 @@ import {
   ArrowUpIcon,
   ArrowDownIcon,
 } from "@heroicons/react/24/solid";
-import { Empty, Modal } from "antd";
+import { Empty, Modal, Tooltip } from "antd";
 import { InboxOutlined, EyeOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 
@@ -67,25 +67,6 @@ export default function VerificationsHistoryTable() {
       console.log("API Response:", response.data);
 
       const details = response.data?.findData || [];
-      // console.log("All Verification Details:");
-      // details.forEach((detail, index) => {
-      //   console.log(`Verification ${index + 1}:`, {
-      //     id: detail._id,
-      //     date: detail.createdAt,
-      //     verificationType: detail.verifyWith,
-      //     slipType: detail.slipLayout,
-      //     dataFor: detail.dataFor,
-      //     status: detail.data?.verification?.status,
-      //     reference: detail.data?.verification?.reference,
-      //     endpointName: detail.data?.endpoint_name,
-      //     responseDetail: detail.data?.detail,
-      //     // Additional verification data based on type
-      //     verificationData:
-      //       detail.verifyWith === "nin"
-      //         ? detail.data?.nin_data
-      //         : detail.data?.data,
-      //   });
-      // });
 
       // Set the API data
       setApiData(details || []);
@@ -176,9 +157,19 @@ export default function VerificationsHistoryTable() {
     );
   };
 
-  const showModal = (transaction) => {
-    setSelectedTransaction(transaction);
-    setIsModalVisible(true);
+  const showModal = async (transaction) => {
+    if (transaction.dataFor === "IPE-Slip") {
+      const trackingId = transaction.data?.old_tracking_id;
+      const details = await fetchIPEDetails(trackingId);
+      setSelectedTransaction({
+        ...transaction,
+        ipeDetails: details,
+      });
+      setIsModalVisible(true);
+    } else {
+      setSelectedTransaction(transaction);
+      setIsModalVisible(true);
+    }
   };
 
   const handleViewSlip = (transaction) => {
@@ -200,6 +191,27 @@ export default function VerificationsHistoryTable() {
           state: { apiData: transaction.data?.data?.data }, // Match the structure from BVNVerify
         });
       }
+    }
+  };
+
+  // Update the fetchIPEDetails function
+  const fetchIPEDetails = async (trackingId) => {
+    try {
+      const payload = {
+        trackingId: trackingId,
+        userId,
+      };
+
+      console.log("Fetching IPE details with payload:", payload);
+      const response = await axios.post(
+        `${config.apiBaseUrl}${config.endpoints.freeStatusipe}`,
+        payload,
+        { withCredentials: true }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching IPE details:", error);
+      return null;
     }
   };
 
@@ -249,7 +261,7 @@ export default function VerificationsHistoryTable() {
   return (
     <div className="p-4 w-full">
       <h2 className="text-[clamp(1.2rem,2vw,2rem)] font-bold mb-4">
-        Summary of All Transaction History
+        IPE Transaction History
       </h2>
 
       {/* Search and Date Filter Controls */}
@@ -292,10 +304,11 @@ export default function VerificationsHistoryTable() {
                     sortKey="createdAt"
                     className="w-[clamp(80px,15vw,112px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
                   />
+
                   <TableHeader
-                    label="Data For"
-                    sortKey="dataFor"
-                    className="w-[clamp(120px,20vw,160px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
+                    label="Status"
+                    sortKey="status"
+                    className="w-[100px] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
                   />
                   <th className="w-[60px] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">
                     View Slip
@@ -317,9 +330,10 @@ export default function VerificationsHistoryTable() {
                         "dd/MM/yyyy HH:mm"
                       )}
                     </td>
-                    <td className="w-[clamp(120px,20vw,160px)] px-2 py-2 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[clamp(0.65rem,1vw,0.75rem)] font-medium capitalize bg-blue-100 text-blue-800">
-                        {transaction.dataFor}
+
+                    <td className="w-[100px] px-2 py-2 whitespace-nowrap">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        {transaction.data?.transactionStatus || "completed"}
                       </span>
                     </td>
                     <td className="w-[60px] px-2 py-2 whitespace-nowrap">
@@ -616,6 +630,11 @@ export default function VerificationsHistoryTable() {
                     {selectedTransaction.data?.detail || "N/A"}
                   </p>
                 </div>
+              </div>
+            )}
+            {selectedTransaction.dataFor === "IPE-Slip" && (
+              <div className="grid grid-cols-2 gap-4">
+                {/* Existing IPE details */}
               </div>
             )}
           </div>

@@ -4,14 +4,26 @@ import "react-toastify/dist/ReactToastify.css"; // <-- Import styles
 import CoatofArm from "../assets/images/coat-of-arm.png";
 import BVNlogo from "../assets/images/BVN-logo.png";
 import Avatar from "../assets/images/BVN-logo.png";
+import { useBVNSlip } from "../../context/BVNSlipContext";
+import { useNavigate } from "react-router-dom";
 
-function BasicBVN({ apiData }) {
+function BasicBVN() {
+  const { slipData, clearSlip } = useBVNSlip();
+  const navigate = useNavigate();
+
   useEffect(() => {
+    if (!slipData) {
+      navigate("/dashboard/bvnhistory");
+      return;
+    }
+
     toast.success("BVN verified successfully!");
+
+    return () => clearSlip(); // Clean up when component unmounts
   }, []);
 
-  // Example: apiData = { data: { ...fields }, ... }
-  const user = apiData || {};
+  // Remove apiData prop and use slipData from context
+  const user = slipData || {};
   console.log("User Data:", user);
   const handlePrint = () => {
     toast.info("Printing BVN Slip...", { autoClose: 2000 });

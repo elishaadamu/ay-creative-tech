@@ -16,6 +16,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import ForgottenPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import InputOTP from "./pages/InputOTP";
+import { BVNSlipProvider } from "./context/BVNSlipContext";
 
 const App = () => {
   const location = useLocation();
@@ -63,34 +64,39 @@ const App = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
-      {showLayout && <NavBar />}
-      <div className="flex-grow">
-        <AnimatePresence mode="wait">
-          <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<Home />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="*" element={<NotFound />} />
-            <Route path="/forgottenpassword" element={<ForgottenPassword />} />
-            <Route path="/resetpassword" element={<ResetPassword />} />
-            <Route path="/otp" element={<InputOTP />} />
+    <BVNSlipProvider>
+      <div className="flex flex-col min-h-screen">
+        {showLayout && <NavBar />}
+        <div className="flex-grow">
+          <AnimatePresence mode="wait">
+            <Routes location={location} key={location.pathname}>
+              <Route path="/" element={<Home />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="*" element={<NotFound />} />
+              <Route
+                path="/forgottenpassword"
+                element={<ForgottenPassword />}
+              />
+              <Route path="/resetpassword" element={<ResetPassword />} />
+              <Route path="/otp" element={<InputOTP />} />
 
-            <Route
-              path="/dashboard/*"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </AnimatePresence>
+              <Route
+                path="/dashboard/*"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </AnimatePresence>
+        </div>
+        {showLayout && <Footer />}
+        {!isDashboard && <Backtotop />}
       </div>
-      {showLayout && <Footer />}
-      {!isDashboard && <Backtotop />}
-    </div>
+    </BVNSlipProvider>
   );
 };
 
