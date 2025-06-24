@@ -113,7 +113,7 @@ function Services() {
               {serviceItems.map((item, index) => (
                 <div key={index} className="group flex items-start gap-4 ">
                   <div className="flex justify-center items-center w-14 h-14 rounded-full bg-gray-100 transition group-hover:bg-amber-600">
-                    <IoCopyOutline className="text-2xl text-amber-600 group-hover:text-white transition" />
+                    <IoCopyOutline className="w-8 h-8 text-amber-600 group-hover:text-white transition" />
                   </div>
                   <div>
                     <h3 className="font-bold text-[16px] dark:text-white group-hover:text-amber-600">

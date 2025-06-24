@@ -77,8 +77,11 @@ const Footer = () => {
               <img src={Logo} alt="Logo" className="nav-logo" />
             </NavLink>
           </div>
-          <p className="text-gray-500 mt-5">
-            Empowering Brands Through Smart Tech and Bold Ideas.
+          <p className="text-gray-500 mt-5 mr-1">
+            Trusted platform providing secure verification including Nin,Bvn and
+            documents modification, Our mission is to offer reliable,fast, and
+            accurate verification solutions to help you with your personal and
+            business needs.
           </p>
           <div className="flex justify-start mt-5 items-center gap-1">
             <MdOutlineMarkEmailRead />

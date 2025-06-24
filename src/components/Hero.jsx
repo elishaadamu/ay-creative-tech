@@ -10,6 +10,9 @@ const HeroSection = () => {
         id="heroSection"
         className="hero--section items-start mx-auto max-w-[1500px]"
       >
+        <div className="hero--section--img">
+          <img src={HeroImage} alt="Hero Section" />
+        </div>
         <div className="hero--section--content--box">
           <div className="hero--section--content">
             <p className="text-xlb  md:text-3xl text-center md:text-left ">
@@ -53,9 +56,6 @@ const HeroSection = () => {
               </NavLink>
             </div>
           </a>
-        </div>
-        <div className="hero--section--img">
-          <img src={HeroImage} alt="Hero Section" />
         </div>
       </div>
       <hr className="text-black dark:text-white" />

@@ -1,5 +1,5 @@
 body.light .hero {
-  background-color: rebeccapurple !important;
+  background-color: #273042 !important;
 }
 body.light .hero--section--content--box p {
   color: white;
@@ -143,5 +143,16 @@ body.dark .consult--button:nth-child(2):hover {
   }
   .divider {
     margin: 20px;
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .hero--section {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    padding: 133.333px 85.333px 133.333px;
+    justify-content: space-between;
+    gap: 32px;
+    background-color: var(--bg-shade);
   }
 }
