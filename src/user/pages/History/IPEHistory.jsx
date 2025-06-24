@@ -28,6 +28,17 @@ function decryptData(ciphertext) {
   }
 }
 
+// Add this helper function at the top of the file
+const formatDate = (dateString) => {
+  try {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    return isNaN(date.getTime()) ? "N/A" : format(date, "dd/MM/yyyy HH:mm:ss");
+  } catch (error) {
+    return "N/A";
+  }
+};
+
 export default function VerificationsHistoryTable() {
   const navigate = useNavigate();
 
@@ -66,10 +77,10 @@ export default function VerificationsHistoryTable() {
       });
       console.log("API Response:", response.data);
 
-      const details = response.data?.findData || [];
+      const details = response.data || [];
 
       // Set the API data
-      setApiData(details || []);
+      setSelectedTransaction(details || []);
     } catch (error) {
       console.error("Error fetching verification history:", error);
     } finally {
@@ -85,8 +96,9 @@ export default function VerificationsHistoryTable() {
     const searchStr = searchTerm.toLowerCase();
     const transactionDate = new Date(transaction.createdAt);
 
-    // Date filter
+    // Date filter with validation
     const passesDateFilter =
+      (!startDate || !isNaN(transactionDate.getTime())) &&
       (!startDate || transactionDate >= startDate) &&
       (!endDate || transactionDate <= endDate);
 
@@ -117,6 +129,12 @@ export default function VerificationsHistoryTable() {
       if (sortConfig.key === "createdAt") {
         const dateA = new Date(a[sortConfig.key]);
         const dateB = new Date(b[sortConfig.key]);
+
+        // Handle invalid dates
+        if (isNaN(dateA.getTime())) return 1;
+        if (isNaN(dateB.getTime())) return -1;
+        if (isNaN(dateA.getTime()) && isNaN(dateB.getTime())) return 0;
+
         return sortConfig.direction === "asc" ? dateA - dateB : dateB - dateA;
       }
 
@@ -157,21 +175,6 @@ export default function VerificationsHistoryTable() {
     );
   };
 
-  const showModal = async (transaction) => {
-    if (transaction.dataFor === "IPE-Slip") {
-      const trackingId = transaction.data?.old_tracking_id;
-      const details = await fetchIPEDetails(trackingId);
-      setSelectedTransaction({
-        ...transaction,
-        ipeDetails: details,
-      });
-      setIsModalVisible(true);
-    } else {
-      setSelectedTransaction(transaction);
-      setIsModalVisible(true);
-    }
-  };
-
   const handleViewSlip = (transaction) => {
     const slipType = transaction.slipLayout;
     const verificationType = transaction.verifyWith;
@@ -191,27 +194,6 @@ export default function VerificationsHistoryTable() {
           state: { apiData: transaction.data?.data?.data }, // Match the structure from BVNVerify
         });
       }
-    }
-  };
-
-  // Update the fetchIPEDetails function
-  const fetchIPEDetails = async (trackingId) => {
-    try {
-      const payload = {
-        trackingId: trackingId,
-        userId,
-      };
-
-      console.log("Fetching IPE details with payload:", payload);
-      const response = await axios.post(
-        `${config.apiBaseUrl}${config.endpoints.freeStatusipe}`,
-        payload,
-        { withCredentials: true }
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching IPE details:", error);
-      return null;
     }
   };
 
@@ -257,6 +239,12 @@ export default function VerificationsHistoryTable() {
   );
 
   const totalPages = Math.ceil(sortedTransactions.length / pageSize);
+
+  // Add this function before the return statement
+  const showModal = (transaction) => {
+    setSelectedTransaction(transaction);
+    setIsModalVisible(true);
+  };
 
   return (
     <div className="p-4 w-full">
@@ -325,10 +313,7 @@ export default function VerificationsHistoryTable() {
                     className="hover:bg-gray-50 transition-colors"
                   >
                     <td className="w-[clamp(80px,15vw,112px)] px-2 py-2 whitespace-nowrap text-[clamp(0.8rem,1vw,0.75rem)] text-gray-900">
-                      {format(
-                        new Date(transaction.createdAt),
-                        "dd/MM/yyyy HH:mm"
-                      )}
+                      {formatDate(transaction.createdAt)}
                     </td>
 
                     <td className="w-[100px] px-2 py-2 whitespace-nowrap">
@@ -515,10 +500,7 @@ export default function VerificationsHistoryTable() {
                 <div>
                   <p className="text-sm font-medium text-gray-500">Date</p>
                   <p className="mt-1 text-sm text-gray-900">
-                    {format(
-                      new Date(selectedTransaction.createdAt),
-                      "dd/MM/yyyy HH:mm:ss"
-                    )}
+                    {formatDate(selectedTransaction.createdAt)}
                   </p>
                 </div>
                 <div>
@@ -584,10 +566,7 @@ export default function VerificationsHistoryTable() {
                 <div>
                   <p className="text-sm font-medium text-gray-500">Date</p>
                   <p className="mt-1 text-sm text-gray-900">
-                    {format(
-                      new Date(selectedTransaction.createdAt),
-                      "dd/MM/yyyy HH:mm:ss"
-                    )}
+                    {formatDate(selectedTransaction.createdAt)}
                   </p>
                 </div>
                 <div>

@@ -28,6 +28,8 @@ function checkStatusipe() {
   const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
   const [verificationResult, setVerificationResult] = useState(null);
   const [amount, setAmount] = useState(0); // Default amount
+  const [countdown, setCountdown] = useState(600); // 10 minutes in seconds
+  const [isCountingDown, setIsCountingDown] = useState(false);
 
   const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
 
@@ -96,6 +98,7 @@ function checkStatusipe() {
 
       setVerificationResult(response.data?.data);
       setIsSuccessModalVisible(true);
+      setIsCountingDown(true); // Start the countdown
       toast.success("IPE Clearance verified successfully!");
     } catch (error) {
       console.error("Verification error:", error);
@@ -115,7 +118,8 @@ function checkStatusipe() {
 
   const handleViewStatus = () => {
     // Navigate to IPE clearance page
-    navigate("/dashboard/ipe-clearance");
+    navigate("/dashboard/ipe-history");
+    toast.success("Navigating to IPE Clearance History", 1500);
     // Close the modal after navigation
     setIsSuccessModalVisible(false);
   };
@@ -144,10 +148,43 @@ function checkStatusipe() {
     fetchPrices();
   }, []);
 
+  // Countdown timer effect
+  useEffect(() => {
+    let timer;
+    if (isCountingDown && countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown((prevCount) => {
+          if (prevCount <= 1) {
+            navigate("/dashboard/ipe-history");
+            return 0;
+          }
+          return prevCount - 1;
+        });
+      }, 1000);
+    }
+
+    return () => clearInterval(timer);
+  }, [isCountingDown, countdown, navigate]);
+
+  // Prevent navigation during countdown
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (isCountingDown) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isCountingDown]);
+
   return (
     <>
       <div className="w-full rounded-2xl mb-10 bg-white p-5 shadow-lg">
-        <p className="text-[18px] text-gray-500  ">Check IPE Status</p>
+        <p className="text-3xl font-bold text-amber-500 mb-5 text-center ">
+          Check IPE Status
+        </p>
         <p className="text-[18px] text-black mt-2 ">
           This service will cost you:{" "}
           <span className="p-1 text-lg bg-green-100 text-green-900 rounded">
@@ -229,22 +266,54 @@ function checkStatusipe() {
 
       <Modal
         open={isSuccessModalVisible}
-        onCancel={() => setIsSuccessModalVisible(false)}
+        closable={!isCountingDown}
+        maskClosable={false}
+        onCancel={() => {
+          if (!isCountingDown) {
+            setIsSuccessModalVisible(false);
+          }
+        }}
         footer={[
-          <Link
-            to="/dashboard/ipe-history"
-            key="view-status"
+          <button
+            key="check-status"
             onClick={handleViewStatus}
-            className="bg-amber-500 cursor-pointer flex justify-center hover:bg-amber-600 text-white font-medium py-2 px-4 rounded-xl transition-colors"
+            disabled={isCountingDown}
+            className={`flex justify-center border border-black font-medium py-2 px-4 rounded-xl transition-colors ${
+              isCountingDown
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-amber-500 hover:bg-amber-600 cursor-pointer text-white"
+            }`}
           >
-            View Status
-          </Link>,
+            {isCountingDown
+              ? `View Status (${Math.floor(countdown / 60)}:${(countdown % 60)
+                  .toString()
+                  .padStart(2, "0")})`
+              : "View Status"}
+          </button>,
         ]}
       >
         <div className="py-4 text-center">
           <h1 className="text-3xl font-bold text-amber-500 mb-5">
-            IPE Clearance
+            IPE Status Check
           </h1>
+
+          {verificationResult && (
+            <>
+              <p className="text-[17px] text-green-900 bg-green-100 mb-5 ">
+                {verificationResult.description}
+              </p>
+            </>
+          )}
+
+          <div className="text-gray-600 text-xl mb-4">
+            Status check request submitted successfully! Please wait for 10
+            minutes. Do not close this window or navigate away.
+          </div>
+
+          <div className="text-2xl font-semibold text-amber-500">
+            Time remaining: {Math.floor(countdown / 60)}:
+            {(countdown % 60).toString().padStart(2, "0")}
+          </div>
         </div>
       </Modal>
     </>

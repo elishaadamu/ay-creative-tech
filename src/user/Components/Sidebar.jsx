@@ -20,6 +20,8 @@ import {
   FaLeaf,
   FaSimCard,
 } from "react-icons/fa";
+import { FaListCheck } from "react-icons/fa6";
+
 import { RiPassportFill } from "react-icons/ri";
 import { MdHistory } from "react-icons/md";
 import { IoEnterSharp } from "react-icons/io5";
@@ -93,6 +95,11 @@ const sidebarSections = [
         to: "/dashboard/ipe-clearance",
         icon: <FaPersonCircleCheck className="w-5 h-5" />,
         label: "IPE Clearance",
+      },
+      {
+        to: "/dashboard/check-ipe-status",
+        icon: <FaListCheck className="w-5 h-5" />,
+        label: "IPE Clearance Check Status",
       },
       {
         to: "/dashboard/personalisation",

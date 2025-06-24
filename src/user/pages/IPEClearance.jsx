@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { config } from "../../config/config.jsx";
 import CryptoJS from "crypto-js";
 import { Link } from "react-router-dom";
+import { format } from "date-fns";
 
 function IPEClearance() {
   const navigate = useNavigate();
@@ -30,6 +31,9 @@ function IPEClearance() {
   const [amount, setAmount] = useState(0); // Default amount
   const [countdown, setCountdown] = useState(600); // 600 seconds = 10 minutes
   const [isCountingDown, setIsCountingDown] = useState(false);
+  const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
+  const [statusData, setStatusData] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
 
@@ -118,7 +122,7 @@ function IPEClearance() {
 
   const handleViewStatus = () => {
     if (!isCountingDown) {
-      navigate("/dashboard/check-ipe-status");
+      navigate("/dashboard/ipe-history");
       setIsSuccessModalVisible(false);
     }
   };
@@ -154,8 +158,7 @@ function IPEClearance() {
       timer = setInterval(() => {
         setCountdown((prevCount) => {
           if (prevCount <= 1) {
-            // When countdown reaches 0, navigate
-            navigate("/dashboard/check-ipe-status");
+            setIsCountingDown(false);
             return 0;
           }
           return prevCount - 1;
@@ -164,7 +167,7 @@ function IPEClearance() {
     }
 
     return () => clearInterval(timer);
-  }, [isCountingDown, countdown, navigate]);
+  }, [isCountingDown, countdown]);
 
   // First, add this useEffect to prevent navigation
   useEffect(() => {
@@ -178,6 +181,48 @@ function IPEClearance() {
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [isCountingDown]);
+
+  // Add this new function to handle the status check
+  const fetchFreeStatusIPE = async (trackingId) => {
+    const payload = {
+      trackingId: formData.trackingId,
+      userId,
+    };
+    try {
+      const response = await axios.post(
+        `${config.apiBaseUrl}${config.endpoints.freeStatusipe}`,
+        { payload },
+        { withCredentials: true }
+      );
+      console.log("Free Status IPE Response:", response.data);
+      setStatusData(response.data?.data);
+    } catch (error) {
+      console.error("Error fetching IPE status:", error);
+      toast.error(error.response?.data?.message || "Failed to fetch status");
+      return null;
+    }
+  };
+
+  const handleCheckStatus = async () => {
+    if (!formData.trackingId) {
+      toast.error("Please provide a tracking ID");
+      return;
+    }
+
+    try {
+      const details = await fetchFreeStatusIPE(formData.trackingId);
+      if (details) {
+        setStatusDetails({
+          createdAt: new Date(),
+          dataFor: "IPE-Slip",
+          data: details,
+        });
+        setIsModalVisible(true);
+      }
+    } catch (error) {
+      console.error("Error checking status:", error);
+    }
+  };
 
   return (
     <>
@@ -272,28 +317,22 @@ function IPEClearance() {
           }
         }}
         footer={[
-          <Link
-            to="/dashboard/check-ipe-status"
-            key="view-status"
-            onClick={(e) => {
-              if (isCountingDown) {
-                e.preventDefault();
-                return;
-              }
-              handleViewStatus();
-            }}
+          <button
+            key="check-status"
+            onClick={handleCheckStatus}
+            disabled={isCountingDown}
             className={`flex justify-center font-medium py-2 px-4 rounded-xl transition-colors ${
               isCountingDown
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-amber-500 hover:bg-amber-600 cursor-pointer text-white"
             }`}
           >
-            Get Status{" "}
-            {isCountingDown &&
-              `(${Math.floor(countdown / 60)}:${(countdown % 60)
-                .toString()
-                .padStart(2, "0")})`}
-          </Link>,
+            {isCountingDown
+              ? `Check Status (${Math.floor(countdown / 60)}:${(countdown % 60)
+                  .toString()
+                  .padStart(2, "0")})`
+              : "Check Status"}
+          </button>,
         ]}
       >
         <div className="py-4 text-center">
@@ -319,6 +358,86 @@ function IPEClearance() {
             {(countdown % 60).toString().padStart(2, "0")}
           </div>
         </div>
+      </Modal>
+
+      <Modal
+        title="Verification Details"
+        open={isStatusModalVisible}
+        onCancel={() => setIsStatusModalVisible(false)}
+        footer={null}
+        width={600}
+      >
+        {statusData && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm font-medium text-gray-500">Date</p>
+                <p className="mt-1 text-sm text-gray-900">
+                  {format(
+                    new Date(statusData.createdAt),
+                    "dd/MM/yyyy HH:mm:ss"
+                  )}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Status</p>
+                <span className="mt-1 text-sm font-medium capitalize px-2 py-0.5 rounded-full inline-block bg-green-100 text-green-800">
+                  {statusData.data?.transactionStatus || "N/A"}
+                </span>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Name</p>
+                <p className="mt-1 text-sm text-gray-900">
+                  {statusData.data?.reply?.name || "N/A"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  Date of Birth
+                </p>
+                <p className="mt-1 text-sm text-gray-900">
+                  {statusData.data?.reply?.dob || "N/A"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">New NIN</p>
+                <p className="mt-1 text-sm text-gray-900">
+                  {statusData.data?.newNIN || "N/A"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  New Tracking ID
+                </p>
+                <p className="mt-1 text-sm text-gray-900">
+                  {statusData.data?.newTracking_id || "N/A"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  Old Tracking ID
+                </p>
+                <p className="mt-1 text-sm text-gray-900">
+                  {statusData.data?.old_tracking_id || "N/A"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  Verification Status
+                </p>
+                <p className="mt-1 text-sm text-gray-900">
+                  {statusData.data?.verificationStatus || "N/A"}
+                </p>
+              </div>
+              <div className="col-span-2">
+                <p className="text-sm font-medium text-gray-500">Message</p>
+                <p className="mt-1 text-sm text-gray-900">
+                  {statusData.data?.message || "N/A"}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </Modal>
     </>
   );
