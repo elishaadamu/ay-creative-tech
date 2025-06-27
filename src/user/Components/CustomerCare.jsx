@@ -74,7 +74,7 @@ function CustomerCare() {
           <h3 className="text-lg font-semibold text-gray-800">Contact Us</h3>
           <p className="text-gray-600">Need help? Chat with us on WhatsApp!</p>
           <a
-            href="https://wa.me/+2347067206984" // Replace with your WhatsApp number
+            href="https://wa.me/+2349077968959" // Replace with your WhatsApp number
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center space-x-2 bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-all duration-300"

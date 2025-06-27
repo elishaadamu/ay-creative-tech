@@ -110,14 +110,15 @@ body.dark .consult--button:nth-child(2):hover {
     display: flex;
     flex-direction: column-reverse;
     padding: 20px;
-    padding-top: 100px;
+    padding: 100px 20px 133.333px !important;
+  }
+  .hero--section--title {
+    font-size: clamp(30px, 3vw, 65px) !important;
+    word-wrap: break-word;
   }
   .hero--section--content > p {
   }
   .hero--section--title {
-  }
-  .hero--section-description {
-    font-size: 18px;
   }
 
   .hero--section--content,
@@ -144,7 +145,7 @@ body.dark .consult--button:nth-child(2):hover {
   }
 }
 
-@media screen and (max-width: 1280px) {
+@media screen and (max-width: 1024px) {
   .hero--section {
     display: grid;
     grid-template-columns: repeat(1, 1fr);
@@ -158,4 +159,18 @@ body.dark .consult--button:nth-child(2):hover {
     align-items: center;
     justify-content: center;
   }
+  .hero--section .description {
+    font-size: clamp(20px, 3vw, 50px) !important;
+  }
+}
+@media screen and (max-width: 1500px) and (min-width: 1024px) {
+  .hero--section--title {
+    font-size: clamp(30px, 4vw, 65px);
+
+    line-height: 65px;
+    word-wrap: break-word;
+  }
+}
+
+@media screen and (max-width: 660px) {
 }

@@ -15,19 +15,19 @@ const HeroSection = () => {
         </div>
         <div className="hero--section--content--box">
           <div className="hero--section--content">
-            <p className="text-xlb  md:text-3xl text-center md:text-left ">
+            <p className="text-2xl   md:text-3xl text-center lg:text-left ">
               {" "}
               WELCOME TO
               <span className="text-amber-600 ml-2">AYVERIFY</span>
             </p>
-            <h1 className="hero--section--title text-2xl md:text-4xl text-white dark:text-white">
+            <h1 className="hero--section--title text-4xl  md:text-4xl text-white dark:text-white">
               <span className="hero--section-title--color">
                 Trusted, secured,
               </span>
               <br />
               fast, reliable, accurate NIN and BVN verification.
             </h1>
-            <p className="text-[14px] md:text-[18px] ">
+            <p className="text-[14px] md:text-[18px] description ">
               Trusted platform providing secure verification including Nin,Bvn
               and documents modification, Our mission is to offer reliable,fast,
               and accurate verification solutions to help you with your personal
@@ -38,7 +38,7 @@ const HeroSection = () => {
             href="#"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex justify-center xl:justify-start"
+            className="flex justify-center lg:justify-start"
           >
             <div className="flex gap-3">
               <NavLink
