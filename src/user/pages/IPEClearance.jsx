@@ -48,6 +48,37 @@ function IPEClearance() {
     }
   }
 
+  const storeTimerData = (trackingId, endTime) => {
+    const timerData = {
+      trackingId,
+      endTime,
+      startedAt: new Date().toISOString(),
+    };
+    localStorage.setItem("ipeTimer", JSON.stringify(timerData));
+  };
+
+  const getStoredTimerData = () => {
+    const storedData = localStorage.getItem("ipeTimer");
+    if (!storedData) return null;
+
+    try {
+      const timerData = JSON.parse(storedData);
+      const now = new Date().getTime();
+      const endTime = new Date(timerData.endTime).getTime();
+
+      // If timer has expired, clear it and return null
+      if (now >= endTime) {
+        localStorage.removeItem("ipeTimer");
+        return null;
+      }
+
+      return timerData;
+    } catch (error) {
+      console.error("Error parsing timer data:", error);
+      return null;
+    }
+  };
+
   /* --------------------------------- render -------------------------------- */
   const showConfirmation = async () => {
     const result = await Swal.fire({
@@ -103,6 +134,8 @@ function IPEClearance() {
       setVerificationResult(response.data?.data);
       setIsSuccessModalVisible(true);
       setIsCountingDown(true); // Start the countdown
+      setCountdown(600); // Reset countdown to 10 minutes
+      // Timer data will be stored in the useEffect
       toast.success("IPE Clearance verified successfully!");
     } catch (error) {
       console.error("Verification error:", error);
@@ -151,14 +184,36 @@ function IPEClearance() {
     fetchPrices();
   }, []);
 
-  // Add useEffect for countdown
+  // Modify the useEffect for countdown to use localStorage
   useEffect(() => {
+    // Check for stored timer when component mounts
+    const storedTimer = getStoredTimerData();
+    if (storedTimer) {
+      setFormData((prev) => ({ ...prev, trackingId: storedTimer.trackingId }));
+      const remainingTime = Math.floor(
+        (new Date(storedTimer.endTime) - new Date()) / 1000
+      );
+      if (remainingTime > 0) {
+        setCountdown(remainingTime);
+        setIsCountingDown(true);
+        setIsSuccessModalVisible(true);
+      }
+    }
+
     let timer;
     if (isCountingDown && countdown > 0) {
+      // Store timer data when countdown starts
+      if (countdown === 600) {
+        const endTime = new Date(Date.now() + countdown * 1000).toISOString();
+        storeTimerData(formData.trackingId, endTime);
+      }
+
       timer = setInterval(() => {
         setCountdown((prevCount) => {
           if (prevCount <= 1) {
             setIsCountingDown(false);
+            localStorage.removeItem("ipeTimer"); // Clear timer data
+            handleCheckStatus(); // Automatically check status when timer ends
             return 0;
           }
           return prevCount - 1;
@@ -166,7 +221,9 @@ function IPEClearance() {
       }, 1000);
     }
 
-    return () => clearInterval(timer);
+    return () => {
+      if (timer) clearInterval(timer);
+    };
   }, [isCountingDown, countdown]);
 
   // First, add this useEffect to prevent navigation
@@ -184,18 +241,37 @@ function IPEClearance() {
 
   // Add this new function to handle the status check
   const fetchFreeStatusIPE = async (trackingId) => {
+    // Get user ID from localStorage
+    let userId = null;
+    try {
+      const userStr = localStorage.getItem("user");
+      if (userStr) {
+        const userObj = decryptData(userStr);
+        userId = userObj?._id || userObj?.id;
+      }
+    } catch (error) {
+      console.error("Error getting user ID:", error);
+    }
+
+    if (!userId) {
+      toast.error("User not found. Please login again.");
+      return null;
+    }
+
     const payload = {
       trackingId: formData.trackingId,
-      userId,
+      userId: userId,
     };
+
     try {
       const response = await axios.post(
         `${config.apiBaseUrl}${config.endpoints.freeStatusipe}`,
-        { payload },
+        payload,
         { withCredentials: true }
       );
       console.log("Free Status IPE Response:", response.data);
       setStatusData(response.data?.data);
+      return response.data?.data;
     } catch (error) {
       console.error("Error fetching IPE status:", error);
       toast.error(error.response?.data?.message || "Failed to fetch status");
@@ -223,6 +299,36 @@ function IPEClearance() {
       console.error("Error checking status:", error);
     }
   };
+
+  // Add a function to check if there's a pending status check
+  const checkPendingStatus = () => {
+    const storedTimer = getStoredTimerData();
+    if (storedTimer) {
+      const now = new Date().getTime();
+      const endTime = new Date(storedTimer.endTime).getTime();
+
+      if (now >= endTime) {
+        // Timer has completed, trigger status check
+        setFormData((prev) => ({
+          ...prev,
+          trackingId: storedTimer.trackingId,
+        }));
+        handleCheckStatus();
+        localStorage.removeItem("ipeTimer");
+      } else {
+        // Timer still running, show remaining time
+        const remainingTime = Math.floor((endTime - now) / 1000);
+        setCountdown(remainingTime);
+        setIsCountingDown(true);
+        setIsSuccessModalVisible(true);
+      }
+    }
+  };
+
+  // Add this useEffect to check for pending status when component mounts
+  useEffect(() => {
+    checkPendingStatus();
+  }, []);
 
   return (
     <>
