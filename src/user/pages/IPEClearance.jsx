@@ -29,11 +29,6 @@ function IPEClearance() {
   const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
   const [verificationResult, setVerificationResult] = useState(null);
   const [amount, setAmount] = useState(0); // Default amount
-  const [countdown, setCountdown] = useState(600); // 600 seconds = 10 minutes
-  const [isCountingDown, setIsCountingDown] = useState(false);
-  const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
-  const [statusData, setStatusData] = useState(null);
-  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
 
@@ -47,37 +42,6 @@ function IPEClearance() {
       return null;
     }
   }
-
-  const storeTimerData = (trackingId, endTime) => {
-    const timerData = {
-      trackingId,
-      endTime,
-      startedAt: new Date().toISOString(),
-    };
-    localStorage.setItem("ipeTimer", JSON.stringify(timerData));
-  };
-
-  const getStoredTimerData = () => {
-    const storedData = localStorage.getItem("ipeTimer");
-    if (!storedData) return null;
-
-    try {
-      const timerData = JSON.parse(storedData);
-      const now = new Date().getTime();
-      const endTime = new Date(timerData.endTime).getTime();
-
-      // If timer has expired, clear it and return null
-      if (now >= endTime) {
-        localStorage.removeItem("ipeTimer");
-        return null;
-      }
-
-      return timerData;
-    } catch (error) {
-      console.error("Error parsing timer data:", error);
-      return null;
-    }
-  };
 
   /* --------------------------------- render -------------------------------- */
   const showConfirmation = async () => {
@@ -133,9 +97,6 @@ function IPEClearance() {
 
       setVerificationResult(response.data?.data);
       setIsSuccessModalVisible(true);
-      setIsCountingDown(true); // Start the countdown
-      setCountdown(600); // Reset countdown to 10 minutes
-      // Timer data will be stored in the useEffect
       toast.success("IPE Clearance verified successfully!");
     } catch (error) {
       console.error("Verification error:", error);
@@ -153,10 +114,59 @@ function IPEClearance() {
     });
   };
 
-  const handleViewStatus = () => {
-    if (!isCountingDown) {
+  const handleViewStatus = async () => {
+    try {
+      // Get user ID from localStorage
+      let userId = null;
+      try {
+        const userStr = localStorage.getItem("user");
+        if (userStr) {
+          const userObj = decryptData(userStr);
+          userId = userObj?._id || userObj?.id;
+        }
+      } catch (error) {
+        console.error("Error getting user ID:", error);
+      }
+
+      if (!userId) {
+        toast.error("User not found. Please login again.");
+        return;
+      }
+
+      const payload = {
+        trackingId: formData.trackingId,
+        userId: userId,
+      };
+      console.log("IPE Payload", payload);
+
+      // Trigger the free status IPE endpoint
+      await axios.post(
+        `${config.apiBaseUrl}${config.endpoints.freeStatusipe}`,
+        payload,
+        { withCredentials: true }
+      );
+
+      // Show alert message
+      await Swal.fire({
+        title: "Redirecting...",
+        text: "You are being directed to the IPE History to view details.",
+        icon: "info",
+        timer: 5000,
+        showConfirmButton: false,
+        timerProgressBar: true,
+      });
+
+      // Navigate to IPE history
       navigate("/dashboard/ipe-history");
       setIsSuccessModalVisible(false);
+    } catch (error) {
+      console.error("Error triggering free status IPE:", error);
+      // Still navigate even if the API call fails
+      toast.info("You are being directed to the IPE History to view details.");
+      setTimeout(() => {
+        navigate("/dashboard/ipe-history");
+        setIsSuccessModalVisible(false);
+      }, 1000);
     }
   };
 
@@ -182,152 +192,6 @@ function IPEClearance() {
     };
 
     fetchPrices();
-  }, []);
-
-  // Modify the useEffect for countdown to use localStorage
-  useEffect(() => {
-    // Check for stored timer when component mounts
-    const storedTimer = getStoredTimerData();
-    if (storedTimer) {
-      setFormData((prev) => ({ ...prev, trackingId: storedTimer.trackingId }));
-      const remainingTime = Math.floor(
-        (new Date(storedTimer.endTime) - new Date()) / 1000
-      );
-      if (remainingTime > 0) {
-        setCountdown(remainingTime);
-        setIsCountingDown(true);
-        setIsSuccessModalVisible(true);
-      }
-    }
-
-    let timer;
-    if (isCountingDown && countdown > 0) {
-      // Store timer data when countdown starts
-      if (countdown === 600) {
-        const endTime = new Date(Date.now() + countdown * 1000).toISOString();
-        storeTimerData(formData.trackingId, endTime);
-      }
-
-      timer = setInterval(() => {
-        setCountdown((prevCount) => {
-          if (prevCount <= 1) {
-            setIsCountingDown(false);
-            localStorage.removeItem("ipeTimer"); // Clear timer data
-            handleCheckStatus(); // Automatically check status when timer ends
-            return 0;
-          }
-          return prevCount - 1;
-        });
-      }, 1000);
-    }
-
-    return () => {
-      if (timer) clearInterval(timer);
-    };
-  }, [isCountingDown, countdown]);
-
-  // First, add this useEffect to prevent navigation
-  useEffect(() => {
-    const handleBeforeUnload = (e) => {
-      if (isCountingDown) {
-        e.preventDefault();
-        e.returnValue = "";
-      }
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [isCountingDown]);
-
-  // Add this new function to handle the status check
-  const fetchFreeStatusIPE = async (trackingId) => {
-    // Get user ID from localStorage
-    let userId = null;
-    try {
-      const userStr = localStorage.getItem("user");
-      if (userStr) {
-        const userObj = decryptData(userStr);
-        userId = userObj?._id || userObj?.id;
-      }
-    } catch (error) {
-      console.error("Error getting user ID:", error);
-    }
-
-    if (!userId) {
-      toast.error("User not found. Please login again.");
-      return null;
-    }
-
-    const payload = {
-      trackingId: formData.trackingId,
-      userId: userId,
-    };
-
-    try {
-      const response = await axios.post(
-        `${config.apiBaseUrl}${config.endpoints.freeStatusipe}`,
-        payload,
-        { withCredentials: true }
-      );
-      console.log("Free Status IPE Response:", response.data);
-      setStatusData(response.data?.data);
-      return response.data?.data;
-    } catch (error) {
-      console.error("Error fetching IPE status:", error);
-      toast.error(error.response?.data?.message || "Failed to fetch status");
-      return null;
-    }
-  };
-
-  const handleCheckStatus = async () => {
-    if (!formData.trackingId) {
-      toast.error("Please provide a tracking ID");
-      return;
-    }
-
-    try {
-      const details = await fetchFreeStatusIPE(formData.trackingId);
-      if (details) {
-        setStatusDetails({
-          createdAt: new Date(),
-          dataFor: "IPE-Slip",
-          data: details,
-        });
-        setIsModalVisible(true);
-      }
-    } catch (error) {
-      console.error("Error checking status:", error);
-    }
-  };
-
-  // Add a function to check if there's a pending status check
-  const checkPendingStatus = () => {
-    const storedTimer = getStoredTimerData();
-    if (storedTimer) {
-      const now = new Date().getTime();
-      const endTime = new Date(storedTimer.endTime).getTime();
-
-      if (now >= endTime) {
-        // Timer has completed, trigger status check
-        setFormData((prev) => ({
-          ...prev,
-          trackingId: storedTimer.trackingId,
-        }));
-        handleCheckStatus();
-        localStorage.removeItem("ipeTimer");
-      } else {
-        // Timer still running, show remaining time
-        const remainingTime = Math.floor((endTime - now) / 1000);
-        setCountdown(remainingTime);
-        setIsCountingDown(true);
-        setIsSuccessModalVisible(true);
-      }
-    }
-  };
-
-  // Add this useEffect to check for pending status when component mounts
-  useEffect(() => {
-    checkPendingStatus();
   }, []);
 
   return (
@@ -415,29 +279,14 @@ function IPEClearance() {
 
       <Modal
         open={isSuccessModalVisible}
-        closable={!isCountingDown}
-        maskClosable={false}
-        onCancel={() => {
-          if (!isCountingDown) {
-            setIsSuccessModalVisible(false);
-          }
-        }}
+        onCancel={() => setIsSuccessModalVisible(false)}
         footer={[
           <button
-            key="check-status"
-            onClick={handleCheckStatus}
-            disabled={isCountingDown}
-            className={`flex justify-center font-medium py-2 px-4 rounded-xl transition-colors ${
-              isCountingDown
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-amber-500 hover:bg-amber-600 cursor-pointer text-white"
-            }`}
+            key="view-status"
+            onClick={handleViewStatus}
+            className="bg-amber-500 hover:bg-amber-600 text-white font-medium py-2 px-4 rounded-xl cursor-pointer"
           >
-            {isCountingDown
-              ? `Check Status (${Math.floor(countdown / 60)}:${(countdown % 60)
-                  .toString()
-                  .padStart(2, "0")})`
-              : "Check Status"}
+            View Status
           </button>,
         ]}
       >
@@ -448,102 +297,16 @@ function IPEClearance() {
 
           {verificationResult && (
             <>
-              <p className="text-[17px] text-green-900 bg-green-100 mb-5 ">
+              <p className="text-[17px] text-green-900 bg-green-100 mb-5 p-3 rounded">
                 {verificationResult.description}
               </p>
             </>
           )}
 
           <div className="text-gray-600 text-xl mb-4">
-            Clearance request submitted successfully! Please wait for 10
-            minutes. Do not close this window or navigate away.
-          </div>
-
-          <div className="text-2xl font-semibold text-amber-500">
-            Time remaining: {Math.floor(countdown / 60)}:
-            {(countdown % 60).toString().padStart(2, "0")}
+            Clearance request submitted successfully!
           </div>
         </div>
-      </Modal>
-
-      <Modal
-        title="Verification Details"
-        open={isStatusModalVisible}
-        onCancel={() => setIsStatusModalVisible(false)}
-        footer={null}
-        width={600}
-      >
-        {statusData && (
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Date</p>
-                <p className="mt-1 text-sm text-gray-900">
-                  {format(
-                    new Date(statusData.createdAt),
-                    "dd/MM/yyyy HH:mm:ss"
-                  )}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Status</p>
-                <span className="mt-1 text-sm font-medium capitalize px-2 py-0.5 rounded-full inline-block bg-green-100 text-green-800">
-                  {statusData.data?.transactionStatus || "N/A"}
-                </span>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Name</p>
-                <p className="mt-1 text-sm text-gray-900">
-                  {statusData.data?.reply?.name || "N/A"}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">
-                  Date of Birth
-                </p>
-                <p className="mt-1 text-sm text-gray-900">
-                  {statusData.data?.reply?.dob || "N/A"}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">New NIN</p>
-                <p className="mt-1 text-sm text-gray-900">
-                  {statusData.data?.newNIN || "N/A"}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">
-                  New Tracking ID
-                </p>
-                <p className="mt-1 text-sm text-gray-900">
-                  {statusData.data?.newTracking_id || "N/A"}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">
-                  Old Tracking ID
-                </p>
-                <p className="mt-1 text-sm text-gray-900">
-                  {statusData.data?.old_tracking_id || "N/A"}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">
-                  Verification Status
-                </p>
-                <p className="mt-1 text-sm text-gray-900">
-                  {statusData.data?.verificationStatus || "N/A"}
-                </p>
-              </div>
-              <div className="col-span-2">
-                <p className="text-sm font-medium text-gray-500">Message</p>
-                <p className="mt-1 text-sm text-gray-900">
-                  {statusData.data?.message || "N/A"}
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
       </Modal>
     </>
   );
