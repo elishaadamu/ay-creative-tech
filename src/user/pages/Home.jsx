@@ -11,7 +11,7 @@ import Airtime from "../assets/images/airtime.png";
 import Bank from "../assets/images/bank.webp";
 import Data from "../assets/images/data.png";
 import { IoClose } from "react-icons/io5";
-import { FaRegCopy } from "react-icons/fa"; // <-- Add this import
+import { FaRegCopy } from "react-icons/fa";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import "../assets/css/style.css";
 import Logo from "../assets/images/logo-ay.png";
@@ -38,13 +38,183 @@ function decryptData(ciphertext) {
   }
 }
 
+// DepositModal Component
+function DepositModal({ open, onClose }) {
+  const user = decryptData(localStorage.getItem("user"));
+  const [amount, setAmount] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("paystack");
+  const [modalVisible, setModalVisible] = useState(false);
+
+  // Add useEffect to handle animation
+  useEffect(() => {
+    if (open) {
+      // Small delay to trigger animation
+      setTimeout(() => setModalVisible(true), 10);
+    } else {
+      setModalVisible(false);
+    }
+  }, [open]);
+
+  const handleClose = () => {
+    setModalVisible(false);
+    // Wait for animation to complete before closing
+    setTimeout(() => onClose(), 300);
+  };
+
+  const handlePaystack = () => {
+    if (!window.PaystackPop) {
+      toast.error("Paystack is not loaded. Please refresh the page.");
+      return;
+    }
+
+    const handler = window.PaystackPop.setup({
+      key: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
+      email: user?.email,
+      amount: Number(amount) * 100,
+      currency: "NGN",
+      ref: `AY-${Date.now()}`,
+      metadata: {
+        userId: user?._id || user?.id,
+        name: `${user?.firstName} ${user?.lastName}`,
+      },
+      callback: function (response) {
+        toast.success("Payment successful. Processing...");
+        // Handle successful payment here
+        console.log("Payment successful:", response);
+        onClose();
+      },
+      onClose: function () {
+        toast.error("Payment closed by user.");
+      },
+    });
+
+    // Close the modal before opening the Paystack popup
+    onClose();
+    handler.openIframe();
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!amount || !paymentMethod) {
+      toast.error("Please complete all fields");
+      return;
+    }
+    if (Number(amount) < 100) {
+      toast.error("Minimum deposit amount is ₦100");
+      return;
+    }
+    if (paymentMethod === "paystack") {
+      handlePaystack();
+    }
+  };
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex justify-center items-center bg-black/50">
+      <div
+        className={`bg-white rounded-xl w-[450px] max-w-[90%] p-6 shadow-xl 
+          transform transition-all duration-300 
+          ${modalVisible ? "scale-100 opacity-100" : "scale-90 opacity-0"}`}
+      >
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold text-gray-800">Make a Deposit</h2>
+          <button
+            onClick={handleClose}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            <IoClose size={24} />
+          </button>
+        </div>
+
+        <p className="text-gray-600 mb-6">
+          Add funds to your AY Creative wallet.
+        </p>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label
+              htmlFor="amount"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Amount
+            </label>
+            <input
+              id="amount"
+              type="number"
+              placeholder="0.00"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              required
+              min="100"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="payment"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Payment Method
+            </label>
+            <select
+              value={paymentMethod}
+              onChange={(e) => setPaymentMethod(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+            >
+              <option value="paystack">Paystack</option>
+            </select>
+          </div>
+
+          {amount && (
+            <div className="bg-gray-50 p-4 rounded-md">
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Deposit Amount:</span>
+                  <span>₦{Number(amount).toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Processing Fee:</span>
+                  <span>₦0.00</span>
+                </div>
+                <hr className="my-2" />
+                <div className="flex justify-between font-bold">
+                  <span>Total:</span>
+                  <span>₦{Number(amount).toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="flex space-x-3 mt-6">
+            <button
+              type="button"
+              onClick={handleClose}
+              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600"
+            >
+              Deposit
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 function Dashboard() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
-  const [isOpen, setIsOpen] = useState(false); // <-- add this
-  const toggleModal = () => setIsOpen((open) => !open); // <-- and this
+  const [isOpen, setIsOpen] = useState(false);
+  const [isDepositModalOpen, setIsDepositModalOpen] = useState(false); // New state for deposit modal
 
   const [creatingAccount, setCreatingAccount] = useState(false);
   const [account, setAccount] = useState(null);
@@ -70,6 +240,18 @@ function Dashboard() {
     }
   }, []);
 
+  // Load Paystack script
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://js.paystack.co/v1/inline.js";
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
   // Fetch account info on mount
   useEffect(() => {
     const fetchAccount = async () => {
@@ -79,7 +261,7 @@ function Dashboard() {
           `${config.apiBaseUrl}/virtualAccount/${userId}`
         );
         console.log("res.data", res.data.customerPin);
-        setAccount(res.data); // <-- use res.data, not res.data.account
+        setAccount(res.data);
       } catch (err) {
         setAccount(null);
         console.error("Fetch account error:", err, err.response?.data);
@@ -254,17 +436,17 @@ function Dashboard() {
 
   const openModal = () => {
     setIsOpen(true);
-    setTimeout(() => setModalVisible(true), 10); // allow for transition
+    setTimeout(() => setModalVisible(true), 10);
   };
 
   const closeModal = () => {
     setModalVisible(false);
-    setTimeout(() => setIsOpen(false), 300); // match transition duration
+    setTimeout(() => setIsOpen(false), 300);
   };
 
   const [showBalance, setShowBalance] = useState(true);
   const [verificationCount, setVerificationCount] = useState(0);
-  const [loadingVerifications, setLoadingVerifications] = useState(true); // Add this state variable at the top with other state declarations
+  const [loadingVerifications, setLoadingVerifications] = useState(true);
 
   // Update the useEffect for fetching verification counts
   useEffect(() => {
@@ -326,16 +508,25 @@ function Dashboard() {
                   {showBalance ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </p>
-              <p
-                onClick={openModal}
-                className="w-[140px] h-[40px] text-black bg-amber-400 cursor-pointer hover:bg-amber-500 max-w-full rounded-lg p-2"
-                style={{ marginTop: "16px" }}
-              >
-                <span className="flex flex-row items-center gap-2">
-                  <CiWallet className="text-2xl font-bold" />
-                  <span>Add Money</span>
-                </span>
-              </p>
+
+              {/* Updated Add Money section with two buttons */}
+              <div className="flex flex-col items-center md:justify-start sm:flex-row gap-3">
+                <button
+                  onClick={openModal}
+                  className=" w-[160px] h-[40px] text-black bg-gray-200 cursor-pointer hover:bg-gray-300 rounded-lg p-2 flex items-center justify-center gap-2"
+                >
+                  <CiWallet className="text-xl" />
+                  <span>Bank Transfer</span>
+                </button>
+
+                <button
+                  onClick={() => setIsDepositModalOpen(true)}
+                  className="w-[160px] h-[40px] text-white bg-amber-400 cursor-pointer hover:bg-amber-500 rounded-lg p-2 flex items-center justify-center gap-2"
+                >
+                  <CiWallet className="text-xl" />
+                  <span>Card Payment</span>
+                </button>
+              </div>
             </>
           ) : (
             <>
@@ -353,7 +544,7 @@ function Dashboard() {
             </>
           )}
 
-          {/* Modal */}
+          {/* Bank Transfer Modal */}
           {isOpen && (
             <div
               className={`fixed inset-0 z-50 flex justify-center items-center bg-black/30 transition-opacity duration-300 ${
@@ -365,7 +556,6 @@ function Dashboard() {
                   modalVisible ? "scale-100" : "scale-90"
                 } flex flex-col justify-center items-center mx-auto`}
               >
-                {/* Close Button */}
                 <button
                   className="absolute top-[-10px] right-[-15px] cursor-pointer bg-gray-200 rounded p-1 text-gray-500 hover:text-black"
                   onClick={closeModal}
@@ -373,7 +563,6 @@ function Dashboard() {
                   <IoClose size={24} />
                 </button>
 
-                {/* Modal Content */}
                 <h2 className="text-2xl font-bold text-gray-500 mb-1">
                   Fund Your Wallet
                 </h2>
@@ -422,6 +611,7 @@ function Dashboard() {
             </div>
           )}
         </div>
+
         <div className="flex-1/2 rounded bg-white shadow-md hover:shadow-lg ring-2 ring-amber-50/2 w-full p-5">
           <div className="flex justify-between items-center relative">
             <FaCube className="text-5xl" />
@@ -459,6 +649,7 @@ function Dashboard() {
           </p>
         </div>
       </div>
+
       {/* Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 w-full py-4">
         {navItems.map((item) => (
@@ -478,7 +669,13 @@ function Dashboard() {
           </NavLink>
         ))}
       </div>
-      {/* <pre>{JSON.stringify(account, null, 2)}</pre> */}
+
+      {/* Deposit Modal */}
+      <DepositModal
+        open={isDepositModalOpen}
+        onClose={() => setIsDepositModalOpen(false)}
+      />
+
       <ToastContainer />
     </div>
   );

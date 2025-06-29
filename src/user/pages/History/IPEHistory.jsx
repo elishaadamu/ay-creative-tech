@@ -2,7 +2,7 @@ import * as React from "react";
 import axios from "axios";
 import { config } from "../../../config/config.jsx";
 import CryptoJS from "crypto-js";
-import { format, formatDistanceToNow, differenceInMinutes } from "date-fns"; // Add this import for date formatting
+import { format, formatDistanceToNow, differenceInMinutes } from "date-fns";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {
@@ -11,8 +11,10 @@ import {
   ArrowDownIcon,
 } from "@heroicons/react/24/solid";
 import { Empty, Modal, Tooltip } from "antd";
-import { InboxOutlined, EyeOutlined } from "@ant-design/icons";
+import { InboxOutlined, EyeOutlined, ReloadOutlined } from "@ant-design/icons"; // Added ReloadOutlined
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify"; // Add toast import
+import Swal from "sweetalert2"; // Add Swal import
 
 // Add your secret key for decryption
 const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
@@ -64,6 +66,64 @@ export default function VerificationsHistoryTable() {
   const [pageSize, setPageSize] = React.useState(10);
   const [currentPage, setCurrentPage] = React.useState(1);
 
+  // Add handleViewStatus function
+  const handleViewStatus = async (transaction) => {
+    try {
+      // Get user ID from localStorage
+      let userId = null;
+      try {
+        const userStr = localStorage.getItem("user");
+        if (userStr) {
+          const userObj = decryptData(userStr);
+          userId = userObj?._id || userObj?.id;
+        }
+      } catch (error) {
+        console.error("Error getting user ID:", error);
+      }
+
+      if (!userId) {
+        toast.error("User not found. Please login again.");
+        return;
+      }
+
+      // Extract tracking ID from transaction data
+      const trackingId =
+        transaction.data?.old_tracking_id ||
+        transaction.data?.newTracking_id ||
+        transaction.data?.tracking_id;
+
+      if (!trackingId) {
+        toast.error("No tracking ID found for this transaction.");
+        return;
+      }
+
+      const payload = {
+        trackingId: trackingId,
+        userId: userId,
+      };
+      console.log("IPE Payload", payload);
+
+      // Show loading toast
+      toast.info("Fetching latest status...");
+
+      // Trigger the free status IPE endpoint
+      await axios.post(
+        `${config.apiBaseUrl}${config.endpoints.freeStatusipe}`,
+        payload,
+        { withCredentials: true }
+      );
+
+      // Show success message
+      toast.success("Status updated successfully!");
+
+      // Refresh the current page data
+      fetchVerificationHistory();
+    } catch (error) {
+      console.error("Error triggering free status IPE:", error);
+      toast.error("Failed to fetch latest status. Please try again.");
+    }
+  };
+
   const fetchVerificationHistory = async () => {
     if (!userId) return;
 
@@ -78,8 +138,6 @@ export default function VerificationsHistoryTable() {
       console.log("API Response:", response.data);
 
       const details = response.data || [];
-
-      // Set the API data
       setSelectedTransaction(details || []);
     } catch (error) {
       console.error("Error fetching verification history:", error);
@@ -187,11 +245,11 @@ export default function VerificationsHistoryTable() {
     } else if (verificationType === "bvn") {
       if (slipType === "Basic") {
         navigate("/dashboard/verifications/basicbvn", {
-          state: { apiData: transaction.data?.data }, // Match the structure from BVNVerify
+          state: { apiData: transaction.data?.data },
         });
       } else {
         navigate("/dashboard/verifications/advancedbvn", {
-          state: { apiData: transaction.data?.data?.data }, // Match the structure from BVNVerify
+          state: { apiData: transaction.data?.data?.data },
         });
       }
     }
@@ -279,7 +337,11 @@ export default function VerificationsHistoryTable() {
         />
       </div>
 
-      {loading}
+      {loading && (
+        <div className="flex justify-center items-center h-32">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        </div>
+      )}
 
       {!loading && sortedTransactions.length > 0 ? (
         <div className="relative overflow-hidden rounded-lg border border-gray-200 shadow">
@@ -303,6 +365,9 @@ export default function VerificationsHistoryTable() {
                   </th>
                   <th className="w-[60px] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">
                     Details
+                  </th>
+                  <th className="w-[60px] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">
+                    Refresh Status
                   </th>
                 </tr>
               </thead>
@@ -340,6 +405,16 @@ export default function VerificationsHistoryTable() {
                       >
                         <EyeOutlined className="text-lg" />
                       </button>
+                    </td>
+                    <td className="w-[60px] px-2 py-2 whitespace-nowrap">
+                      <Tooltip title="Refresh IPE Status">
+                        <button
+                          onClick={() => handleViewStatus(transaction)}
+                          className="text-amber-600 hover:text-amber-800 transition-colors"
+                        >
+                          <ReloadOutlined className="text-lg" />
+                        </button>
+                      </Tooltip>
                     </td>
                   </tr>
                 ))}
@@ -609,11 +684,6 @@ export default function VerificationsHistoryTable() {
                     {selectedTransaction.data?.detail || "N/A"}
                   </p>
                 </div>
-              </div>
-            )}
-            {selectedTransaction.dataFor === "IPE-Slip" && (
-              <div className="grid grid-cols-2 gap-4">
-                {/* Existing IPE details */}
               </div>
             )}
           </div>
