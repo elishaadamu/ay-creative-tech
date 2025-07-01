@@ -68,7 +68,7 @@ function DepositModal({ open, onClose }) {
     }
 
     const handler = window.PaystackPop.setup({
-      key: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
+      key: import.meta.env.VITE_PAYSTACK_PUBLIC_URL,
       email: user?.email,
       amount: Number(amount) * 100,
       currency: "NGN",
