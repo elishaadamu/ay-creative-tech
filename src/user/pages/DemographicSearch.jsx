@@ -168,7 +168,10 @@ function DemographicSearch() {
       {/* Cost Display */}
       <div className="mb-6 my-5 bg-gray-50 rounded-lg">
         <p className="text-lg font-medium">
-          This service will cost you = ₦{demographicPrice}.00
+          This service will cost you ={" "}
+          <span className="p-1 text-lg bg-green-100 text-green-900 rounded">
+            ₦{demographicPrice}.00
+          </span>
         </p>
       </div>
 
