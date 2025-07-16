@@ -256,10 +256,13 @@ function Dashboard() {
   useEffect(() => {
     const fetchAccount = async () => {
       setLoadingAccount(true);
+
       try {
         const res = await axios.get(
           `${config.apiBaseUrl}/virtualAccount/${userId}`
         );
+        let userData = `${config.apiBaseUrl}/virtualAccount/${userId}`;
+        console.log("Fetching account data from:", userData);
         console.log("res.data", res.data.customerPin);
         setAccount(res.data);
       } catch (err) {
