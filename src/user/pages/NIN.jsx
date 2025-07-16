@@ -42,7 +42,7 @@ function NIN() {
         const ninPricing = response.data.find(
           (item) => item.serviceKey === "nin"
         );
-        console.log("NIN Pricing:", ninPricing.prices.agent);
+        console.log("NIN Pricing:", ninPricing.agentPrice);
         if (ninPricing) {
           // Update cardSlip with new prices
           const updatedCardSlip = cardSlip.map((slip) => ({
