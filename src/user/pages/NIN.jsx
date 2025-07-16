@@ -39,13 +39,15 @@ function NIN() {
         );
         console.log("API Prices Response:", response.data);
         // Find NIN pricing
-        const ninPricing = response.data.find((item) => item.key === "nin");
+        const ninPricing = response.data.find(
+          (item) => item.serviceKey === "nin"
+        );
         console.log("NIN Pricing:", ninPricing.prices.agent);
         if (ninPricing) {
           // Update cardSlip with new prices
           const updatedCardSlip = cardSlip.map((slip) => ({
             ...slip,
-            price: ninPricing.prices.agent,
+            price: ninPricing.agentPrice,
           }));
 
           setApiPrices(updatedCardSlip);
