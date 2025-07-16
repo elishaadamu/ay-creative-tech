@@ -4,6 +4,8 @@ import Swal from "sweetalert2";
 import { config } from "../../config/config";
 import CryptoJS from "crypto-js";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 function Validation() {
   const [form] = Form.useForm();
@@ -19,6 +21,10 @@ function Validation() {
   // Add state for PIN visibility
   const [showPin, setShowPin] = useState(false);
 
+  // Add state for API prices
+  const [apiPrices, setApiPrices] = useState(null);
+  const [validationPrice, setValidationPrice] = useState(0); // Default price
+
   const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
 
   function decryptData(ciphertext) {
@@ -31,6 +37,33 @@ function Validation() {
       return null;
     }
   }
+
+  // Add useEffect to fetch prices when component mounts
+  useEffect(() => {
+    const fetchPrices = async () => {
+      try {
+        const response = await axios.get(
+          `${config.apiBaseUrl}${config.endpoints.currentapipricing}`,
+          { withCredentials: true }
+        );
+        console.log("API Prices Response:", response.data);
+        // Find validation pricing
+        const validationPricing = response.data.find(
+          (item) => item.serviceKey === "validation"
+        );
+        console.log("Validation Pricing:", validationPricing);
+        if (validationPricing) {
+          setValidationPrice(validationPricing.agentPrice);
+        }
+      } catch (error) {
+        console.error("Error fetching API prices:", error);
+        toast.error("Failed to fetch current prices");
+      }
+    };
+
+    fetchPrices();
+  }, []);
+
   // Get userId from encrypted localStorage
   let userId = null;
   try {
@@ -47,7 +80,7 @@ function Validation() {
     // Show confirmation dialog first
     const result = await Swal.fire({
       title: "Confirm Search",
-      text: `Are you sure you want to proceed with this Validation Service? Amount: ₦1000`,
+      text: `Are you sure you want to proceed with this Validation Service? Amount: ₦${validationPrice}`,
       icon: "question",
       showCancelButton: true,
       confirmButtonColor: "#f59e0b",
@@ -59,13 +92,13 @@ function Validation() {
     if (!result.isConfirmed) {
       return;
     }
-    const amount = 1000; // Fixed amount for validation
+
     setLoading(true);
     try {
       // Simplified payload to match new requirements
       const payload = {
         userId: userId,
-        amount: amount,
+        amount: validationPrice,
         validationType: values.validationType,
         nin: values.nin,
         pin: values.pin,
@@ -133,7 +166,7 @@ function Validation() {
       {/* Cost Display */}
       <div className="mb-6 my-5 bg-gray-50 rounded-lg">
         <p className="text-lg font-medium">
-          This service will cost you = ₦1000.00
+          This service will cost you = ₦{validationPrice}.00
         </p>
       </div>
 
@@ -167,7 +200,6 @@ function Validation() {
         </Form.Item>
 
         {/* NIN Field */}
-
         <Form.Item
           name="nin"
           label="NIN"

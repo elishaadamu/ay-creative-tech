@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import RegularImg from "../assets/images/regular.png";
 import { MdOutlineSendToMobile } from "react-icons/md";
 import {
   AiOutlineLoading3Quarters,
   AiOutlineEye,
   AiOutlineEyeInvisible,
-} from "react-icons/ai"; // Add this import
+} from "react-icons/ai";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -14,26 +14,61 @@ import { config } from "../../config/config.jsx";
 import CryptoJS from "crypto-js";
 import Swal from "sweetalert2";
 
-function NIN() {
+function Personalisation() {
   const navigate = useNavigate();
 
   /* ---------------------------------- data --------------------------------- */
   const cardVerify = [{ label: "TRACKING ID", value: "trackingId" }];
 
+  // Add state for API prices
+  const [apiPrices, setApiPrices] = useState(null);
+  const [personalisationPrice, setPersonalisationPrice] = useState(0); // Default price
+
+  // Add useEffect to fetch prices when component mounts
+  useEffect(() => {
+    const fetchPrices = async () => {
+      try {
+        const response = await axios.get(
+          `${config.apiBaseUrl}${config.endpoints.currentapipricing}`,
+          { withCredentials: true }
+        );
+        console.log("API Prices Response:", response.data);
+        // Find personalisation pricing
+        const personalisationPricing = response.data.find(
+          (item) => item.serviceKey === "personalisation"
+        );
+        console.log("Personalisation Pricing:", personalisationPricing);
+        if (personalisationPricing) {
+          setPersonalisationPrice(personalisationPricing.agentPrice);
+        }
+      } catch (error) {
+        console.error("Error fetching API prices:", error);
+        toast.error("Failed to fetch current prices");
+      }
+    };
+
+    fetchPrices();
+  }, []);
+
   const cardSlip = [
-    { label: "Regular Slip", value: "regular", image: RegularImg, price: 150 },
+    {
+      label: "Regular Slip",
+      value: "regular",
+      image: RegularImg,
+      price: personalisationPrice,
+    },
   ];
 
   /* ---------------------------- component state ---------------------------- */
-  const [selectedVerify, setSelectedVerify] = useState("trackingId"); // unselected by default
-  const [selectedSlip, setSelectedSlip] = useState("regular"); // unselected by default
+  const [selectedVerify, setSelectedVerify] = useState("trackingId");
+  const [selectedSlip, setSelectedSlip] = useState("regular");
   const [formData, setFormData] = useState({
-    trackingId: "", // Initialize with empty string
-    pin: "", // Add PIN to formData
+    trackingId: "",
+    pin: "",
   });
   const [loading, setLoading] = useState(false);
   const [verificationResult, setVerificationResult] = useState(null);
-  const [showPin, setShowPin] = useState(false); // Add state for PIN visibility
+  const [showPin, setShowPin] = useState(false);
 
   // Add your secret key for decryption
   const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
@@ -63,13 +98,10 @@ function NIN() {
       return;
     }
 
-    // Fixed price for Regular Slip
-    const slipAmount = 150;
-
     // Show confirmation dialog
     const result = await Swal.fire({
       title: "Confirm Verification",
-      text: `Are you sure you want to proceed with this verification? Amount: ₦${slipAmount}`,
+      text: `Are you sure you want to proceed with this verification? Amount: ₦${personalisationPrice}`,
       icon: "question",
       showCancelButton: true,
       confirmButtonColor: "#f59e0b",
@@ -97,7 +129,7 @@ function NIN() {
       verifyWith: "trackingID",
       slipLayout: "Regular",
       trackingId: formData.trackingId,
-      amount: slipAmount,
+      amount: personalisationPrice,
       userId,
       pin: formData.pin,
     };
@@ -158,7 +190,7 @@ function NIN() {
     <div className="w-full rounded-2xl mb-10 bg-white p-5 shadow-lg">
       <p className="text-[18px] text-gray-500">Personalisation</p>
       <form onSubmit={handleSubmit}>
-        {/* ------------------------------- Step #1 ------------------------------- */}
+        {/* ------------------------------- Step #1 ------------------------------- */}
         <p className="mt-7 text-[14px] text-gray-500">1. Verify With</p>
         <hr className="my-5 border-gray-200" />
 
@@ -203,7 +235,7 @@ function NIN() {
           ))}
         </div>
 
-        {/* ------------------------------- Step #2 ------------------------------- */}
+        {/* ------------------------------- Step #2 ------------------------------- */}
         <p className="mt-7 text-[14px] text-gray-500">2. Slip Layout</p>
         <hr className="my-5 border-gray-200" />
 
@@ -230,7 +262,7 @@ function NIN() {
 
               {/* price */}
               <p className="mb-4 text-3xl font-bold tracking-wide text-slate-700">
-                ₦{price}.00
+                ₦{personalisationPrice}.00
               </p>
 
               {/* preview image */}
@@ -261,7 +293,7 @@ function NIN() {
             </label>
           ))}
         </div>
-        {/* ------------------------------- Step #3 ------------------------------- */}
+        {/* ------------------------------- Step #3 ------------------------------- */}
         <div>
           <p className="mt-7 text-[14px] text-gray-500">3. Supply ID Number</p>
           <hr className="my-7 border-gray-200" />
@@ -271,7 +303,7 @@ function NIN() {
             placeholder="TRACKING ID"
             required
             name="trackingId"
-            value={formData.trackingId || ""} // Provide fallback empty string
+            value={formData.trackingId || ""}
             onChange={handleInputChange}
             inputMode="text"
             autoComplete="off"
@@ -291,7 +323,7 @@ function NIN() {
                 placeholder="Enter 4-digit Transaction PIN"
                 required
                 name="pin"
-                value={formData.pin || ""} // Provide fallback empty string
+                value={formData.pin || ""}
                 onChange={handleInputChange}
                 inputMode="numeric"
                 maxLength="4"
@@ -363,4 +395,4 @@ function NIN() {
   );
 }
 
-export default NIN;
+export default Personalisation;

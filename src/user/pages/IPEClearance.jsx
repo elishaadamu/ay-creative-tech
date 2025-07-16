@@ -184,7 +184,7 @@ function IPEClearance() {
           (item) => item.serviceKey === "ipe"
         );
 
-        if (ipePricing?.prices?.agent) {
+        if (ipePricing?.agentPrice) {
           setAmount(ipePricing.agentPrice);
         }
       } catch (error) {

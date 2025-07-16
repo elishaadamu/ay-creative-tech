@@ -4,6 +4,8 @@ import Swal from "sweetalert2";
 import { config } from "../../config/config";
 import CryptoJS from "crypto-js";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 function DemographicSearch() {
   const [form] = Form.useForm();
@@ -19,6 +21,10 @@ function DemographicSearch() {
   // Add state for PIN visibility
   const [showPin, setShowPin] = useState(false);
 
+  // Add state for API prices
+  const [apiPrices, setApiPrices] = useState(null);
+  const [demographicPrice, setDemographicPrice] = useState(0); // Default price
+
   const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
 
   function decryptData(ciphertext) {
@@ -31,6 +37,33 @@ function DemographicSearch() {
       return null;
     }
   }
+
+  // Add useEffect to fetch prices when component mounts
+  useEffect(() => {
+    const fetchPrices = async () => {
+      try {
+        const response = await axios.get(
+          `${config.apiBaseUrl}${config.endpoints.currentapipricing}`,
+          { withCredentials: true }
+        );
+        console.log("API Prices Response:", response.data);
+        // Find demographic search pricing
+        const demographicPricing = response.data.find(
+          (item) => item.serviceKey === "demographic"
+        );
+        console.log("Demographic Pricing:", demographicPricing);
+        if (demographicPricing) {
+          setDemographicPrice(demographicPricing.agentPrice);
+        }
+      } catch (error) {
+        console.error("Error fetching API prices:", error);
+        toast.error("Failed to fetch current prices");
+      }
+    };
+
+    fetchPrices();
+  }, []);
+
   // Get userId from encrypted localStorage
   let userId = null;
   try {
@@ -47,7 +80,7 @@ function DemographicSearch() {
     // Show confirmation dialog first
     const result = await Swal.fire({
       title: "Confirm Search",
-      text: `Are you sure you want to proceed with this demographic search? Amount: ₦${values.amount}`,
+      text: `Are you sure you want to proceed with this demographic search? Amount: ₦${demographicPrice}`,
       icon: "question",
       showCancelButton: true,
       confirmButtonColor: "#f59e0b",
@@ -65,7 +98,7 @@ function DemographicSearch() {
       // Simplified payload to match new requirements
       const payload = {
         userId: userId,
-        amount: 450,
+        amount: demographicPrice,
         firstName: values.firstName,
         lastName: values.lastName,
         dob: values.dob.format("DD-MM-YY"),
@@ -135,7 +168,7 @@ function DemographicSearch() {
       {/* Cost Display */}
       <div className="mb-6 my-5 bg-gray-50 rounded-lg">
         <p className="text-lg font-medium">
-          This service will cost you = ₦450.00
+          This service will cost you = ₦{demographicPrice}.00
         </p>
       </div>
 
@@ -152,8 +185,12 @@ function DemographicSearch() {
           rules={[{ required: true, message: "Please select slip type" }]}
         >
           <Select size="large" placeholder="Select slip type">
-            <Select.Option value="450">Premium Slip = ₦450</Select.Option>
-            <Select.Option value="400">Standard Slip = ₦450</Select.Option>
+            <Select.Option value={demographicPrice}>
+              Premium Slip = ₦{demographicPrice}
+            </Select.Option>
+            <Select.Option value={demographicPrice}>
+              Standard Slip = ₦{demographicPrice}
+            </Select.Option>
             <Select.Option value="0">Digital Slip = ₦0.00</Select.Option>
           </Select>
         </Form.Item>
