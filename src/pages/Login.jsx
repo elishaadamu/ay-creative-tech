@@ -72,11 +72,7 @@ const Login = () => {
         },
         { withCredentials: true }
       );
-      console.log(
-        "Login request sent:",
-        `${config.apiBaseUrl}${config.endpoints.login}`
-      );
-      console.log("Login response:", res.data);
+
       localStorage.setItem("user", encryptData(res.data));
       localStorage.setItem("showWelcomeModal", "true");
       toast.success("Login successful! Redirecting...");
