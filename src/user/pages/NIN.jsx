@@ -27,7 +27,7 @@ function NIN() {
   ];
 
   // Add new state for API prices
-  const [apiPrices, setApiPrices] = useState(null);
+  const [AgentPrices, setAgentPrices] = useState(null);
 
   // Add useEffect to fetch prices when component mounts
   useEffect(() => {
@@ -42,7 +42,6 @@ function NIN() {
         const ninPricing = response.data.find(
           (item) => item.serviceKey === "nin"
         );
-        console.log("NIN Pricing:", ninPricing.agentPrice);
         if (ninPricing) {
           // Update cardSlip with new prices
           const updatedCardSlip = cardSlip.map((slip) => ({
@@ -50,7 +49,7 @@ function NIN() {
             price: ninPricing.agentPrice,
           }));
 
-          setApiPrices(updatedCardSlip);
+          setAgentPrices(updatedCardSlip);
         }
       } catch (error) {
         console.error("Error fetching API prices:", error);
@@ -66,25 +65,25 @@ function NIN() {
       label: "Information Slip",
       value: "Basic",
       image: BasicImg,
-      price: apiPrices?.find((p) => p.value === "Basic")?.price || 200,
+      price: AgentPrices?.find((p) => p.value === "Basic")?.price || 200,
     },
     {
       label: "Regular Slip",
       value: "Regular",
       image: RegularImg,
-      price: apiPrices?.find((p) => p.value === "Regular")?.price || 200,
+      price: AgentPrices?.find((p) => p.value === "Regular")?.price || 200,
     },
     {
       label: "Standard Slip",
       value: "Standard",
       image: StandardImg,
-      price: apiPrices?.find((p) => p.value === "Standard")?.price || 200,
+      price: AgentPrices?.find((p) => p.value === "Standard")?.price || 200,
     },
     {
       label: "Premium Slip",
       value: "Premium",
       image: PremiumImg,
-      price: apiPrices?.find((p) => p.value === "Premium")?.price || 300,
+      price: AgentPrices?.find((p) => p.value === "Premium")?.price || 300,
     },
   ];
 
@@ -129,7 +128,7 @@ function NIN() {
 
     // Find the selected slip's price from the updated prices
     const selectedSlipObj =
-      apiPrices?.find((s) => s.value === selectedSlip) ||
+      AgentPrices?.find((s) => s.value === selectedSlip) ||
       cardSlip.find((s) => s.value === selectedSlip);
     const slipAmount = selectedSlipObj ? selectedSlipObj.price : 0;
 

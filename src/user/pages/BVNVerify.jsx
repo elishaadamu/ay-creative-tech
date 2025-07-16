@@ -159,7 +159,9 @@ function BVNVerify() {
         );
 
         // Find BVN pricing
-        const bvnPricing = response.data.find((item) => item.key === "bvn");
+        const bvnPricing = response.data.find(
+          (item) => item.serviceKey === "bvn"
+        );
 
         if (bvnPricing) {
           // Update cardSlip with new prices
@@ -167,12 +169,12 @@ function BVNVerify() {
             {
               label: "Basic Details",
               value: "Basic",
-              price: bvnPricing.prices.agent,
+              price: bvnPricing.agentPrice,
             },
             {
               label: "Advanced Details",
               value: "Advanced",
-              price: bvnPricing.prices.agent,
+              price: bvnPricing.agentPrice,
             },
           ]);
         }
