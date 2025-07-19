@@ -169,7 +169,7 @@ function NIN() {
       userId,
       pin: formData.pin,
     };
-
+    console.log("Payload for verification:", payload);
     try {
       const response = await axios.post(
         `${config.apiBaseUrl}${config.endpoints.NINVerify}`,
