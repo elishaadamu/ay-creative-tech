@@ -90,11 +90,16 @@ function CAC() {
     }
   };
 
+  // Update the convertToBase64 function
   const convertToBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
+      reader.onload = () => {
+        // Get the base64 string without the data URL prefix
+        const base64String = reader.result.split(",")[1];
+        resolve(base64String);
+      };
       reader.onerror = (error) => reject(error);
     });
   };
@@ -161,7 +166,7 @@ function CAC() {
       const userObj = decryptData(userStr);
       const userId = userObj?._id || userObj?.id;
 
-      // Convert files to base64
+      // Convert files to base64 - now directly getting base64 string without data URL prefix
       const passportBase64 = await convertToBase64(fileList.passport);
       const signatureBase64 = await convertToBase64(fileList.signature);
 
@@ -194,6 +199,7 @@ function CAC() {
         phoneNumber: allFormData.phone,
         email: allFormData.email,
         homeAddress: allFormData.homeAddress,
+        cityOfOrigin: allFormData.cityOfOrigin,
         stateOfOrigin: allFormData.stateOfOrigin,
         lgaOfOrigin: allFormData.lgaOfOrigin,
 
@@ -202,9 +208,9 @@ function CAC() {
         identityNumber: values.identityNumber,
         dateOfBirth: values.dateOfBirth?.format("YYYY-MM-DD"),
 
-        // Files
-        passport: passportBase64.split(",")[1],
-        signature: signatureBase64.split(",")[1],
+        // Files - no need to split as we're already getting clean base64
+        passport: passportBase64,
+        signature: signatureBase64,
       };
 
       console.log("Final payload:", payload);
@@ -522,10 +528,17 @@ function CAC() {
                 <Input />
               </Form.Item>
             </div>
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Form.Item
                 name="homeAddress"
                 label="Home Address"
+                rules={[{ required: true }]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                name="cityOfOrigin"
+                label="City of Origin"
                 rules={[{ required: true }]}
               >
                 <Input />
