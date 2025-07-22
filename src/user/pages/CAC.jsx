@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import base64 from "base64-encode-file";
 import {
   Form,
   Input,
@@ -90,18 +91,15 @@ function CAC() {
     }
   };
 
-  // Update the convertToBase64 function
-  const convertToBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        // Get the base64 string without the data URL prefix
-        const base64String = reader.result.split(",")[1];
-        resolve(base64String);
-      };
-      reader.onerror = (error) => reject(error);
-    });
+  // Replace convertToBase64 function with the new one using base64-encode-file
+  const convertToBase64 = async (file) => {
+    try {
+      const base64String = await base64(file);
+      return base64String.split(",")[1]; // Remove the data:image/* prefix
+    } catch (error) {
+      console.error("Error converting file to base64:", error);
+      throw error;
+    }
   };
 
   const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
@@ -166,7 +164,7 @@ function CAC() {
       const userObj = decryptData(userStr);
       const userId = userObj?._id || userObj?.id;
 
-      // Convert files to base64 - now directly getting base64 string without data URL prefix
+      // Convert files to base64 using the new method
       const passportBase64 = await convertToBase64(fileList.passport);
       const signatureBase64 = await convertToBase64(fileList.signature);
 
@@ -305,6 +303,13 @@ function CAC() {
           ...prev,
           [type]: file,
         }));
+
+        // Debug log the base64 string
+        const base64String = await convertToBase64(file);
+        console.log(
+          `${type} base64 preview:`,
+          base64String.substring(0, 50) + "..."
+        );
       } catch (error) {
         console.error(`Error handling ${type} upload:`, error);
         message.error(`Failed to upload ${type}`);
