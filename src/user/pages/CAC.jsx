@@ -596,16 +596,18 @@ function CAC() {
                 ]}
               >
                 <Select placeholder="Select identity type">
-                  <Select.Option value="driversLicence">
+                  <Select.Option value="Drivers Licence">
                     Driver's Licence
                   </Select.Option>
-                  <Select.Option value="nin">
+                  <Select.Option value="NIN">
                     National Identity Number
                   </Select.Option>
-                  <Select.Option value="internationalPassport">
+                  <Select.Option value="International Passport">
                     International Passport
                   </Select.Option>
-                  <Select.Option value="votersCard">Voter's Card</Select.Option>
+                  <Select.Option value="Voters Card">
+                    Voter's Card
+                  </Select.Option>
                 </Select>
               </Form.Item>
               <Form.Item

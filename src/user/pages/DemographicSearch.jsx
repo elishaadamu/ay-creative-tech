@@ -10,11 +10,6 @@ import { toast } from "react-toastify";
 function DemographicSearch() {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [states, setStates] = useState([]);
-  const [lgas, setLgas] = useState([]);
-  const [banks, setBanks] = useState([]);
-  const [locationLoading, setLocationLoading] = useState(false);
-  const [banksLoading, setBanksLoading] = useState(false);
   const [isBankOpen, setIsBankOpen] = useState(false);
   const [isStateOpen, setIsStateOpen] = useState(false);
   const [isLgaOpen, setIsLgaOpen] = useState(false);
@@ -22,7 +17,6 @@ function DemographicSearch() {
   const [showPin, setShowPin] = useState(false);
 
   // Add state for API prices
-  const [apiPrices, setApiPrices] = useState(null);
   const [demographicPrice, setDemographicPrice] = useState(0); // Default price
 
   const SECRET_KEY = import.meta.env.VITE_APP_SECRET_KEY;
@@ -46,12 +40,12 @@ function DemographicSearch() {
           `${config.apiBaseUrl}${config.endpoints.currentapipricing}`,
           { withCredentials: true }
         );
-        console.log("API Prices Response:", response.data);
+
         // Find demographic search pricing
         const demographicPricing = response.data.find(
           (item) => item.serviceKey === "demographic"
         );
-        console.log("Demographic Pricing:", demographicPricing);
+
         if (demographicPricing) {
           setDemographicPrice(demographicPricing.agentPrice);
         }
@@ -63,14 +57,13 @@ function DemographicSearch() {
 
     fetchPrices();
   }, []);
-
-  // Get userId from encrypted localStorage
   let userId = null;
   try {
     const userStr = localStorage.getItem("user");
     if (userStr) {
       const userObj = decryptData(userStr);
       userId = userObj?._id || userObj?.id;
+      console.log("UserId", userId);
     }
   } catch (error) {
     console.error("Error getting userId:", error);
@@ -105,40 +98,48 @@ function DemographicSearch() {
         gender: values.gender,
         pin: values.pin,
       };
+
       console.log("Payload:", payload);
-      const response = await fetch(
+
+      const response = await axios.post(
         `${config.apiBaseUrl}${config.endpoints.DemographicSearch}`,
+        payload,
         {
-          method: "POST",
+          withCredentials: true,
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(payload),
         }
       );
-      console.log("Response status:", response);
 
-      const data = await response.json();
-      console.log("Response data:", data);
+      console.log("Response status:", response.status);
+      console.log("Response data:", response.data);
+
       if (response.status === 200) {
         await Swal.fire({
           icon: "success",
-          title: "Registration Successful!",
-          text: " ",
+          title: "Search Successful!",
+          text: "Demographic search completed successfully.",
           confirmButtonColor: "#f59e0b",
         });
 
         form.resetFields();
       } else {
-        throw new Error(data.message || "Registration failed");
+        throw new Error(response.data.message || "Search failed");
       }
     } catch (error) {
-      console.error("Registration error:", error);
+      console.error("Search error:", error);
+
+      // Handle axios error responses
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to perform demographic search. Please try again.";
 
       Swal.fire({
         icon: "error",
-        title: "Registration Failed",
-        text: "Failed to submit registration. Please try again.",
+        title: "Search Failed",
+        text: errorMessage,
         confirmButtonColor: "#f59e0b",
       });
     } finally {
@@ -181,24 +182,47 @@ function DemographicSearch() {
         onFinish={onFinish}
         requiredMark={true}
       >
-        {/* Slip Selection */}
+        {/* Slip Selection - Fixed with unique keys */}
         <Form.Item
           name="amount"
           label="Select Slip"
           rules={[{ required: true, message: "Please select slip type" }]}
         >
           <Select size="large" placeholder="Select slip type">
-            <Select.Option value={demographicPrice}>
+            <Select.Option key="premium" value={demographicPrice}>
               Premium Slip = ₦{demographicPrice}
             </Select.Option>
-            <Select.Option value={demographicPrice}>
+            <Select.Option key="standard" value={demographicPrice}>
               Standard Slip = ₦{demographicPrice}
             </Select.Option>
-            <Select.Option value="0">Digital Slip = ₦0.00</Select.Option>
+            <Select.Option key="digital" value="0">
+              Digital Slip = ₦0.00
+            </Select.Option>
           </Select>
         </Form.Item>
 
-        {/* First Name */}
+        {/* Alternative approach - use different values if they should be different */}
+        {/* 
+        <Form.Item
+          name="slipType"
+          label="Select Slip"
+          rules={[{ required: true, message: "Please select slip type" }]}
+        >
+          <Select size="large" placeholder="Select slip type">
+            <Select.Option value="premium">
+              Premium Slip = ₦{demographicPrice}
+            </Select.Option>
+            <Select.Option value="standard">
+              Standard Slip = ₦{demographicPrice}
+            </Select.Option>
+            <Select.Option value="digital">
+              Digital Slip = ₦0.00
+            </Select.Option>
+          </Select>
+        </Form.Item>
+        */}
+
+        {/* Rest of your existing form fields... */}
         <Form.Item
           name="firstName"
           label="First Name"
@@ -207,7 +231,6 @@ function DemographicSearch() {
           <Input size="large" placeholder="Enter first name" />
         </Form.Item>
 
-        {/* Last Name */}
         <Form.Item
           name="lastName"
           label="Last Name"
@@ -216,7 +239,6 @@ function DemographicSearch() {
           <Input size="large" placeholder="Enter last name" />
         </Form.Item>
 
-        {/* Gender Field */}
         <Form.Item
           name="gender"
           label="Gender"
@@ -228,7 +250,6 @@ function DemographicSearch() {
           </Select>
         </Form.Item>
 
-        {/* Date of Birth */}
         <Form.Item
           name="dob"
           label="Date of Birth"
@@ -237,7 +258,6 @@ function DemographicSearch() {
           <DatePicker className="w-full" size="large" />
         </Form.Item>
 
-        {/* PIN Field */}
         <Form.Item
           name="pin"
           label="Transaction PIN"
@@ -270,7 +290,7 @@ function DemographicSearch() {
             className="w-full justify-center flex items-center bg-amber-500 mt-[-5px]"
             loading={loading}
           >
-            Verify NIN
+            Demographic Search
           </Button>
         </Form.Item>
       </Form>
