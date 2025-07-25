@@ -67,27 +67,6 @@ export default function VerificationsHistoryTable() {
       console.log("API Response:", response.data);
 
       const details = response.data?.findData || [];
-      // console.log("All Verification Details:");
-      // details.forEach((detail, index) => {
-      //   console.log(`Verification ${index + 1}:`, {
-      //     id: detail._id,
-      //     date: detail.createdAt,
-      //     verificationType: detail.verifyWith,
-      //     slipType: detail.slipLayout,
-      //     dataFor: detail.dataFor,
-      //     status: detail.data?.verification?.status,
-      //     reference: detail.data?.verification?.reference,
-      //     endpointName: detail.data?.endpoint_name,
-      //     responseDetail: detail.data?.detail,
-      //     // Additional verification data based on type
-      //     verificationData:
-      //       detail.verifyWith === "nin"
-      //         ? detail.data?.nin_data
-      //         : detail.data?.data,
-      //   });
-      // });
-
-      // Set the API data
       setApiData(details || []);
     } catch (error) {
       console.error("Error fetching verification history:", error);
@@ -190,16 +169,8 @@ export default function VerificationsHistoryTable() {
       navigate("/dashboard/verifications/ninslip", {
         state: { userData: transaction.data?.nin_data },
       });
-    } else if (verificationType === "bvn") {
-      if (slipType === "Basic") {
-        navigate("/dashboard/verifications/basicbvn", {
-          state: { apiData: transaction.data?.data }, // Match the structure from BVNVerify
-        });
-      } else {
-        navigate("/dashboard/verifications/advancedbvn", {
-          state: { apiData: transaction.data?.data?.data }, // Match the structure from BVNVerify
-        });
-      }
+    } else {
+      navigate("/dashboard/bvnhistory");
     }
   };
 
@@ -250,7 +221,17 @@ export default function VerificationsHistoryTable() {
         />
       </div>
 
-      {loading}
+      {/* Loading Spinner */}
+      {loading && (
+        <div className="flex justify-center items-center h-64">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+            <p className="text-gray-500 text-sm">
+              Loading transaction history...
+            </p>
+          </div>
+        </div>
+      )}
 
       {!loading && sortedTransactions.length > 0 ? (
         <div className="relative overflow-hidden rounded-lg border border-gray-200 shadow">
@@ -319,7 +300,7 @@ export default function VerificationsHistoryTable() {
             </table>
           </div>
         </div>
-      ) : (
+      ) : !loading ? (
         <div className="flex flex-col items-center justify-center p-8">
           <Empty
             image={Empty.PRESENTED_IMAGE_SIMPLE}
@@ -336,9 +317,9 @@ export default function VerificationsHistoryTable() {
             }
           />
         </div>
-      )}
+      ) : null}
 
-      {/* Pagination Controls */}
+      {/* Pagination Controls - only show when not loading and has data */}
       {!loading && sortedTransactions.length > 0 && (
         <div className="mt-4 flex flex-col lg:flex-row gap-4 items-center justify-between">
           {/* Rows per page and showing entries */}

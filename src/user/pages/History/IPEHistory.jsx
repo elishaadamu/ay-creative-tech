@@ -137,8 +137,8 @@ export default function VerificationsHistoryTable() {
       });
       console.log("API Response:", response.data);
 
-      const details = response.data || [];
-      setSelectedTransaction(details || []);
+      const details = response.data?.findData || [];
+      setApiData(details || []);
     } catch (error) {
       console.error("Error fetching verification history:", error);
     } finally {
@@ -337,9 +337,15 @@ export default function VerificationsHistoryTable() {
         />
       </div>
 
+      {/* Loading Spinner */}
       {loading && (
-        <div className="flex justify-center items-center h-32">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        <div className="flex justify-center items-center h-64">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+            <p className="text-gray-500 text-sm">
+              Loading IPE transaction history...
+            </p>
+          </div>
         </div>
       )}
 
@@ -361,7 +367,7 @@ export default function VerificationsHistoryTable() {
                     className="w-[100px] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
                   />
                   <th className="w-[60px] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">
-                    View Slip
+                    Tracking ID
                   </th>
                   <th className="w-[60px] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">
                     Details
@@ -381,22 +387,15 @@ export default function VerificationsHistoryTable() {
                       {formatDate(transaction.createdAt)}
                     </td>
 
-                    <td className="w-[100px] px-2 py-2 whitespace-nowrap">
+                    <td className="w-[100px]  py-2 whitespace-nowrap">
                       <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                         {transaction.data?.transactionStatus || "completed"}
                       </span>
                     </td>
-                    <td className="w-[60px] px-2 py-2 whitespace-nowrap">
-                      {transaction.dataFor !== "IPE-Slip" ? (
-                        <button
-                          onClick={() => handleViewSlip(transaction)}
-                          className="text-green-600 hover:text-green-800 transition-colors"
-                        >
-                          <EyeOutlined className="text-lg" />
-                        </button>
-                      ) : (
-                        <span className="text-gray-400">N/A</span>
-                      )}
+                    <td className="w-[60px]  py-2 whitespace-nowrap">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium">
+                        {transaction.data?.newTracking_id || "N/A"}
+                      </span>
                     </td>
                     <td className="w-[60px] px-2 py-2 whitespace-nowrap">
                       <button
@@ -422,7 +421,7 @@ export default function VerificationsHistoryTable() {
             </table>
           </div>
         </div>
-      ) : (
+      ) : !loading ? (
         <div className="flex flex-col items-center justify-center p-8">
           <Empty
             image={Empty.PRESENTED_IMAGE_SIMPLE}
@@ -439,9 +438,9 @@ export default function VerificationsHistoryTable() {
             }
           />
         </div>
-      )}
+      ) : null}
 
-      {/* Pagination Controls */}
+      {/* Pagination Controls - only show when not loading and has data */}
       {!loading && sortedTransactions.length > 0 && (
         <div className="mt-4 flex flex-col lg:flex-row gap-4 items-center justify-between">
           {/* Rows per page and showing entries */}

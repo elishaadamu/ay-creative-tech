@@ -67,27 +67,6 @@ export default function VerificationsHistoryTable() {
       console.log("API Response:", response.data);
 
       const details = response.data?.findData || [];
-      // console.log("All Verification Details:");
-      // details.forEach((detail, index) => {
-      //   console.log(`Verification ${index + 1}:`, {
-      //     id: detail._id,
-      //     date: detail.createdAt,
-      //     verificationType: detail.verifyWith,
-      //     slipType: detail.slipLayout,
-      //     dataFor: detail.dataFor,
-      //     status: detail.data?.verification?.status,
-      //     reference: detail.data?.verification?.reference,
-      //     endpointName: detail.data?.endpoint_name,
-      //     responseDetail: detail.data?.detail,
-      //     // Additional verification data based on type
-      //     verificationData:
-      //       detail.verifyWith === "nin"
-      //         ? detail.data?.nin_data
-      //         : detail.data?.data,
-      //   });
-      // });
-
-      // Set the API data
       setApiData(details || []);
     } catch (error) {
       console.error("Error fetching verification history:", error);
@@ -255,7 +234,17 @@ export default function VerificationsHistoryTable() {
         />
       </div>
 
-      {loading}
+      {/* Loading Spinner */}
+      {loading && (
+        <div className="flex justify-center items-center h-64">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+            <p className="text-gray-500 text-sm">
+              Loading NIN verification history...
+            </p>
+          </div>
+        </div>
+      )}
 
       {!loading && sortedTransactions.length > 0 ? (
         <div className="relative overflow-hidden rounded-lg border border-gray-200 shadow">
@@ -273,6 +262,9 @@ export default function VerificationsHistoryTable() {
                     sortKey="dataFor"
                     className="w-[clamp(120px,20vw,160px)] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200"
                   />
+                  <th className="w-[60px] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">
+                    NIN Number
+                  </th>
                   <th className="w-[60px] px-2 py-2 text-left text-[clamp(0.65rem,1vw,0.75rem)] font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">
                     View Slip
                   </th>
@@ -296,6 +288,11 @@ export default function VerificationsHistoryTable() {
                     <td className="w-[clamp(120px,20vw,160px)] px-2 py-2 whitespace-nowrap">
                       <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[clamp(0.65rem,1vw,0.75rem)] font-medium capitalize bg-blue-100 text-blue-800">
                         {transaction.dataFor}
+                      </span>
+                    </td>
+                    <td className="w-[clamp(120px,20vw,160px)]  py-2 whitespace-nowrap">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[clamp(0.65rem,1vw,0.75rem)] font-medium capitalize ">
+                        {transaction.data.nin_data.nin}
                       </span>
                     </td>
                     <td className="w-[60px] px-2 py-2 whitespace-nowrap">
@@ -324,7 +321,7 @@ export default function VerificationsHistoryTable() {
             </table>
           </div>
         </div>
-      ) : (
+      ) : !loading ? (
         <div className="flex flex-col items-center justify-center p-8">
           <Empty
             image={Empty.PRESENTED_IMAGE_SIMPLE}
@@ -341,9 +338,9 @@ export default function VerificationsHistoryTable() {
             }
           />
         </div>
-      )}
+      ) : null}
 
-      {/* Pagination Controls */}
+      {/* Pagination Controls - only show when not loading and has data */}
       {!loading && sortedTransactions.length > 0 && (
         <div className="mt-4 flex flex-col lg:flex-row gap-4 items-center justify-between">
           {/* Rows per page and showing entries */}
